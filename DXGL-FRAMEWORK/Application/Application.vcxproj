@@ -161,6 +161,7 @@
     <ClCompile Include="Source\MouseController.cpp" />
     <ClCompile Include="Source\Scene1.cpp" />
     <ClCompile Include="Source\SceneAssignment.cpp" />
+    <ClCompile Include="Source\SceneHitMen.cpp" />
     <ClCompile Include="Source\shader.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -180,6 +181,7 @@
     <ClInclude Include="Source\Scene.h" />
     <ClInclude Include="Source\Scene1.h" />
     <ClInclude Include="Source\SceneAssignment.h" />
+    <ClInclude Include="Source\SceneHitMen.h" />
     <ClInclude Include="Source\shader.hpp" />
     <ClInclude Include="Source\Vertex.h" />
   </ItemGroup>
