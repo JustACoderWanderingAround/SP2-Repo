@@ -4,7 +4,12 @@
 #include "Application.h"
 #include "MeshBuilder.h"
 #include "Mtx44.h"
-
+#include <glm\glm.hpp>
+#include <glm\gtc\matrix_transform.hpp>
+#include <glm\gtc\type_ptr.hpp>
+#include <glm\gtc\matrix_inverse.hpp>
+#include <glm\gtc\matrix_access.hpp>
+#include <GLFW/glfw3.h>
 using namespace std;
 
 #define time_scale 5
@@ -66,9 +71,9 @@ void Scene1::Init()
 	m_obj = new GameObject(GameObject::GO_BALL);
 
 	// position set to (half width and 10% of the screen height
-	m_obj->pos = Vector3(m_worldWidth / 2.0f, m_worldHeight / 10.0f, 0.f);
-	m_obj->scale = Vector3(10.f, 10.f, 1.f);
-	m_obj->vel = Vector3(0.f, 0.f, 0.f);
+	m_obj->pos = glm::vec3(m_worldWidth / 2.0f, m_worldHeight / 10.0f, 0.f);
+	m_obj->scale = glm::vec3(10.f, 10.f, 1.f);
+	m_obj->vel = glm::vec3(0.f, 0.f, 0.f);
 	m_obj->active = false;
 	m_obj->mass = 1;
 
@@ -79,11 +84,11 @@ void Scene1::Init()
 		m_alien[i] = new GameObject(GameObject::GO_ALIEN);
 
 		// randomise the position. only appear on the top half of the screen
-		m_alien[i]->pos = Vector3( (float)(rand() % (int) m_worldWidth),
+		m_alien[i]->pos = glm::vec3( (float)(rand() % (int) m_worldWidth),
 									(float)(rand() % (int) (m_worldHeight / 2) + (m_worldHeight / 2)),
 									0.f);
 		// randomise the size of the alien 
-		m_alien[i]->scale = Vector3(20.f, 20.f, 1.f);
+		m_alien[i]->scale = glm::vec3(20.f, 20.f, 1.f);
 		// set active. 
 		m_alien[i]->active = true;
 		m_alien[i]->mass = 2;
@@ -95,7 +100,7 @@ void Scene1::Init()
 
 	wh = Application::GetWindowHeight();
 	ww = Application::GetWindowWidth();
-	mousePos = (x * (m_worldWidth / ww), (wh - y) * (m_worldHeight / wh), 0);
+	mousePos = glm::vec3(x * (m_worldWidth / ww), (wh - y) * (m_worldHeight / wh), 0);
 }
 
 void Scene1::Update(double dt)
@@ -104,7 +109,7 @@ void Scene1::Update(double dt)
 	Application::GetCursorPos(&x, &y);
 	wh = Application::GetWindowHeight();
 	ww = Application::GetWindowWidth();
-	mousePos = Vector3(x * (m_worldWidth / ww), ((wh - y) * m_worldHeight / wh), 0);
+	mousePos = glm::vec3(x * (m_worldWidth / ww), ((wh - y) * m_worldHeight / wh), 0);
 	HandleKeyPress();
 
 	m_obj->fixedUpdate(dt);
@@ -113,99 +118,13 @@ void Scene1::Update(double dt)
 	for (int j = 0; j < MAX_ALIEN; ++j) {
 		// check active (if inactive, it's already been shot)
 		if (m_alien[j]->active) {
-			if (CheckSSCollision(m_obj, m_alien[j])) {
-				CollisionResponse(m_obj, m_alien[j]);
+			if (m_alien[j]->CheckSSCollision(m_obj)) {
+				m_alien[j]->CollisionResponse(m_obj);
 			}
 
 			m_alien[j]->fixedUpdate(dt);
 		}
 	}
-}
-
-bool Scene1::CheckSSCollision(GameObject* A, GameObject* B)
-{
-	// code the collision check here	
-	return (A->pos.Distance(B->pos) < A->scale.x + B->scale.x);
-}
-
-/*void Scene1::CollisionResponse(GameObject* go1, GameObject* go2)
-{
-	// code the collision response here
-	Vector3 tempgo1 = go1->vel;
-	Vector3 tempgo2 = go2->vel;
-
-	float m1 = go1->mass;
-	float m2 = go2->mass;
-
-	Vector3 mom2 = m2 * tempgo2;
-	Vector3 mom1 = m1 * tempgo1;
-
-	go1->vel.Set(mom2.x / m1, mom2.y / m1, 0);
-	go2->vel.Set(mom1.x / m2, mom1.y / m2, 0);
-}*/
-void Scene1::CollisionResponse(GameObject* go1, GameObject* go2)
-{
-	// code the collision response here
-	Vector3 tempgo1 = go1->vel;
-	Vector3 tempgo2 = go2->vel;
-
-	float m1 = go1->mass;
-	float m2 = go2->mass;
-
-	Vector3 mom2 = m2 * tempgo2;
-	Vector3 mom1 = m1 * tempgo1;
-
-	go1->vel.Set(mom2.x / m1, mom2.y / m1, 0);
-	go2->vel.Set(mom1.x / m2, mom1.y / m2, 0);
-
-	// step 1
-	//Vector3 normal = Vector3(go2->pos.x - go1->pos.x, go2->pos.y - go1->pos.y, 0);
-	Vector3 normal = go2->pos - go1->pos;
-	normal = normal.Normalize();
-	//std::cout << normal << std::endl;
-	//float normalMagnitude = sqrtf((normal.x * normal.x) + (normal.y * normal.y));
-	//Vector3 unitNormal = normal * (1 / normalMagnitude);
-	Vector3 unitTangent;
-	unitTangent.x = (-1 * normal.y);
-	unitTangent.y = (normal.x);
-	float normalVel1, normalVel2, tangentVel1, tangentVel2;
-	// step 3
-	normalVel1 = normal.Dot(go1->vel);
-	normalVel2 = normal.Dot(go2->vel);
-	tangentVel1 = unitTangent.Dot(go1->vel);
-	tangentVel2 = unitTangent.Dot(go2->vel);
-
-	// step 5
-	float vNormalVel1, vNormalVel2;
-	vNormalVel1 = ((normalVel1 * (go1->mass - go2->mass)) + (2 * (go2->mass * normalVel2))) * 1 / (go1->mass + go2->mass);
-	vNormalVel2 = ((normalVel2 * (go2->mass - go1->mass)) + (2 * (go1->mass * normalVel1))) * 1 / (go1->mass + go2->mass);
-
-	// step 6
-	Vector3 vPrimeNormalVel1, vPrimeNormalVel2, vPrimeTanVel1, vPrimeTanVel2;
-
-	// v1prime
-	vPrimeNormalVel1 = normal * vNormalVel1;
-	vPrimeTanVel1 = unitTangent * tangentVel1;
-
-	// v2prime
-	vPrimeNormalVel2 = normal * vNormalVel2;
-	vPrimeTanVel2 = unitTangent * tangentVel2;
-
-	// step 7
-	go1->vel = vPrimeNormalVel1 + vPrimeTanVel1;
-	go2->vel = vPrimeNormalVel2 + vPrimeTanVel2;
-
-	// ensuring that the spheres only collide once as opposed to collide multiple times over multiple frames
-	//if (go1->pos.x > go2->pos.x) {
-	//	go1->pos -= (unitNormal * go1->scale.x + go2->scale.x) * (1 / normalMagnitude);
-	//	go2->pos += (unitNormal * go1->scale.x + go2->scale.x) * (1 / normalMagnitude);
-	//}
-	//else {
-	//	go1->pos += (unitNormal * go1->scale.x + go2->scale.x) * (1 / normalMagnitude);
-	//	go2->pos -= (unitNormal * go1->scale.x + go2->scale.x) * (1 / normalMagnitude);
-	//}
-	//go1->vel = normalVel1 + tangentVel1;
-	//go2->vel = normalVel2 + tangentVel2;
 }
 void Scene1::Render()
 {
@@ -226,40 +145,49 @@ void Scene1::Render()
 
 	RenderMesh(meshList[GEO_AXES], false);
 
-	// Render objects
-	if (m_obj->active)
-	{
-		modelStack.PushMatrix();
-		modelStack.Translate(m_obj->pos.x, m_obj->pos.y, m_obj->pos.z);
-		modelStack.Scale(m_obj->scale.x, m_obj->scale.y, m_obj->scale.z);
-		RenderMesh(meshList[GEO_BALL], false);
-		modelStack.PopMatrix();
-	}
-
-	// loop all the aliens
-	for (int i = 0; i < MAX_ALIEN; ++i)
-	{
-		// check if active
-		if (m_alien[i]->active) {
-
-			modelStack.PushMatrix();
-			modelStack.Translate(m_alien[i]->pos.x, m_alien[i]->pos.y, m_alien[i]->pos.z);
-			modelStack.Scale(m_alien[i]->scale.x, m_alien[i]->scale.y, m_alien[i]->scale.z);
-			// render
-			RenderMesh(meshList[GEO_ALIEN], false);
-			modelStack.PopMatrix();
-		}
-	}
-
 }
 
 void Scene1::RenderMesh(Mesh* mesh, bool enableLight)
 {
-	Mtx44 MVP;
+	glm::mat4 MVP, modelView, modelView_inverse_transpose;
 
-	//MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
-	glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]);
+	MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
+	glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, glm::value_ptr(MVP));
+	modelView = viewStack.Top() * modelStack.Top();
+	glUniformMatrix4fv(m_parameters[U_MODELVIEW], 1, GL_FALSE, glm::value_ptr(modelView));
+	if (enableLight)
+	{
+		glUniform1i(m_parameters[U_LIGHTENABLED], 1);
+		modelView_inverse_transpose = glm::inverseTranspose(modelView);
+		glUniformMatrix4fv(m_parameters[U_MODELVIEW_INVERSE_TRANSPOSE], 1, GL_FALSE, glm::value_ptr(modelView_inverse_transpose));
+
+		//load material
+		glUniform3fv(m_parameters[U_MATERIAL_AMBIENT], 1, &mesh->material.kAmbient.r);
+		glUniform3fv(m_parameters[U_MATERIAL_DIFFUSE], 1, &mesh->material.kDiffuse.r);
+		glUniform3fv(m_parameters[U_MATERIAL_SPECULAR], 1, &mesh->material.kSpecular.r);
+		glUniform1f(m_parameters[U_MATERIAL_SHININESS], mesh->material.kShininess);
+	}
+	else
+	{
+		glUniform1i(m_parameters[U_LIGHTENABLED], 0);
+	}
+	if (mesh->textureID > 0)
+	{
+		glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED], 1);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, mesh->textureID);
+		glUniform1i(m_parameters[U_COLOR_TEXTURE], 0);
+	}
+	else
+	{
+		glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED], 0);
+	}
+
 	mesh->Render();
+	if (mesh->textureID > 0)
+	{
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
 }
 
 void Scene1::Exit()
@@ -301,8 +229,8 @@ void Scene1::HandleKeyPress()
 	if (!bRButtonState && Application::IsMousePressed(1)) {
 		bRButtonState = true;
 		m_obj->active = true;
-		m_obj->pos.Set(mousePos.x, mousePos.y, 0);
-		m_obj->vel = Vector3(0, 0, 0);
+		m_obj->pos = glm::vec3(mousePos.x, mousePos.y, 0);
+		m_obj->vel = glm::vec3(0, 0, 0);
 	}
 	else if (bRButtonState && !Application::IsMousePressed(1)) {
 		bRButtonState = false;
@@ -319,15 +247,4 @@ void Scene1::HandleKeyPress()
 	}
 	else UPButton = false;
 
-	// Left button
-	if (Application::IsKeyPressed(0x25))
-		left.x = -1.f;
-	else
-		left.x = 0.f;
-
-	// Right button
-	if (Application::IsKeyPressed(0x27))
-		right.x = 1.f;
-	else
-		right.x = 0.f;
 }

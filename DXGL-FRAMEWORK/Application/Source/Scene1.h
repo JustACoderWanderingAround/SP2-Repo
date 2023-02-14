@@ -27,6 +27,18 @@ public:
 	enum UNIFORM_TYPE
 	{
 		U_MVP = 0,
+		U_MODELVIEW,
+		U_MODELVIEW_INVERSE_TRANSPOSE,
+		U_MATERIAL_AMBIENT,
+		U_MATERIAL_DIFFUSE,
+		U_MATERIAL_SPECULAR,
+		U_MATERIAL_SHININESS,
+		U_NUMLIGHTS,
+		U_COLOR_TEXTURE_ENABLED,
+		U_COLOR_TEXTURE,
+		U_LIGHTENABLED,
+		U_TEXT_ENABLED,
+		U_TEXT_COLOR,
 		U_TOTAL,
 	};
 
@@ -41,8 +53,6 @@ public:
 private:
 	void HandleKeyPress();
 	void RenderMesh(Mesh* mesh, bool enableLight);
-	bool CheckSSCollision(GameObject* A, GameObject* B);
-	void CollisionResponse(GameObject* go1, GameObject* go2);
 
 	unsigned m_vertexArrayID;
 	Mesh* meshList[NUM_GEOMETRY];
@@ -62,15 +72,12 @@ private:
 	MatrixStack projectionStack;
 
 	//Vector3 gravity;
-	Vector3 temp, acc, force;
-	Vector3 up, down, left, right;
-	Vector3 diff;
 	bool slowdown;
 	bool UPButton;
 	float multiplier, distX, distY;
 	double x, y, ww, wh;
-	Vector3 mousePos;
-	Vector3 A, B, AB, BE, AE;
+	glm::vec3 mousePos;
+	glm::vec3 A, B, AB, BE, AE;
 	float dist;
 };
 
