@@ -3,3 +3,5 @@
 ################################################################################
 
 /.vs
+/DXGL-FRAMEWORK/glm/glm/out/build/x64-Debug/CMakeFiles
+/DXGL-FRAMEWORK/glm/glm/out/build/x64-Debug
