@@ -143,28 +143,35 @@ void SceneHitMen::Init()
 			m_parameters[U_TEXT_COLOR] = glGetUniformLocation(m_programID, "textColor");
 	
 		}
-		roomY = 8.f;
-		initCamY = roomY + 1.3;
+		initCamY = 5;
 		// Initialise camera properties
 		mainFPSCam.Init(glm::vec3(21, initCamY, 0.f), glm::vec3(0, initCamY, 0), glm::vec3(0.f, initCamY, 0.f));
-		zakuCam.Init(glm::vec3(0, initCamY + 2, 15.f), glm::vec3(0, initCamY + 2, 0), glm::vec3(0.f, 1, 0.f), false);
+		zakuCam.Init(glm::vec3(0, initCamY, 15.f), glm::vec3(0, initCamY, 0), glm::vec3(0.f, 1, 0.f), false);
 		cameraArray.push_back(mainFPSCam);
 		cameraArray.push_back(zakuCam);
-
-		for (int i = 0; i < NUM_DIRTBALLS; i++) {
-			GameObject* temp = new GameObject();
-			temp->pos = glm::vec3(5 - rand() % 10, rand() % 10, 5.f - rand() % 10);
-			int scale = 1 + rand() % 3;
-			temp->scale = glm::vec3(scale, scale, scale);
-			dirtBalls.push_back(temp);
-		}
 		// Init VBO here
 		for (int i = 0; i < NUM_GEOMETRY; ++i)
 		{
 			meshList[i] = nullptr;
 		}
-
-
+		int counter = 0;
+		int offSet = 0;
+		for (int i = -2; i < 3; i++) {
+			for (int j = -2; j < 3; j++) {
+				doorMen.emplace_back(new GameObject);
+				doorMen[counter]->pos = (glm::vec3(- 1 * j * 3.f + offSet, 5.f + offSet, -1 * i * 1.f));
+				doorMenInitPos.emplace_back(doorMen[counter]->pos);
+				doorMen[counter]->scale = glm::vec3(0.5f, 0.5f, 0.5f);
+				doorMen[counter]->vel = glm::vec3(0, 0, 0);
+				doorMen[counter]->force = glm::vec3(0, 0, 0);
+				counter += 1;
+			}
+			offSet += 1;
+		}
+		m_table.pos = glm::vec3(0, 0, 0);
+		m_table.scale = glm::vec3(5, 5, 5);
+		m_floor.pos = glm::vec3(0, 0, 0);
+		m_floor.scale = glm::vec3(100, 0, 100);
 		// meshList
 		{
 			meshList[GEO_AXES] = MeshBuilder::GenerateAxes("Axes", 10000.f, 10000.f, 10000.f);
@@ -173,9 +180,23 @@ void SceneHitMen::Init()
 
 			meshList[GEO_DOORMAN] = MeshBuilder::GenerateOBJ("doorman","OBJ//doorman.obj");
 			meshList[GEO_DOORMAN]->textureID = LoadTGA("image//doorman.tga");
+			meshList[GEO_TABLE] = MeshBuilder::GenerateOBJ("table", "OBJ//table.obj");
+			meshList[GEO_TABLE]->textureID = LoadTGA("image//table.tga");
 
 
-
+			// skybox
+			meshList[GEO_LEFT] = MeshBuilder::GenerateQuad("Plane", Color(1.f, 1.f, 1.f), 100.f);
+			meshList[GEO_LEFT]->textureID = LoadTGA("Image//Sky_NightTime01LF.tga");
+			meshList[GEO_RIGHT] = MeshBuilder::GenerateQuad("Plane", Color(1.f, 1.f, 1.f), 100.f);
+			meshList[GEO_RIGHT]->textureID = LoadTGA("Image//Sky_NightTime01RT.tga");
+			meshList[GEO_TOP] = MeshBuilder::GenerateQuad("Plane", Color(1.f, 1.f, 1.f), 100.f);
+			meshList[GEO_TOP]->textureID = LoadTGA("Image//Sky_NightTime01UP.tga");
+			meshList[GEO_BOTTOM] = MeshBuilder::GenerateQuad("Plane", Color(1.f, 1.f, 1.f), 100.f);
+			meshList[GEO_BOTTOM]->textureID = LoadTGA("Image//Sky_NightTime01DN.tga");
+			meshList[GEO_FRONT] = MeshBuilder::GenerateQuad("Plane", Color(1.f, 1.f, 1.f), 100.f);
+			meshList[GEO_FRONT]->textureID = LoadTGA("Image//Sky_NightTime01FT.tga");
+			meshList[GEO_BACK] = MeshBuilder::GenerateQuad("Plane", Color(1.f, 1.f, 1.f), 100.f);
+			meshList[GEO_BACK]->textureID = LoadTGA("Image//Sky_NightTime01BK.tga");
 
 			// for zaku 
 			{
@@ -316,20 +337,30 @@ void SceneHitMen::Init()
 			glUniform1f(m_parameters[U_LIGHT0_EXPONENT + (i * 11)], light[i].exponent);
 		}
 		
+		m_player.pos = glm::vec3(0, 0, 0);
+
 		cameraNum = 1;
-		doorOpen = false;
-		boosting = false;
 }
 
 
 void SceneHitMen::Update(double dt)
 {
+	if (elapsedTime + 100 == DBL_MAX)
+		elapsedTime = 0;
+	elapsedTime += dt;
+	glm::vec3 gravity = glm::vec3(0, -5.f, 0.f);
+	for (int i = 0; i < NUM_DOORMEN; i++) {
+		//if (doorMen[i]->vel.y < 10)
+			//doorMen[i]->vel += gravity;
+		doorMen[i]->pos.x =  5.f * sin(elapsedTime * 1.5f) + doorMenInitPos[i].x;
+		doorMen[i]->fixedUpdate(dt);
+	}
 	HandleKeyPress();
 
 
 	// spotlight for zaku cleaner view
-	light[0].position = glm::vec3(cameraArray[1].position.x, cameraArray[1].position.y, cameraArray[1].position.z);
-	light[0].spotDirection = glm::normalize(cameraArray[1].position - cameraArray[1].target);
+	//light[0].position = glm::vec3(cameraArray[1].position.x, cameraArray[1].position.y, cameraArray[1].position.z);
+	//light[0].spotDirection = glm::normalize(cameraArray[1].position - cameraArray[1].target);
 	cameraArray[cameraNum].Update(dt);
 }
 
@@ -363,11 +394,27 @@ void SceneHitMen::Render()
 	modelStack.PushMatrix(); {
 		RenderMesh(meshList[GEO_AXES], false);
 	} modelStack.PopMatrix();
+	for (int i = 0; i < NUM_DOORMEN; i++) {
+		modelStack.PushMatrix(); {
+			modelStack.Translate(doorMen[i]->pos.x, doorMen[i]->pos.y, doorMen[i]->pos.z);
+			modelStack.Scale(doorMen[i]->scale.x, doorMen[i]->scale.y, doorMen[i]->scale.z);
+			RenderMesh(meshList[GEO_DOORMAN], false);
+		} modelStack.PopMatrix();
+	}
 	modelStack.PushMatrix(); {
-		modelStack.Translate(5.f, 0.f, 0.f);
-		RenderMesh(meshList[GEO_DOORMAN], false);
+		modelStack.Scale(5.f, 5.f, 5.f);
+		RenderMesh(meshList[GEO_TABLE], false);
 	} modelStack.PopMatrix();
-
+	modelStack.PushMatrix(); {
+		modelStack.Translate(0.f, 4.5f, 0.8f);
+		modelStack.Scale(5.f, 1.5f, 1.f);
+		RenderMesh(meshList[GEO_TABLE], false);
+	} modelStack.PopMatrix();
+	modelStack.PushMatrix(); {
+		modelStack.Translate(0.f, 4.5f, -0.2f);
+		modelStack.Scale(5.f, 2.5f, 1.f);
+		RenderMesh(meshList[GEO_TABLE], false);
+	} modelStack.PopMatrix();
 }
 
 
@@ -513,7 +560,7 @@ void SceneHitMen::RenderTextOnScreen(Mesh* mesh, std::string text, Color color, 
 	glEnable(GL_DEPTH_TEST);
 
 }
-
+/*
 void SceneHitMen::RenderZaku()
 {
 	// Render the zaku
@@ -1015,7 +1062,7 @@ void SceneHitMen::RenderZaku()
 
 	} modelStack.PopMatrix();
 }
-
+*/
 void SceneHitMen::RenderSkybox()
 {
 	modelStack.PushMatrix(); {
@@ -1086,20 +1133,6 @@ void SceneHitMen::Exit()
 		if (meshList[i])
 		{
 			delete meshList[i];
-		}
-	}
-	for (int i = 0; i < interactables.size(); ++i)
-	{
-		if (interactables[i])
-		{
-			delete interactables[i];
-		}
-	}
-	for (int i = 0; i < dirtBalls.size(); ++i)
-	{
-		if (dirtBalls[i])
-		{
-			delete dirtBalls[i];
 		}
 	}
 	glDeleteVertexArrays(1, &m_vertexArrayID);

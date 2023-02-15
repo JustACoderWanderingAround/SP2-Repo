@@ -11,6 +11,7 @@
 #include "GameObject.h"
 #define NUM_INTERACTABLES 1
 #define NUM_DIRTBALLS 5
+#define NUM_DOORMEN 15
 class SceneHitMen : public Scene
 {
 public:
@@ -39,9 +40,11 @@ public:
 		GEO_WOOD_CUBE,
 		GEO_AXE_CUBE,
 		GEO_FIRE_CUBE,
-		GEO_GREY_FLOOR,
-		GEO_DOORMAN,
 
+		GEO_GREY_FLOOR,
+
+		GEO_DOORMAN,
+		GEO_TABLE,
 		GEO_UI,
 		GEO_TEXT,
 		NUM_GEOMETRY,
@@ -141,7 +144,6 @@ private:
 	void RenderMeshOnScreen(Mesh* mesh, float x, float y, float sizex, float sizey);
 	void RenderText(Mesh* mesh, std::string text, Color color);
 	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y);
-	void RenderZaku();
 	void RenderLight(int lightIndex);
 	unsigned m_vertexArrayID;
 	Mesh* meshList[NUM_GEOMETRY];
@@ -149,9 +151,12 @@ private:
 	unsigned m_programID;
 	unsigned m_parameters[U_TOTAL];
 	GameObject m_player;
-	GameObject zakuCleaner;
-	std::vector<GameObject*> dirtBalls;
-	std::vector<GameObject*> interactables;
+	GameObject m_bullet;
+	GameObject m_floor;
+	std::vector<GameObject*> doorMen;
+	std::vector<glm::vec3> doorMenInitPos;
+	GameObject m_table;
+	/*std::vector<GameObject*>*/ ;
 	CameraFPS mainFPSCam;
 	CameraFPS zakuCam;
 	CameraFPS configCam;
@@ -159,22 +164,14 @@ private:
 	//AltAzCamera zakuCam;
 	int projType = 1; // fix to 0 for orthographic, 1 for projection
 	MatrixStack modelStack, viewStack, projectionStack;
-	glm::vec3 door1pos, door2pos;
 	static const int NUM_LIGHTS = 5;
 	Light light[NUM_LIGHTS];
 	bool enableLight;
 	float initCamY;
-	bool boosting;
 	glm::vec3 zakuPos;
 	int cameraNum;
-	int currInteractable;
-	int roomY;
 	bool showUI;
-	bool doorOpen;
-	bool lowered;
-	bool secured;
-	int strapAngle;
-	glm::vec3 zakuCleanerPos;
+	double elapsedTime;
 };
 
 #endif

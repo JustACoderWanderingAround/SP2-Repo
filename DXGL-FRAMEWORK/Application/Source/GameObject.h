@@ -35,6 +35,7 @@ struct GameObject
 	bool CheckLineCollision(GameObject* go1, GameObject* go2);
 	void WallCollisionResponse(GameObject* go1, GameObject* go2);
 	bool CheckCSCollision(GameObject* A, GameObject* B);
+	bool CheckCCCollision(GameObject* B);
 	bool active;
 	float mass;
 	float momentOfInertia;

@@ -55,6 +55,14 @@ bool GameObject::CheckCSCollision(GameObject* A, GameObject* B)
 
 }
 
+bool GameObject::CheckCCCollision(GameObject* that)
+{
+	float distX = fabs(this->pos.x - that->pos.x);
+	float distY = fabs(this->pos.y - that->pos.y);
+	float distZ = fabs(this->pos.z - that->pos.z);
+	return (distX < this->scale.x * 0.5f + that->scale.x * 0.5f && distY < this->scale.y * 0.5f + that->scale.y * 0.5f && distZ < this->scale.z * 0.5f + that->scale.z * 0.5f);
+}
+
 void GameObject::fixedUpdate(double dt)
 {
 	// check if button press
