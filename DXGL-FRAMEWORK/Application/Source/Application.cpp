@@ -14,6 +14,8 @@
 #include "MouseController.h"	
 #include "Scene.h"
 #include "Scene1.h"
+#include "SceneAssignment.h"
+#include "SceneCanTopple.h"
 GLFWwindow* m_window;
 const unsigned char FPS = 60; // FPS of this game
 const unsigned int frameTime = 1000 / FPS; // time for each frame
@@ -148,7 +150,7 @@ void Application::Init()
 void Application::Run()
 {
 	//Main Loop
-	Scene *scene = new Scene1();
+	Scene *scene = new SceneCanTopple();
 	scene->Init();
 
 	m_timer.startTimer();    // Start timer to calculate how long it takes to render this frame
