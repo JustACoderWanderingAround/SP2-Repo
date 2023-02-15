@@ -17,6 +17,14 @@ void CameraFPS::Init(const glm::vec3& pos, const glm::vec3& target, const glm::v
 	this->mouseControl = mouseControl;
 	this->fieldOfView = fieldOfView;
 	this->keyBoardControl = keyBoardControl;
+	glm::mat4 yaw = glm::rotate(
+		glm::mat4(1.f), // Default identity
+		glm::radians(90.f), // Convert degree angle to radians
+		glm::vec3(up.x, up.y, up.z) // Use camera Up vector to rotate
+	);
+	// Calculate the rotated view vector
+	rotatedView = yaw * glm::vec4(0, 0, 0, 0);
+
 }
 
 void CameraFPS::Reset()
@@ -33,7 +41,7 @@ void CameraFPS::Update(double dt)
 
 
 	//roh tah teh
-	if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_LEFT)) {
+	if(KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_LEFT)) {
 		//Calculate amount of angle to rotate
 		float angle = ROTATE_SPEED * static_cast<float>(dt);
 		glm::mat4 yaw = glm::rotate(

@@ -143,12 +143,11 @@ void SceneHitMen::Init()
 			m_parameters[U_TEXT_COLOR] = glGetUniformLocation(m_programID, "textColor");
 	
 		}
-		initCamY = 5;
+		initCamY = 8.8;
 		// Initialise camera properties
-		mainFPSCam.Init(glm::vec3(21, initCamY, 0.f), glm::vec3(0, initCamY, 0), glm::vec3(0.f, initCamY, 0.f));
-		zakuCam.Init(glm::vec3(0, initCamY, 15.f), glm::vec3(0, initCamY, 0), glm::vec3(0.f, 1, 0.f), false);
-		cameraArray.push_back(mainFPSCam);
-		cameraArray.push_back(zakuCam);
+		//mainFPSCam.Init(glm::vec3(21, initCamY, 0.f), glm::vec3(0, initCamY, 0), glm::vec3(0.f, initCamY, 0.f));
+		gunCam.Init(glm::vec3(0, initCamY, 27.f), glm::vec3(0, initCamY, 0), glm::vec3(0.f, 1, 0.f), false, false);
+		mainFPSCam.Init(glm::vec3(0,0, 0.f), glm::vec3(-1, 0, 0), glm::vec3(0.f, 1, 0.f));
 		// Init VBO here
 		for (int i = 0; i < NUM_GEOMETRY; ++i)
 		{
@@ -182,21 +181,28 @@ void SceneHitMen::Init()
 			meshList[GEO_DOORMAN]->textureID = LoadTGA("image//doorman.tga");
 			meshList[GEO_TABLE] = MeshBuilder::GenerateOBJ("table", "OBJ//table.obj");
 			meshList[GEO_TABLE]->textureID = LoadTGA("image//table.tga");
-
+			meshList[GEO_TENT] = MeshBuilder::GenerateOBJ("tent", "OBJ//tent.obj");
+			meshList[GEO_TENT]->textureID = LoadTGA("image//tent.tga");
+			meshList[GEO_GUN] = MeshBuilder::GenerateOBJMTL("gun", "OBJ//mosin.obj", "OBJ//mosin.mtl");
+			meshList[GEO_GUN]->textureID = LoadTGA("image//mosin.tga");
 
 			// skybox
 			meshList[GEO_LEFT] = MeshBuilder::GenerateQuad("Plane", Color(1.f, 1.f, 1.f), 100.f);
-			meshList[GEO_LEFT]->textureID = LoadTGA("Image//Sky_NightTime01LF.tga");
+			meshList[GEO_LEFT]->textureID = LoadTGA("Image//skyboxleft.tga");
 			meshList[GEO_RIGHT] = MeshBuilder::GenerateQuad("Plane", Color(1.f, 1.f, 1.f), 100.f);
-			meshList[GEO_RIGHT]->textureID = LoadTGA("Image//Sky_NightTime01RT.tga");
+			meshList[GEO_RIGHT]->textureID = LoadTGA("Image//skyboxright.tga");
 			meshList[GEO_TOP] = MeshBuilder::GenerateQuad("Plane", Color(1.f, 1.f, 1.f), 100.f);
-			meshList[GEO_TOP]->textureID = LoadTGA("Image//Sky_NightTime01UP.tga");
+			meshList[GEO_TOP]->textureID = LoadTGA("Image//skyboxtop.tga");
 			meshList[GEO_BOTTOM] = MeshBuilder::GenerateQuad("Plane", Color(1.f, 1.f, 1.f), 100.f);
-			meshList[GEO_BOTTOM]->textureID = LoadTGA("Image//Sky_NightTime01DN.tga");
+			meshList[GEO_BOTTOM]->textureID = LoadTGA("Image//skyboxbottom.tga");
 			meshList[GEO_FRONT] = MeshBuilder::GenerateQuad("Plane", Color(1.f, 1.f, 1.f), 100.f);
-			meshList[GEO_FRONT]->textureID = LoadTGA("Image//Sky_NightTime01FT.tga");
+			meshList[GEO_FRONT]->textureID = LoadTGA("Image//skyboxfront.tga");
 			meshList[GEO_BACK] = MeshBuilder::GenerateQuad("Plane", Color(1.f, 1.f, 1.f), 100.f);
-			meshList[GEO_BACK]->textureID = LoadTGA("Image//Sky_NightTime01BK.tga");
+			meshList[GEO_BACK]->textureID = LoadTGA("Image//skyboxback.tga");
+			meshList[GEO_TABLE]->material.kAmbient.Set(0.3f, 0.3f, 0.3f);
+			meshList[GEO_TABLE]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
+			meshList[GEO_TABLE]->material.kSpecular.Set(0.9f, 0.9f, 0.9f);
+			meshList[GEO_TABLE]->material.kShininess = 5.0f;
 
 			// for zaku 
 			{
@@ -270,27 +276,27 @@ void SceneHitMen::Init()
 		glUniform1i(m_parameters[U_NUMLIGHTS], NUM_LIGHTS);
 		// light params
 		{
-			// light that follows primary zakuCam
-			light[0].position = glm::vec3(0, 25, -10);
+			// environment light
+			light[0].position = glm::vec3(0, 25, 0);
 			light[0].color.Set(1, 1, 1);
-			light[0].type = Light::LIGHT_SPOT;
-			light[0].power = 5.f;
+			light[0].type = Light::LIGHT_DIRECTIONAL;
+			light[0].power = 1.f;
 			light[0].kC = 1.f;
 			light[0].kL = 0.01f;
 			light[0].kQ = 0.001f;
 			light[0].cosCutoff = 5.f;
 			light[0].cosInner = 1.f;
 			light[0].exponent = 3.f;
+			light[0].spotDirection = glm::vec3(0, -1, 0);
 
 
-
-			// main Hangar light 
-			light[1].position = glm::vec3(0, 20, 0);
+			// main tent light 
+			light[1].position = glm::vec3(0, 15, 0);
 			light[1].type = Light::LIGHT_SPOT;
 			//light[1].color.Set(1, 1, 1);
 			light[1].color.Set(247 / 255.f, 181 / 255.f, 0);
-			light[1].spotDirection = glm::normalize(light[1].position - glm::vec3(0, 0, 0));
-			light[1].power = 7.5f;
+			light[1].spotDirection = glm::vec3(0, 1, 0);
+			light[1].power = 2.f;
 			light[1].kC = 1.f;
 			light[1].kL = 0.01f;
 			light[1].kQ = 0.001f;
@@ -300,7 +306,7 @@ void SceneHitMen::Init()
 
 			// room light 1
 			light[2].position = glm::vec3(15, 10.f, 0);
-			light[2].power = 3.f;
+			light[2].power = 0.f;
 			light[2].type = Light::LIGHT_POINT;
 			light[2].spotDirection = glm::vec3(0.f, -1.f, 0.f);
 			light[2].cosCutoff = 65.f;
@@ -309,7 +315,7 @@ void SceneHitMen::Init()
 
 			// room light 2
 			light[3].position = glm::vec3(21, 10.f, 0);
-			light[3].power = 3.f;
+			light[3].power = 0.f;
 			light[3].type = Light::LIGHT_POINT;
 			light[3].spotDirection = glm::vec3(0.f, -1.f, 0.f);
 			light[3].cosCutoff = 65.f;
@@ -339,7 +345,7 @@ void SceneHitMen::Init()
 		
 		m_player.pos = glm::vec3(0, 0, 0);
 
-		cameraNum = 1;
+		cameraNum = 0;
 }
 
 
@@ -356,25 +362,26 @@ void SceneHitMen::Update(double dt)
 		doorMen[i]->fixedUpdate(dt);
 	}
 	HandleKeyPress();
-
+	std::cout << gunCam.position.x << "," << gunCam.position.y << "," << gunCam.position.z << std::endl;
 
 	// spotlight for zaku cleaner view
 	//light[0].position = glm::vec3(cameraArray[1].position.x, cameraArray[1].position.y, cameraArray[1].position.z);
 	//light[0].spotDirection = glm::normalize(cameraArray[1].position - cameraArray[1].target);
-	cameraArray[cameraNum].Update(dt);
+	gunCam.Update(dt);
 }
 
 void SceneHitMen::Render()
 {
+	glm::vec3 view = gunCam.position - gunCam.target;
 	// Clear color buffer every frame
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Load view matrix stack and set it with camera position, target position and up direction
 	viewStack.LoadIdentity(); {
 		viewStack.LookAt(
-			cameraArray[cameraNum].position.x, cameraArray[cameraNum].position.y, cameraArray[cameraNum].position.z,
-			cameraArray[cameraNum].target.x, cameraArray[cameraNum].target.y, cameraArray[cameraNum].target.z,
-			cameraArray[cameraNum].up.x, cameraArray[cameraNum].up.y, cameraArray[cameraNum].up.z
+			gunCam.position.x, gunCam.position.y, gunCam.position.z,
+			gunCam.target.x, gunCam.target.y, gunCam.target.z,
+			gunCam.up.x, gunCam.up.y, gunCam.up.z
 		);
 		// Load identity matrix into the model stack
 	} modelStack.LoadIdentity();
@@ -398,23 +405,45 @@ void SceneHitMen::Render()
 		modelStack.PushMatrix(); {
 			modelStack.Translate(doorMen[i]->pos.x, doorMen[i]->pos.y, doorMen[i]->pos.z);
 			modelStack.Scale(doorMen[i]->scale.x, doorMen[i]->scale.y, doorMen[i]->scale.z);
-			RenderMesh(meshList[GEO_DOORMAN], false);
+			RenderMesh(meshList[GEO_DOORMAN], true);
 		} modelStack.PopMatrix();
 	}
 	modelStack.PushMatrix(); {
-		modelStack.Scale(5.f, 5.f, 5.f);
-		RenderMesh(meshList[GEO_TABLE], false);
+		modelStack.Scale(1, 1, 1);
+		RenderMesh(meshList[GEO_TENT], true);
 	} modelStack.PopMatrix();
 	modelStack.PushMatrix(); {
-		modelStack.Translate(0.f, 4.5f, 0.8f);
-		modelStack.Scale(5.f, 1.5f, 1.f);
-		RenderMesh(meshList[GEO_TABLE], false);
+		modelStack.Translate(gunCam.position.x, gunCam.position.y - 0.5, gunCam.position.z);
+		//modelStack.Rotate(gunHori, 0.f, 1.f, 0.f);
+		//modelStack.Rotate(gunVerti, 1.f, 0.f, 0.f);
+		modelStack.Rotate(glm::degrees (atan2(view.x, view.z)), 0.f, 1.f, 0.f);
+		modelStack.Rotate(-1 * glm::degrees(atan2(view.y, view.z)), 1.f, 0.f, 0.f);
+		RenderMesh(meshList[GEO_GUN], true);
 	} modelStack.PopMatrix();
+	// render tables
 	modelStack.PushMatrix(); {
-		modelStack.Translate(0.f, 4.5f, -0.2f);
-		modelStack.Scale(5.f, 2.5f, 1.f);
-		RenderMesh(meshList[GEO_TABLE], false);
-	} modelStack.PopMatrix();
+		modelStack.Scale(12.f, 1.f, 1.f);
+		modelStack.PushMatrix(); {
+			modelStack.Scale(1.f, 5.f, 5.f);
+			RenderMesh(meshList[GEO_TABLE], true);
+		} modelStack.PopMatrix();
+		modelStack.PushMatrix(); {
+			modelStack.Translate(0.f, 4.5f, 0.8f);
+			modelStack.Scale(1.f, 1.5f, 1.f);
+			RenderMesh(meshList[GEO_TABLE], true);
+		} modelStack.PopMatrix();
+		modelStack.PushMatrix(); {
+			modelStack.Translate(0.f, 4.5f, -0.2f);
+			modelStack.Scale(1.f, 2.5f, 1.f);
+			RenderMesh(meshList[GEO_TABLE], true);
+		} modelStack.PopMatrix();
+		modelStack.PushMatrix(); {
+			modelStack.Translate(0.f, 0.f, 25.f);
+			modelStack.Scale(0.5f, 5.f, 5.f);
+			RenderMesh(meshList[GEO_TABLE], true);
+		} modelStack.PopMatrix();
+	}modelStack.PopMatrix();
+	RenderSkybox();
 }
 
 
@@ -1065,41 +1094,80 @@ void SceneHitMen::RenderZaku()
 */
 void SceneHitMen::RenderSkybox()
 {
-	modelStack.PushMatrix(); {
-		modelStack.Translate(0.f, -500.f, 0.f);
-		modelStack.Rotate(-90, 1.f, 0.f, 0.f);
-		modelStack.Scale(10, 10, 0);
-		RenderMesh(meshList[GEO_BOTTOM], false);
-	}  modelStack.PopMatrix();
-	modelStack.PushMatrix(); {
-		modelStack.Translate(0.f, 500.f, 0.f);
-		modelStack.Rotate(90, 1.f, 0.f, 0.f);
-		modelStack.Scale(10, 10, 0);
-		RenderMesh(meshList[GEO_TOP], false);
-	} modelStack.PopMatrix();
-	modelStack.PushMatrix(); {
-		modelStack.Translate(0.f, 0.f, 500.f);
-		modelStack.Rotate(-180, 0.f, 1.f, 0.f);
-		modelStack.Scale(10, 10, 0);
-		RenderMesh(meshList[GEO_LEFT], false);
-	} modelStack.PopMatrix();
-	modelStack.PushMatrix(); {
-		modelStack.Translate(0.f, 0.f, -500.f);
-		modelStack.Scale(10, 10, 0);
-		RenderMesh(meshList[GEO_RIGHT], false);
-	} modelStack.PopMatrix();
-	modelStack.PushMatrix(); {
-		modelStack.Translate(500.f, 0.f, 0.f);
-		modelStack.Rotate(-90, 0.f, 1.f, 0.f);
-		modelStack.Scale(10, 10, 0);
-		RenderMesh(meshList[GEO_BACK], false);
-	} modelStack.PopMatrix();
-	modelStack.PushMatrix(); {
-		modelStack.Translate(-500.f, 0.f, 0.f);
-		modelStack.Rotate(90, 0.f, 1.f, 0.f);
-		modelStack.Scale(10, 10, 0);
+	modelStack.PushMatrix();
+	{
+		modelStack.Translate(0.f, 0.f, -50.f);
+		modelStack.Rotate(180, 0.f, 0.f, 1.f);
+		modelStack.Scale(1, 1.f, 1);
+		meshList[GEO_FRONT]->material.kAmbient.Set(0.1f, 0.1f, 0.1f);
+		meshList[GEO_FRONT]->material.kDiffuse.Set(0.5f, 0.5f, 0.5f);
+		meshList[GEO_FRONT]->material.kSpecular.Set(0.9f, 0.9f, 0.9f);
 		RenderMesh(meshList[GEO_FRONT], false);
-	} modelStack.PopMatrix();
+	}
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	{
+		modelStack.Translate(0.f, 0.f, 50.f);
+		modelStack.Rotate(180, 0.f, 1.f, 0.f);
+		modelStack.Rotate(180, 0.f, 0.f, 1.f);
+		modelStack.Scale(1, 1.f, 1);
+		meshList[GEO_BACK]->material.kAmbient.Set(0.1f, 0.1f, 0.1f);
+		meshList[GEO_BACK]->material.kDiffuse.Set(0.5f, 0.5f, 0.5f);
+		meshList[GEO_BACK]->material.kSpecular.Set(0.9f, 0.9f, 0.9f);
+		RenderMesh(meshList[GEO_BACK], false);
+	}
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	{
+		modelStack.Translate(-50.f, 0.f, 0.f);
+		modelStack.Rotate(90, 0.f, 1.f, 0.f);
+		modelStack.Rotate(180, 0.f, 0.f, 1.f);
+		modelStack.Scale(1, 1.f, 1);
+		meshList[GEO_RIGHT]->material.kAmbient.Set(0.1f, 0.1f, 0.1f);
+		meshList[GEO_RIGHT]->material.kDiffuse.Set(0.5f, 0.5f, 0.5f);
+		meshList[GEO_RIGHT]->material.kSpecular.Set(0.9f, 0.9f, 0.9f);
+		RenderMesh(meshList[GEO_RIGHT], false);
+	}
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	{
+		modelStack.Translate(50.f, 0.f, 0.f);
+		modelStack.Rotate(90, 0.f, -1.f, 0.f);
+		modelStack.Rotate(180, 0.f, 0.f, 1.f);
+		modelStack.Scale(1, 1.f, 1);
+		meshList[GEO_LEFT]->material.kAmbient.Set(0.1f, 0.1f, 0.1f);
+		meshList[GEO_LEFT]->material.kDiffuse.Set(0.5f, 0.5f, 0.5f);
+		meshList[GEO_LEFT]->material.kSpecular.Set(0.9f, 0.9f, 0.9f);
+		RenderMesh(meshList[GEO_LEFT], false);
+	}
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	{
+		modelStack.Translate(0.f, -10.f, 0.f);
+		modelStack.Rotate(90, -1.f, 0.f, 0.f);
+		modelStack.Rotate(180, 0.f, 0.f, 1.f);
+		meshList[GEO_BOTTOM]->material.kAmbient.Set(0.1f, 0.1f, 0.1f);
+		meshList[GEO_BOTTOM]->material.kDiffuse.Set(0.5f, 0.5f, 0.5f);
+		meshList[GEO_BOTTOM]->material.kSpecular.Set(0.9f, 0.9f, 0.9f);
+		RenderMesh(meshList[GEO_BOTTOM], false);
+	}
+	modelStack.PopMatrix();
+	modelStack.PushMatrix();
+	{
+		modelStack.Translate(0.f, 50.f, 0.f);
+		modelStack.Rotate(90, 1.f, 0.f, 0.f);
+		modelStack.Rotate(180, 0.f, 0.f, 1.f);
+
+		meshList[GEO_TOP]->material.kAmbient.Set(0.1f, 0.1f, 0.1f);
+		meshList[GEO_TOP]->material.kDiffuse.Set(0.5f, 0.5f, 0.5f);
+		meshList[GEO_TOP]->material.kSpecular.Set(0.9f, 0.9f, 0.9f);
+		RenderMesh(meshList[GEO_TOP], false);
+	}
+	modelStack.PopMatrix();
 }
 
 void SceneHitMen::RenderLight(int lightIndex)
@@ -1171,6 +1239,18 @@ void SceneHitMen::HandleKeyPress()
 			cameraNum = 2;
 		else
 			cameraNum = 0;
+	}
+	if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_W)) {
+		gunVerti += 0.1f;
+	}
+	if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_S)) {
+		gunVerti -= 0.1f;
+	}
+	if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_A)) {
+		gunHori += 0.1f;
+	}
+	if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_D)) {
+		gunHori -= 0.1f;
 	}
 	
 }

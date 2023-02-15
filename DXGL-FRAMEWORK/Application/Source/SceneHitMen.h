@@ -42,7 +42,8 @@ public:
 		GEO_FIRE_CUBE,
 
 		GEO_GREY_FLOOR,
-
+		GEO_GUN,
+		GEO_TENT,
 		GEO_DOORMAN,
 		GEO_TABLE,
 		GEO_UI,
@@ -153,12 +154,14 @@ private:
 	GameObject m_player;
 	GameObject m_bullet;
 	GameObject m_floor;
+	float gunHori;
+	float gunVerti;
 	std::vector<GameObject*> doorMen;
 	std::vector<glm::vec3> doorMenInitPos;
 	GameObject m_table;
 	/*std::vector<GameObject*>*/ ;
 	CameraFPS mainFPSCam;
-	CameraFPS zakuCam;
+	CameraFPS gunCam;
 	CameraFPS configCam;
 	std::vector<CameraFPS> cameraArray;
 	//AltAzCamera zakuCam;
