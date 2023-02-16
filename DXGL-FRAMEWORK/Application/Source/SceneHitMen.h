@@ -173,6 +173,11 @@ private:
 	float initCamY;
 	glm::vec3 zakuPos;
 	int cameraNum;
+	int score;
+	int ammo;
+	int time;
+	float horiView;
+	float vertiView;
 	bool showUI;
 	double elapsedTime;
 };

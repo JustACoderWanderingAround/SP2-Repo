@@ -25,6 +25,9 @@ static glm::vec3 RotateVector(const glm::vec3& vec, float radian)
 	return glm::vec3(vec.x * cos(radian) + vec.y * -sin(radian),
 		vec.x * sin(radian) + vec.y * cos(radian), 0.f);
 }
+void GameObject::setDirection(const glm::vec3& vec, float radian) {
+	this->dir = RotateVector(vec, radian);
+}
 
 bool GameObject::CheckLineCollision(GameObject* go1, GameObject* go2)
 {
@@ -72,11 +75,11 @@ void GameObject::fixedUpdate(double dt)
 	if (slowdown && this->vel != glm::vec3(0)) {
 		// add in resistance force to slowly, to simplify the whole equation, you could use -(obj->vel.x)
 		// since mass is 1
-		if (this->vel.x > 0) {
+		/*if (this->vel.x > 0) {
 			force.x = -x_resistant;
 		}
 		else
-			force.x = x_resistant;
+			force.x = x_resistant;*/
 	}
 
 	//Calculate the resulting acceleration
@@ -98,13 +101,13 @@ void GameObject::fixedUpdate(double dt)
 		(this->vel.x > 0 && temp.x < 0) || (this->vel.x < 0 && temp.x > 0))
 		this->vel = glm::vec3(0);
 	// s = 1/2 (u+v)t
-	this->pos += 0.5f * (float)dt * timeScale * (temp + this->vel);
+	this->pos += 0.5f * static_cast<float>(dt) * (this->vel);
 
 	float angularAcceleration = torque.z / this->momentOfInertia;
 	this->anglularVelocity += angularAcceleration * dt;
 	this->anglularVelocity = Math::Clamp(this->anglularVelocity, -ROTATION_SPEED, ROTATION_SPEED);
 
-	this->dir = RotateVector(this->dir, this->anglularVelocity * dt);
+	//this->dir = RotateVector(this->dir, this->anglularVelocity * dt);
 	// need all the forces to reset
 	force = glm::vec3(0);
 	torque = glm::vec3(0);

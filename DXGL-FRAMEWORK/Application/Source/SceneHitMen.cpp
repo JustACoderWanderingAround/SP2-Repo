@@ -203,6 +203,8 @@ void SceneHitMen::Init()
 			meshList[GEO_TABLE]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
 			meshList[GEO_TABLE]->material.kSpecular.Set(0.9f, 0.9f, 0.9f);
 			meshList[GEO_TABLE]->material.kShininess = 5.0f;
+			meshList[GEO_TEXT] = MeshBuilder::GenerateText("comic sanz", 16, 16);
+			meshList[GEO_TEXT]->textureID = LoadTGA("Image//ComicSans.tga");
 
 			// for zaku 
 			{
@@ -343,8 +345,12 @@ void SceneHitMen::Init()
 			glUniform1f(m_parameters[U_LIGHT0_EXPONENT + (i * 11)], light[i].exponent);
 		}
 		
-		m_player.pos = glm::vec3(0, 0, 0);
-
+		m_bullet.pos = glm::vec3(gunCam.position.x, 6.5f, gunCam.position.z);
+		m_bullet.dir = glm::vec3(0, 0, 1.f);
+		m_bullet.vel = glm::vec3(0, 0, 0.f);
+		m_bullet.momentOfInertia = m_bullet.mass * pow(m_bullet.scale.x, 2);
+		gunHori = 0;
+		gunVerti = 0;
 		cameraNum = 0;
 }
 
@@ -353,26 +359,39 @@ void SceneHitMen::Update(double dt)
 {
 	if (elapsedTime + 100 == DBL_MAX)
 		elapsedTime = 0;
-	elapsedTime += dt;
+	if (dt > 0)
+		elapsedTime += dt;
 	glm::vec3 gravity = glm::vec3(0, -5.f, 0.f);
+	gunCam.Update(static_cast<float>(dt));
+	HandleKeyPress();
+	//std::cout << m_bullet.pos.x << m_bullet.pos.y << m_bullet.pos.z << std::endl;
+	glm::vec3 view = glm::vec3(gunCam.position - gunCam.target);
+	horiView = glm::degrees(atan2(view.x, view.z));
+	vertiView = -1 * glm::degrees(atan2(view.y, view.z));
+	if (horiView < 25.1f && horiView > -25.1f) {
+		gunHori = horiView;
+	}
+	if (vertiView < 10.f && vertiView > -4.5f) {
+		gunVerti = vertiView;
+	}
+
 	for (int i = 0; i < NUM_DOORMEN; i++) {
 		//if (doorMen[i]->vel.y < 10)
 			//doorMen[i]->vel += gravity;
-		doorMen[i]->pos.x =  5.f * sin(elapsedTime * 1.5f) + doorMenInitPos[i].x;
-		doorMen[i]->fixedUpdate(dt);
+		if (m_bullet.CheckCCCollision(doorMen[i])) {
+			doorMen[i]->CollisionResponse(&m_bullet);
+		}
+		else 
+			doorMen[i]->pos.x = 5.f * sin(elapsedTime * 1.5f) + doorMenInitPos[i].x;
+		doorMen[i]->fixedUpdate(static_cast<float>(dt));
 	}
-	HandleKeyPress();
-	std::cout << gunCam.position.x << "," << gunCam.position.y << "," << gunCam.position.z << std::endl;
+	m_bullet.fixedUpdate(dt);
 
-	// spotlight for zaku cleaner view
-	//light[0].position = glm::vec3(cameraArray[1].position.x, cameraArray[1].position.y, cameraArray[1].position.z);
-	//light[0].spotDirection = glm::normalize(cameraArray[1].position - cameraArray[1].target);
-	gunCam.Update(dt);
 }
 
 void SceneHitMen::Render()
 {
-	glm::vec3 view = gunCam.position - gunCam.target;
+	
 	// Clear color buffer every frame
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -413,12 +432,16 @@ void SceneHitMen::Render()
 		RenderMesh(meshList[GEO_TENT], true);
 	} modelStack.PopMatrix();
 	modelStack.PushMatrix(); {
-		modelStack.Translate(gunCam.position.x, gunCam.position.y - 0.5, gunCam.position.z);
-		//modelStack.Rotate(gunHori, 0.f, 1.f, 0.f);
-		//modelStack.Rotate(gunVerti, 1.f, 0.f, 0.f);
-		modelStack.Rotate(glm::degrees (atan2(view.x, view.z)), 0.f, 1.f, 0.f);
-		modelStack.Rotate(-1 * glm::degrees(atan2(view.y, view.z)), 1.f, 0.f, 0.f);
-		RenderMesh(meshList[GEO_GUN], true);
+		modelStack.Translate(gunCam.position.x, gunCam.position.y, gunCam.position.z);
+		modelStack.Rotate(gunVerti, 1.f, 0.f, 0.f);
+		modelStack.PushMatrix(); {
+			modelStack.Translate(0.f, -0.5f, 0.f);
+			//modelStack.Rotate(gunHori, 0.f, 1.f, 0.f);
+			//modelStack.Rotate(gunVerti, 1.f, 0.f, 0.f);
+				modelStack.Rotate(gunHori, 0.f, 1.f, 0.f);
+			//modelStack.Rotate(-1 * glm::degrees(atan2(view.y, view.z)), 1.f, 0.f, 0.f);
+			RenderMesh(meshList[GEO_GUN], true);
+		} modelStack.PopMatrix();
 	} modelStack.PopMatrix();
 	// render tables
 	modelStack.PushMatrix(); {
@@ -443,7 +466,17 @@ void SceneHitMen::Render()
 			RenderMesh(meshList[GEO_TABLE], true);
 		} modelStack.PopMatrix();
 	}modelStack.PopMatrix();
+	modelStack.PushMatrix(); {
+		modelStack.Translate(m_bullet.pos.x, m_bullet.pos.y, m_bullet.pos.z);
+		modelStack.Rotate(glm::degrees(atan2(m_bullet.dir.x, m_bullet.dir.z)) , 0.f, 1.f, 0.f);
+		modelStack.Rotate(glm::degrees(atan2(m_bullet.dir.y, m_bullet.dir.z)), 1.f, 0.f, 0.f);
+		RenderMesh(meshList[GEO_CUBE], false);
+	} modelStack.PopMatrix();
 	RenderSkybox();
+	RenderTextOnScreen(meshList[GEO_TEXT], "Score: ", Color(0.f, 0.f, 0.f), 40, 0, 550);
+	RenderTextOnScreen(meshList[GEO_TEXT], "Time: ", Color(0.f, 0.f, 0.f), 40, 600, 550);
+	RenderTextOnScreen(meshList[GEO_TEXT], "Ammo: ", Color(0.f, 0.f, 0.f), 40, 500, 30);
+
 }
 
 
@@ -589,509 +622,6 @@ void SceneHitMen::RenderTextOnScreen(Mesh* mesh, std::string text, Color color, 
 	glEnable(GL_DEPTH_TEST);
 
 }
-/*
-void SceneHitMen::RenderZaku()
-{
-	// Render the zaku
-	//overall transform
-	modelStack.PushMatrix(); {
-		modelStack.Translate(zakuPos.x, zakuPos.y, zakuPos.z);
-		// render torso parts
-		modelStack.PushMatrix(); {
-			// head 
-			modelStack.PushMatrix(); {
-				modelStack.Translate(0.0f, 2.1f, 0.0f);
-				// top part of head
-				modelStack.PushMatrix(); {
-					modelStack.Rotate(180, 1.0f, 0.0f, 0.0f);
-					RenderMesh(meshList[GEO_ZAKU_HEAD], true);
-				} modelStack.PopMatrix();
-				// black thing with eye
-				modelStack.PushMatrix(); {
-					// eye
-					modelStack.Scale(0.8, 0.8, 0.8);
-					modelStack.PushMatrix(); {
-						modelStack.Translate(0.f, -0.1f, 1.f);
-						modelStack.Rotate(90, 1.f, 0.f, 0.f);
-						modelStack.Scale(0.3f, 0.1f, 0.3f);
-						RenderMesh(meshList[GEO_CIRCLE], true);
-					} modelStack.PopMatrix();
-					RenderMesh(meshList[GEO_SPHERE_BLACK], true);
-				} modelStack.PopMatrix();
-				// toob around helmet
-				modelStack.PushMatrix(); {
-					modelStack.Translate(0.0f, -0.55f, 0.0f);
-					modelStack.Scale(0.8f, 0.4f, 0.8f);
-					RenderMesh(meshList[GEO_TORUS], true);
-				} modelStack.PopMatrix();
-				// left and right bar thing
-				modelStack.PushMatrix(); {
-					modelStack.Translate(-0.75, -0.2, 0.3);
-					modelStack.Scale(0.2f, 0.8f, 0.2f);
-					RenderMesh(meshList[GEO_ZAKU_CUBE_ALT], true);
-				} modelStack.PopMatrix();
-				modelStack.PushMatrix(); {
-					modelStack.Translate(0.75, -0.2, 0.3);
-					modelStack.Scale(0.2f, 0.8f, 0.2f);
-					RenderMesh(meshList[GEO_ZAKU_CUBE_ALT], true);
-				} modelStack.PopMatrix();
-				modelStack.PushMatrix(); {
-					modelStack.Translate(0.f, -0.6f, 1.15f);
-					modelStack.Scale(0.6f, 0.35f, 0.2f);
-					RenderMesh(meshList[GEO_ZAKU_CUBE_ALT], true);
-				} modelStack.PopMatrix();
-			} modelStack.PopMatrix();
-			// right arm
-			modelStack.PushMatrix(); {
-				// shoulder joint
-				modelStack.Translate(-3.25f, 0.25f, 0.f);
-				modelStack.PushMatrix(); {
-					modelStack.Translate(-1.f, -0.5f, 0.f);
-					modelStack.Scale(0.1f, 4.f, 2.f);
-					RenderMesh(meshList[GEO_ZAKU_CUBE_ALT], true);
-				} modelStack.PopMatrix();
-				modelStack.PushMatrix(); {
-					modelStack.Translate(0.f, 1.47f, 0.f);
-					modelStack.Scale(2, 0.1f, 2);
-					RenderMesh(meshList[GEO_ZAKU_CUBE_ALT], true);
-				} modelStack.PopMatrix();
-				// upper arm
-				modelStack.PushMatrix(); {
-					modelStack.Translate(0.f, -1.45f, 0.f);
-					// elbow 
-					modelStack.PushMatrix(); {
-						modelStack.Translate(0.f, -0.75f, 0.f);
-						// lower arm
-						modelStack.PushMatrix(); {
-							modelStack.Translate(0.f, -0.35f, 0.f);
-							modelStack.Scale(1.f, 1.5f, 1.f);
-							modelStack.Translate(0.f, -0.5f, 0.f);
-							// hand
-							modelStack.PushMatrix(); {
-								modelStack.Translate(0.f, -0.55f, 0.f);
-								// bang
-								modelStack.PushMatrix(); {
-									modelStack.Translate(0.f, -0.3f, 0.f);
-									// grip
-									modelStack.PushMatrix(); {
-										modelStack.Scale(0.1f, 0.1f, 2.f);
-										RenderMesh(meshList[GEO_GREY_CUBE], true);
-									} modelStack.PopMatrix();
-									// mag
-									modelStack.PushMatrix(); {
-										modelStack.Translate(0.f, -0.5f, 0.f);
-										modelStack.Scale(0.1f, 0.3f, 2.f);
-										RenderMesh(meshList[GEO_GREY_CUBE], true);
-									} modelStack.PopMatrix();
-									// upper rec
-									modelStack.PushMatrix(); {
-										modelStack.Translate(0.f, 0.0f, 1.f);
-										modelStack.Scale(0.3f, 2.5f, 0.3f);
-										RenderMesh(meshList[GEO_GREY_CUBE], true);
-									} modelStack.PopMatrix();
-									// barrel
-									modelStack.PushMatrix(); {
-										modelStack.Translate(0.f, -1.35f, 1.35f);
-										modelStack.Scale(0.5f, 3.5f, 0.7f);
-										RenderMesh(meshList[GEO_GREY_CUBE], true);
-									} modelStack.PopMatrix();
-								} modelStack.PopMatrix();
-								modelStack.Scale(0.1f, 2 / 3.f, 0.9f);
-								RenderMesh(meshList[GEO_GREY_CUBE], true);
-							} modelStack.PopMatrix();
-							RenderMesh(meshList[GEO_ZAKU_CUBE_ALT], true);
-
-						} modelStack.PopMatrix();
-						modelStack.Scale(0.65f, 0.75f, 0.65f);
-						RenderMesh(meshList[GEO_GREY_CUBE], true);
-					} modelStack.PopMatrix();
-					modelStack.Scale(1.2f, 1.2f, 1.f);
-					RenderMesh(meshList[GEO_ZAKU_CUBE_ALT], true);
-				} modelStack.PopMatrix();
-				modelStack.Scale(1.6f, 1.7f, 1.5f);
-				RenderMesh(meshList[GEO_ZAKU_CUBE_ALT], true);
-			} modelStack.PopMatrix();
-			// left arm
-			modelStack.PushMatrix(); {
-				// shoulder
-				modelStack.Translate(3.25f, 0.25f, 0.f);
-				modelStack.PushMatrix(); {
-					modelStack.Translate(0.3f, 0.1f, 0.f);
-					modelStack.Rotate(135, 0.0f, 0.f, 1.f);
-					modelStack.Scale(1.2f, 1.2f, 1.2f);
-					RenderMesh(meshList[GEO_ZAKU_HEAD], true);
-				} modelStack.PopMatrix();
-				// upper arm 
-				modelStack.PushMatrix(); {
-					modelStack.Translate(0.f, -1.45f, 0.f);
-					// elbow
-					modelStack.PushMatrix(); {
-						modelStack.Translate(0.f, -0.75f, 0.f);
-						// lower arm
-						modelStack.PushMatrix(); {
-							modelStack.Translate(0.f, -0.35f, 0.f);
-
-
-							modelStack.Scale(1.f, 1.5f, 1.f);
-							modelStack.Translate(0.f, -0.5f, 0.f);
-							// hand
-							modelStack.PushMatrix(); {
-								modelStack.Translate(0.f, -0.55f, 0.f);
-								modelStack.PushMatrix(); {
-									// club
-									modelStack.PushMatrix(); {
-										modelStack.Scale(1.5f, 1.5f, 1.5f);
-
-										modelStack.PushMatrix(); {
-											modelStack.Translate(0.f, -0.2f, 1.5f);
-											modelStack.PushMatrix(); {
-												modelStack.Translate(0.f, 0.f, 1.8f);
-												modelStack.Scale(0.1f, 2.f, 1.0f);
-												RenderMesh(meshList[GEO_GREY_CUBE], true);
-											} modelStack.PopMatrix();
-											modelStack.Scale(0.2f, 0.2f, 5.f);
-											RenderMesh(meshList[GEO_AXE_CUBE], true);
-										} modelStack.PopMatrix();
-									} modelStack.PopMatrix();
-								} modelStack.PopMatrix();
-								modelStack.Scale(0.1f, 2 / 3.f, 0.9f);
-								RenderMesh(meshList[GEO_GREY_CUBE], true);
-							} modelStack.PopMatrix();
-							RenderMesh(meshList[GEO_ZAKU_CUBE_ALT], true);
-						} modelStack.PopMatrix();
-						modelStack.Scale(0.65f, 0.75f, 0.65f);
-						RenderMesh(meshList[GEO_GREY_CUBE], true);
-					} modelStack.PopMatrix();
-					modelStack.Scale(1.2f, 1.2f, 1.f);
-					RenderMesh(meshList[GEO_ZAKU_CUBE_ALT], true);
-				} modelStack.PopMatrix();
-				modelStack.Scale(1.6f, 1.7f, 1.5f);
-				RenderMesh(meshList[GEO_ZAKU_CUBE_ALT], true);
-			} modelStack.PopMatrix();
-			modelStack.Scale(1.0f, 1.3f, 1.0f);
-			// smaller  angled cubes on torso
-			modelStack.PushMatrix(); {
-				// grey
-				modelStack.Translate(0.0f, 0.0f, 1.f);
-				modelStack.Rotate(45, 1.0f, 0.0f, 0.0f);
-				// green L
-				modelStack.PushMatrix(); {
-					modelStack.Translate(1.2f, 0.f, 0.f);
-					modelStack.Scale(2.5f, 1.39f, 1.39f);
-					RenderMesh(meshList[GEO_ZAKU_CUBE], true);
-				} modelStack.PopMatrix();
-				// green R
-				modelStack.PushMatrix(); {
-					modelStack.Translate(-1.2f, 0.f, 0.f);
-					modelStack.Scale(2.5f, 1.39f, 1.39f);
-					RenderMesh(meshList[GEO_ZAKU_CUBE], true);
-				} modelStack.PopMatrix();
-				modelStack.Scale(2.f, 1.4f, 1.4f);
-				RenderMesh(meshList[GEO_GREY_CUBE], true);
-				modelStack.PushMatrix(); {
-					RenderMesh(meshList[GEO_ZAKU_CUBE], true);
-				} modelStack.PopMatrix();
-			} modelStack.PopMatrix();
-			// green sides
-			modelStack.PushMatrix(); {
-				// LEFT
-				modelStack.PushMatrix(); {
-					// shoulder cube
-					modelStack.Translate(1.5f, 0.f, 0.0f);
-					modelStack.Scale(2.0f, 1.99f, 1.9f);
-					RenderMesh(meshList[GEO_ZAKU_CUBE], true);
-					// shoulder angled cube
-				} modelStack.PopMatrix();
-				// right
-				modelStack.PushMatrix(); {
-					modelStack.Translate(-1.5f, 0.f, 0.0f);
-					modelStack.Scale(2.0f, 1.99f, 1.9f);
-					RenderMesh(meshList[GEO_ZAKU_CUBE], true);
-				} modelStack.PopMatrix();
-			} modelStack.PopMatrix();
-			// lower torso + skirts
-			modelStack.PushMatrix(); {
-				modelStack.Translate(0.f, -2.5f, 0.f);
-				modelStack.Scale(3.f, 0.5f, 0.5f);
-				RenderMesh(meshList[GEO_GREY_CUBE], true);
-			} modelStack.PopMatrix();
-			// booster
-			modelStack.PushMatrix(); {
-				modelStack.Translate(0.f, 0.f, -1.5f);
-				if (boosting) {
-					modelStack.PushMatrix(); {
-						modelStack.Translate(0.f, -0.8f, 0.f);
-						modelStack.Rotate(35, 1.f, 0.f, 0.0f);
-						modelStack.Scale(0.5, 2.f, 0.5f);
-						meshList[GEO_GREY_CUBE]->material.kAmbient.Set(225 / 255.f, 88 / 255.f, 34 / 255.f);
-						meshList[GEO_GREY_CUBE]->material.kDiffuse.Set(235 / 255.f, 98 / 255.f, 44 / 255.f);
-						meshList[GEO_GREY_CUBE]->material.kSpecular.Set(245 / 255.f, 108 / 255.f, 54 / 255.f);
-						meshList[GEO_GREY_CUBE]->material.kShininess = 40.0f;
-						RenderMesh(meshList[GEO_GREY_CUBE], true);
-						meshList[GEO_GREY_CUBE]->material.kAmbient.Set(88 / 255.f, 88 / 255.f, 88 / 255.f);
-						meshList[GEO_GREY_CUBE]->material.kDiffuse.Set(98 / 255.f, 98 / 255.f, 98 / 255.f);
-						meshList[GEO_GREY_CUBE]->material.kSpecular.Set(108 / 255.f, 108 / 255.f, 108 / 255.f);
-					} modelStack.PopMatrix();
-					modelStack.PushMatrix(); {
-						modelStack.Translate(0.f, -0.8f, 0.f);
-						modelStack.Rotate(35, 1.f, 0.f, 0.7f);
-						modelStack.Scale(0.5, 1.5f, 0.5f);
-						meshList[GEO_GREY_CUBE]->material.kAmbient.Set(225 / 255.f, 88 / 255.f, 34 / 255.f);
-						meshList[GEO_GREY_CUBE]->material.kDiffuse.Set(235 / 255.f, 98 / 255.f, 44 / 255.f);
-						meshList[GEO_GREY_CUBE]->material.kSpecular.Set(245 / 255.f, 108 / 255.f, 54 / 255.f);
-						meshList[GEO_GREY_CUBE]->material.kShininess = 40.0f;
-						RenderMesh(meshList[GEO_GREY_CUBE], true);
-						meshList[GEO_GREY_CUBE]->material.kAmbient.Set(88 / 255.f, 88 / 255.f, 88 / 255.f);
-						meshList[GEO_GREY_CUBE]->material.kDiffuse.Set(98 / 255.f, 98 / 255.f, 98 / 255.f);
-						meshList[GEO_GREY_CUBE]->material.kSpecular.Set(108 / 255.f, 108 / 255.f, 108 / 255.f);
-					} modelStack.PopMatrix();
-					modelStack.PushMatrix(); {
-						modelStack.Translate(0.f, -0.8f, 0.f);
-						modelStack.Rotate(35, 1.f, 0.f, -0.7f);
-						modelStack.Scale(0.5, 1.5f, 0.5f);
-						meshList[GEO_GREY_CUBE]->material.kAmbient.Set(225 / 255.f, 88 / 255.f, 34 / 255.f);
-						meshList[GEO_GREY_CUBE]->material.kDiffuse.Set(235 / 255.f, 98 / 255.f, 44 / 255.f);
-						meshList[GEO_GREY_CUBE]->material.kSpecular.Set(245 / 255.f, 108 / 255.f, 54 / 255.f);
-						meshList[GEO_GREY_CUBE]->material.kShininess = 40.0f;
-						RenderMesh(meshList[GEO_GREY_CUBE], true);
-						meshList[GEO_GREY_CUBE]->material.kAmbient.Set(88 / 255.f, 88 / 255.f, 88 / 255.f);
-						meshList[GEO_GREY_CUBE]->material.kDiffuse.Set(98 / 255.f, 98 / 255.f, 98 / 255.f);
-						meshList[GEO_GREY_CUBE]->material.kSpecular.Set(108 / 255.f, 108 / 255.f, 108 / 255.f);
-					} modelStack.PopMatrix();
-				}
-				RenderMesh(meshList[GEO_GREY_CUBE], true);
-			} modelStack.PopMatrix();
-			modelStack.Scale(2.f, 2.f, 2.f);
-			meshList[GEO_GREY_CUBE]->Render();
-			RenderMesh(meshList[GEO_GREY_CUBE], true);
-			// tubey things near stomach
-			modelStack.PushMatrix(); {
-				modelStack.Translate(0.0f, -0.2f, 0.0f);
-				modelStack.Scale(0.8f, 0.8f, 0.8f);
-				modelStack.PushMatrix(); {
-					modelStack.Translate(0.0f, -0.7f, 0.0f);
-					// front
-					modelStack.PushMatrix(); {
-						modelStack.Translate(0.0f, 0.0f, 0.8f);
-						// stomach tube front 1
-						modelStack.PushMatrix(); {
-							modelStack.Rotate(90, 0.0f, 0.0f, 1.0f);
-							modelStack.Scale(0.25f, 1.0f, 0.25f);
-							RenderMesh(meshList[GEO_ZAKU_CYLINDER], true);
-							meshList[GEO_ZAKU_CYLINDER]->Render();
-						} modelStack.PopMatrix();
-						modelStack.PushMatrix(); {
-							modelStack.Rotate(-90, 0.0f, 0.0f, 1.0f);
-							modelStack.Scale(0.25f, 1.0f, 0.25f);
-							RenderMesh(meshList[GEO_ZAKU_CYLINDER], true);
-							meshList[GEO_ZAKU_CYLINDER]->Render();
-						} modelStack.PopMatrix();
-						// stomach cube front 1
-						modelStack.PushMatrix(); {
-							modelStack.Translate(0.75f, 0.0f, 0.0f);
-							modelStack.Scale(0.5f, 0.5f, 0.5f);
-							RenderMesh(meshList[GEO_ZAKU_CUBE_ALT], true);
-						} modelStack.PopMatrix();
-						// stomach cube front 2
-						modelStack.PushMatrix(); {
-							modelStack.Translate(-0.75f, 0.0f, 0.0f);
-							modelStack.Scale(0.5f, 0.5f, 0.5f);
-							RenderMesh(meshList[GEO_ZAKU_CUBE_ALT], true);
-						} modelStack.PopMatrix();
-					} modelStack.PopMatrix();
-					// rear toob + cube
-					modelStack.PushMatrix(); {
-						modelStack.Translate(0.0f, 0.0f, -0.8f);
-						// stomach tube rear 1
-						modelStack.PushMatrix(); {
-							modelStack.Translate(-0.5f, 0.f, 0.f);
-							modelStack.Rotate(90, 0.0f, 0.0f, 1.0f);
-							modelStack.Scale(0.25f, 2.0f, 0.25f);
-							RenderMesh(meshList[GEO_ZAKU_CYLINDER_ALT], true);
-						} modelStack.PopMatrix();
-						// stomach cube rear 1
-						modelStack.PushMatrix(); {
-							modelStack.Translate(0.75f, 0.0f, 0.0f);
-							modelStack.Scale(0.5f, 0.5f, 0.5f);
-							RenderMesh(meshList[GEO_ZAKU_CUBE_ALT], true);
-						} modelStack.PopMatrix();
-						// stomach cube rear 2
-						modelStack.PushMatrix(); {
-							modelStack.Translate(-0.75f, 0.0f, 0.0f);
-							modelStack.Scale(0.5f, 0.5f, 0.5f);
-							RenderMesh(meshList[GEO_ZAKU_CUBE_ALT], true);
-						} modelStack.PopMatrix();
-					} modelStack.PopMatrix();
-					// left toob
-					modelStack.PushMatrix(); {
-						modelStack.Translate(0.75f, 0.0f, 0.6f);
-						modelStack.Rotate(90, 1.0f, 0.0f, 0.0f);
-						modelStack.Scale(0.25f, 2.5f, 0.25f);
-						RenderMesh(meshList[GEO_ZAKU_CYLINDER_ALT], true);
-					} modelStack.PopMatrix();
-					// right toob
-					modelStack.PushMatrix(); {
-						modelStack.Translate(-0.75f, 0.0f, 0.6f);
-						modelStack.Rotate(90, 1.0f, 0.0f, 0.0f);
-						modelStack.Scale(0.25f, 2.5f, 0.25f);
-						RenderMesh(meshList[GEO_ZAKU_CYLINDER_ALT], true);
-					} modelStack.PopMatrix();
-				}modelStack.PopMatrix();
-			} modelStack.PopMatrix();
-			modelStack.PushMatrix(); {
-				modelStack.Translate(0.0f, -0.5f, 0.0f);
-				modelStack.Scale(0.7f, 1.f, 0.7f);
-				RenderMesh(meshList[GEO_GREY_CUBE], true);
-			} modelStack.PopMatrix();
-		} modelStack.PopMatrix();
-		// upper hips and skirts
-		modelStack.PushMatrix(); {
-			modelStack.Translate(0.f, -3.25f, 0.f);
-			modelStack.PushMatrix(); {
-				modelStack.PushMatrix(); {
-					modelStack.Scale(4, 1.0f, 3);
-					RenderMesh(meshList[GEO_ZAKU_CUBE], true);
-				} modelStack.PopMatrix();
-				modelStack.Scale(1.f, 2.5f, 1.f);
-				RenderMesh(meshList[GEO_GREY_CUBE], true);
-			} modelStack.PopMatrix();
-		} modelStack.PopMatrix();
-		// lower hips 
-		modelStack.PushMatrix(); {
-			modelStack.Translate(0.0f, -4.5f, 0.0f);
-			// legs
-			modelStack.PushMatrix(); {
-				modelStack.Scale(0.75f, 1.0f, 1.0f);
-				// right leg
-				modelStack.PushMatrix(); {
-					modelStack.Translate(-1.75f, 0.0f, 0.0f);
-					// lower leg
-					modelStack.PushMatrix(); {
-						// moves lower leg + knee
-						modelStack.Translate(-0.7f, -1.8f, 0.0f);
-						// lower leg
-						modelStack.PushMatrix(); {
-							modelStack.Translate(0.7f, -0.6f, 0.0f);
-							// feet
-							modelStack.PushMatrix(); {
-								modelStack.Translate(0.f, -3.f, 0.0f);
-								// top of foot
-								modelStack.PushMatrix(); {
-									modelStack.Translate(0.f, 0.7f, 0.25f);
-									modelStack.Scale(0.8f, 1.0f, 1.7f);
-									RenderMesh(meshList[GEO_GREY_CUBE], true);
-								} modelStack.PopMatrix();
-								// heel
-								modelStack.PushMatrix(); {
-									modelStack.Translate(0.f, 0.f, -0.5f);
-									modelStack.Scale(1.0f, 0.5f, 1.0f);
-									RenderMesh(meshList[GEO_GREY_CUBE], true);
-								} modelStack.PopMatrix();
-								// front 
-								modelStack.PushMatrix(); {
-									modelStack.Translate(0.f, 0.f, 1.5f);
-									modelStack.Scale(1.0f, 0.5f, 1.0f);
-									RenderMesh(meshList[GEO_GREY_CUBE], true);
-								} modelStack.PopMatrix();
-							} modelStack.PopMatrix();
-							modelStack.Scale(1.5f, 1.8f, 1.5f);
-							modelStack.Translate(0.0f, -0.5f, 0.0f);
-							RenderMesh(meshList[GEO_ZAKU_CUBE_ALT], true);
-
-						} modelStack.PopMatrix();
-						// knee
-						modelStack.Rotate(90, 0.0f, 0.0f, 1.0f);
-						modelStack.Scale(1.0f, 2.5f, 0.5f);
-						RenderMesh(meshList[GEO_GREY_CYLINDER], true);
-					} modelStack.PopMatrix();
-					// upper leg piece
-					modelStack.PushMatrix(); {
-						//modelStack.PushMatrix();
-						// moves upper leg
-						modelStack.Translate(0.0f, -0.5f, 0.0f);
-						// front outer upper leg piece
-						modelStack.PushMatrix(); {
-							modelStack.Translate(-1.f, -0.39f, 0.0f);
-							modelStack.Scale(0.5f, 3.2f, 1.5f);
-							RenderMesh(meshList[GEO_ZAKU_CUBE], true);
-						} modelStack.PopMatrix();
-						modelStack.Scale(1.5f, 2.5, 1.5f);
-						RenderMesh(meshList[GEO_ZAKU_CUBE_ALT], true);
-					} modelStack.PopMatrix();
-					RenderMesh(meshList[GEO_ZAKU_CUBE_ALT], true);
-				} modelStack.PopMatrix();
-				// left leg
-				modelStack.PushMatrix(); {
-					modelStack.Translate(1.75f, 0.0f, 0.0f);
-					// lower leg
-					modelStack.PushMatrix(); {
-						// moves lower leg + knee
-						modelStack.Translate(-0.7f, -1.8f, 0.0f);
-						// lower leg
-						modelStack.PushMatrix(); {
-							modelStack.Translate(0.7f, -0.6f, 0.0f);
-							// feet
-							modelStack.PushMatrix(); {
-								modelStack.Translate(0.f, -3.f, 0.0f);
-								// top of foot
-								modelStack.PushMatrix(); {
-									modelStack.Translate(0.f, 0.7f, 0.25f);
-									modelStack.Scale(0.8f, 1.0f, 1.7f);
-									RenderMesh(meshList[GEO_GREY_CUBE], true);
-								} modelStack.PopMatrix();
-								// heel
-								modelStack.PushMatrix(); {
-									modelStack.Translate(0.f, 0.f, -0.5f);
-									modelStack.Scale(1.0f, 0.5f, 1.0f);
-									RenderMesh(meshList[GEO_GREY_CUBE], true);
-								} modelStack.PopMatrix();
-								// front 
-								modelStack.PushMatrix(); {
-									modelStack.Translate(0.f, 0.f, 1.5f);
-									modelStack.Scale(1.0f, 0.5f, 1.0f);
-									RenderMesh(meshList[GEO_GREY_CUBE], true);
-								} modelStack.PopMatrix();
-							} modelStack.PopMatrix();
-							modelStack.Scale(1.5f, 1.8f, 1.5f);
-							modelStack.Translate(0.0f, -0.5f, 0.0f);
-							RenderMesh(meshList[GEO_ZAKU_CUBE_ALT], true);
-
-						} modelStack.PopMatrix();
-						// little extra flap
-						modelStack.PushMatrix(); {
-							modelStack.Translate(0.7f, -0.6f, 0.0f);
-							modelStack.Scale(1.5f, 1.8f, 1.5f);
-							modelStack.Translate(0.0f, -0.5f, 0.0f);
-							RenderMesh(meshList[GEO_ZAKU_CUBE_ALT], true);
-						} modelStack.PopMatrix();
-						// knee 
-						modelStack.Rotate(90, 0.0f, 0.0f, 1.0f);
-						modelStack.Scale(1.0f, 2.5f, 0.5f);
-						RenderMesh(meshList[GEO_GREY_CYLINDER], true);
-					} modelStack.PopMatrix();
-					// upper leg
-					modelStack.PushMatrix(); {
-						modelStack.Translate(0.0f, -0.5f, 0.0f);
-						// front outer upper leg piece
-						modelStack.PushMatrix(); {
-							modelStack.Translate(1.0f, -0.39f, 0.0f);
-							modelStack.Scale(0.5f, 3.2f, 1.5f);
-							RenderMesh(meshList[GEO_ZAKU_CUBE], true);
-						} modelStack.PopMatrix();
-						modelStack.Scale(1.5f, 2.5f, 1.5f);
-						RenderMesh(meshList[GEO_ZAKU_CUBE_ALT], true);
-					} modelStack.PopMatrix();
-					RenderMesh(meshList[GEO_ZAKU_CUBE_ALT], true);
-
-				} modelStack.PopMatrix();
-			} modelStack.PopMatrix();
-			modelStack.Scale(2.5f, 1.0f, 1.0f);
-			RenderMesh(meshList[GEO_GREY_CUBE], true);
-		} modelStack.PopMatrix();
-
-	} modelStack.PopMatrix();
-}
-*/
 void SceneHitMen::RenderSkybox()
 {
 	modelStack.PushMatrix();
@@ -1240,17 +770,11 @@ void SceneHitMen::HandleKeyPress()
 		else
 			cameraNum = 0;
 	}
-	if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_W)) {
-		gunVerti += 0.1f;
+	if (KeyboardController::GetInstance()->IsKeyPressed(0x20)) {
+		m_bullet.pos = gunCam.position;
+		std::cout << "bang" << std::endl;
+		glm::vec3 view = glm::vec3(gunCam.position - gunCam.target);
+		m_bullet.dir = view;
+ 		m_bullet.vel = m_bullet.dir * -50.f;
 	}
-	if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_S)) {
-		gunVerti -= 0.1f;
-	}
-	if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_A)) {
-		gunHori += 0.1f;
-	}
-	if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_D)) {
-		gunHori -= 0.1f;
-	}
-	
 }

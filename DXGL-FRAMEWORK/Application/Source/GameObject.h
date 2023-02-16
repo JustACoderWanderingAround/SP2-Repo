@@ -36,6 +36,7 @@ struct GameObject
 	void WallCollisionResponse(GameObject* go1, GameObject* go2);
 	bool CheckCSCollision(GameObject* A, GameObject* B);
 	bool CheckCCCollision(GameObject* B);
+	void setDirection(const glm::vec3& vec, float radian);
 	bool active;
 	float mass;
 	float momentOfInertia;
