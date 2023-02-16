@@ -76,10 +76,10 @@ void GameObject::fixedUpdate(double dt)
 		// add in resistance force to slowly, to simplify the whole equation, you could use -(obj->vel.x)
 		// since mass is 1
 		/*if (this->vel.x > 0) {
-			force.x = -x_resistant;
+			force.x = -this->scale.x / 2;
 		}
 		else
-			force.x = x_resistant;*/
+			force.x = this->scale.x / 2;*/
 	}
 
 	//Calculate the resulting acceleration

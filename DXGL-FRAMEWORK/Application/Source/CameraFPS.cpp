@@ -92,6 +92,7 @@ void CameraFPS::Update(double dt)
 		target = position + rotatedView;
 		isDirty = true;
 	}
+
 	// nyoom
 	if (keyBoardControl) {
 		if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_W)) {
