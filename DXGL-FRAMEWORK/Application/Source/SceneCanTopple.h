@@ -10,7 +10,7 @@
 #include <vector>
 #include "GameObject.h"
 #define NUM_INTERACTABLES 1
-#define NUM_DIRTBALLS 5
+#define MAX_CANS 12
 class SceneCanTopple : public Scene
 {
 public:
@@ -23,34 +23,14 @@ public:
 		GEO_FRONT,
 		GEO_BACK,
 		GEO_TOP,
+		GEO_FLOOR,
+		GEO_TABLE,
+		GEO_BALLER,
+		GEO_TENT,
+		GEO_BARREL,
+		GEO_BALL,
+		GEO_SODACAN,
 		GEO_BOTTOM,
-		GEO_TOUCHSCREEN1,
-		GEO_TOUCHSCREEN2,
-		GEO_CIRCLE,
-		GEO_TORUS,
-		GEO_CUBE,
-		GEO_SPHERE_BLACK,
-		GEO_ZAKU_HEAD,
-		GEO_ZAKU_CUBE,
-		GEO_ZAKU_CUBE_ALT,
-		GEO_ZAKU_SPHERE,
-		GEO_GREY_CUBE,
-		GEO_ZAKU_CYLINDER,
-		GEO_ZAKU_CYLINDER_ALT,
-		GEO_GREY_CYLINDER,
-		GEO_WOOD_CUBE,
-		GEO_AXE_CUBE,
-		GEO_FIRE_CUBE,
-		GEO_GREY_FLOOR,
-		GEO_DIRTBALL,
-
-		GEO_GENERAL_FLOOR_1,
-		GEO_GENERAL_WALL_1,
-		GEO_GENERAL_WALL_2,
-		GEO_GENERAL_FLOOR_2,
-		GEO_GENERAL_FLOOR_5,
-		GEO_SECONDARY_WALL_1,
-
 		GEO_PLAYER,
 
 		GEO_CROSSHAIR,
@@ -154,25 +134,26 @@ public:
 
 private:
 	void HandleKeyPress();
+	void RenderCanStack();
+	void RenderBarrels(int barrelStartingX, int barrelStartingZ);
 	void RenderMesh(Mesh* mesh, bool enableLight);
 	void RenderMeshOnScreen(Mesh* mesh, float x, float y, float sizex, float sizey);
 	void RenderText(Mesh* mesh, std::string text, Color color);
+	void CreateCanStack(int canStartingX, int canStartingZ, int stackIdx);
 	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y);
-	void RenderZaku();
 	void RenderLight(int lightIndex);
-	void RenderControlRoom();
 	unsigned m_vertexArrayID;
 	Mesh* meshList[NUM_GEOMETRY];
 
 	unsigned m_programID;
 	unsigned m_parameters[U_TOTAL];
 	GameObject m_player;
+	GameObject* m_ball;
+	GameObject* m_can[36];
 	GameObject zakuCleaner;
 	std::vector<GameObject*> dirtBalls;
 	std::vector<GameObject*> interactables;
-	CameraFPS mainFPSCam;
-	CameraFPS zakuCam;
-	CameraFPS configCam;
+	CameraFPS camera;
 	std::vector<CameraFPS> cameraArray;
 	//AltAzCamera zakuCam;
 	int projType = 1; // fix to 0 for orthographic, 1 for projection
