@@ -158,17 +158,37 @@ void SceneHitMen::Init()
 		for (int i = -2; i < 3; i++) {
 			for (int j = -2; j < 3; j++) {
 				doorMen.emplace_back(new GameObject);
-				doorMen[counter]->pos = (glm::vec3(- 1 * j * 3.f + offSet, 5.f + offSet, -1 * i * 1.f));
+				doorMen[counter]->pos = (glm::vec3(- 1 * j * 3.f + offSet, 7.f + offSet, -1 * i * 1.1f));
 				doorMenInitPos.emplace_back(doorMen[counter]->pos);
-				doorMen[counter]->scale = glm::vec3(0.5f, 0.5f, 0.5f);
+				doorMen[counter]->scale = glm::vec3(0.5f, 3.5f, 0.5f);
 				doorMen[counter]->vel = glm::vec3(0, 0, 0);
 				doorMen[counter]->force = glm::vec3(0, 0, 0);
+				doorMen[counter]->active = true;
+				doorMen[counter]->mass = 1;
+				doorMen[counter]->momentOfInertia = 1.f;
+				doorMen[counter]->dir = glm::vec3(0, 0, 1);
 				counter += 1;
 			}
 			offSet += 1;
 		}
-		m_table.pos = glm::vec3(0, 0, 0);
-		m_table.scale = glm::vec3(5, 5, 5);
+		m_table1.pos = glm::vec3(0, 4.5f, 0);
+		m_table1.scale = glm::vec3(28.f, 0.5f, 5.5f);
+		m_table1.force = glm::vec3(0.f);
+		m_table1.vel = glm::vec3(0.f);
+		m_table1.mass = 10.f;
+
+		m_table2.pos = glm::vec3(0, 5.6f, 0.8f);
+		m_table2.scale = glm::vec3(28.f, 0.5f, 1.1f);
+		m_table2.force = glm::vec3(0.f);
+		m_table2.vel = glm::vec3(0.f);
+		m_table2.mass = 10.f;
+
+		m_table3.pos = glm::vec3(0, 6.6f, -0.2f);
+		m_table3.scale = glm::vec3(28.f, 0.5f, 1.1f);
+		m_table3.force = glm::vec3(0.f);
+		m_table3.vel = glm::vec3(0.f);
+		m_table3.mass = 10.f;
+
 		m_floor.pos = glm::vec3(0, 0, 0);
 		m_floor.scale = glm::vec3(100, 0, 100);
 		// meshList
@@ -370,34 +390,49 @@ void SceneHitMen::Update(double dt)
 		gunCam.Update(static_cast<float>(dt));
 	}
 	else {
-		mainFPSCam.target = doorMen[0]->pos;
 		mainFPSCam.Update(static_cast<float>(dt));
 	}
 	HandleKeyPress();
 	glm::vec3 view = glm::vec3(gunCam.position - gunCam.target);
 	horiView = glm::degrees(atan2(view.x, view.z));
 	vertiView = -1 * glm::degrees(atan2(view.y, view.z));
-	//if (horiView < 25.1f && horiView > -25.1f) {
-		gunHori = horiView;
-	//}
-	//if (vertiView < 10.f && vertiView > -4.5f) {
-		gunVerti = vertiView;
-	//}
-		
+	gunHori = horiView;
+	gunVerti = vertiView;
+	if (m_bullet.CheckCSCollision(&m_table1) || m_bullet.pos.y < 0.0001f) {
+		m_bullet.CollisionResponse(&m_table1);
+	}
+	else {
+		m_bullet.force += gravity;
+	}
+	if (m_bullet.pos.z < -5) {
+		m_bullet.active = false;
+	}
 	for (int i = 0; i < NUM_DOORMEN; i++) {
-		//if (doorMen[i]->vel.y < 10)
-			//doorMen[i]->vel += gravity;
-		if (m_bullet.CheckSSCollision(doorMen[i]) && m_bullet.active) {
-			m_bullet.CollisionResponse(doorMen[i]);
-			//m_bullet.active = false;
-			score += 1;
+		doorMen[i]->force.y = -10.f;
+		if (doorMen[i]->CheckCCCollision(&m_table1) || doorMen[i]->CheckCCCollision(&m_table2) || doorMen[i]->CheckCCCollision(&m_table3) || doorMen[i]->pos.y < 0.0001f) {
+			doorMen[i]->vel.y = 0;
+			doorMen[i]->force.y = 0;
 		}
-		//else 
-			//doorMen[i]->pos.x = 5.f * sin(elapsedTime * 1.5f) + doorMenInitPos[i].x;
+		if (m_bullet.CheckCSCollision(doorMen[i])) {
+			m_bullet.CollisionResponse(doorMen[i]);
+			m_bullet.active = false;
+			if (doorMen[i]->active)
+				score += 1;
+			doorMen[i]->active = false;
+			doorMen[i]->torque = m_bullet.pos - doorMen[i]->pos;
+			
+			//doorMen[i]->pos.y = 20;
+		}
+		else {
+			if (doorMen[i]->active) {
+				doorMen[i]->pos.x = sinf(elapsedTime * 1.5f) + doorMenInitPos[i].x;
+			}
+		}
 		doorMen[i]->fixedUpdate(static_cast<float>(dt));
 	}
+	;
 	m_bullet.fixedUpdate(dt);
-	std::cout << doorMen[0]->pos.x << ", " << doorMen[0]->pos.y << std::endl;
+	//std::cout << doorMen[0]->pos.x << ", " << doorMen[0]->pos.y << std::endl;
 }
 
 void SceneHitMen::Render()
@@ -441,16 +476,23 @@ void SceneHitMen::Render()
 		RenderMesh(meshList[GEO_AXES], false);
 	} modelStack.PopMatrix();
 	for (int i = 0; i < NUM_DOORMEN; i++) {
-		modelStack.PushMatrix(); {
+		
+			modelStack.PushMatrix(); {
+				modelStack.Translate(doorMen[i]->pos.x, doorMen[i]->pos.y - 1.8f, doorMen[i]->pos.z);
+				modelStack.Rotate(glm::degrees(atan2(doorMen[i]->dir.x, doorMen[i]->dir.z)), 0.f, 1.f, 0.f);
+				modelStack.Rotate(glm::degrees(atan2(doorMen[i]->dir.y, doorMen[i]->dir.z)), 1.f, 0.f, 0.f);
+				modelStack.Scale(0.5f, 0.5f, 0.5f);
+				RenderMesh(meshList[GEO_DOORMAN], true);
+				
+			} modelStack.PopMatrix();
+			modelStack.PushMatrix(); {
 			modelStack.Translate(doorMen[i]->pos.x, doorMen[i]->pos.y, doorMen[i]->pos.z);
-			modelStack.Scale(0.5f, 0.5f, 0.5f);
-			RenderMesh(meshList[GEO_DOORMAN], true);
-		} modelStack.PopMatrix();
-		modelStack.PushMatrix(); {
-			modelStack.Translate(doorMen[i]->pos.x, doorMen[i]->pos.y, doorMen[i]->pos.z);
-			modelStack.Scale(0.5f, 0.5f, 0.5f);
-			RenderMesh(meshList[GEO_SPHERE], true);
-		} modelStack.PopMatrix();
+			modelStack.Rotate(glm::degrees(atan2(doorMen[i]->dir.x, doorMen[i]->dir.z)), 0.f, 1.f, 0.f);
+			modelStack.Rotate(glm::degrees(atan2(doorMen[i]->dir.y, doorMen[i]->dir.z)), 1.f, 0.f, 0.f);
+			modelStack.Scale(doorMen[i]->scale.x, doorMen[i]->scale.y, doorMen[i]->scale.z);
+			RenderMesh(meshList[GEO_CUBE], true);
+			} modelStack.PopMatrix();
+		
 	}
 	modelStack.PushMatrix(); {
 		modelStack.Scale(1, 1, 1);
@@ -461,10 +503,7 @@ void SceneHitMen::Render()
 		modelStack.Rotate(gunVerti, 1.f, 0.f, 0.f);
 		modelStack.PushMatrix(); {
 			modelStack.Translate(0.f, -0.5f, 0.f);
-			//modelStack.Rotate(gunHori, 0.f, 1.f, 0.f);
-			//modelStack.Rotate(gunVerti, 1.f, 0.f, 0.f);
-				modelStack.Rotate(gunHori, 0.f, 1.f, 0.f);
-			//modelStack.Rotate(-1 * glm::degrees(atan2(view.y, view.z)), 1.f, 0.f, 0.f);
+			modelStack.Rotate(gunHori, 0.f, 1.f, 0.f);
 			RenderMesh(meshList[GEO_GUN], true);
 		} modelStack.PopMatrix();
 	} modelStack.PopMatrix();
@@ -485,13 +524,13 @@ void SceneHitMen::Render()
 			modelStack.Scale(1.f, 2.5f, 1.f);
 			RenderMesh(meshList[GEO_TABLE], true);
 		} modelStack.PopMatrix();
-		modelStack.PushMatrix(); {
+		/*modelStack.PushMatrix(); {
 			modelStack.Translate(0.f, 0.f, 25.f);
 			modelStack.Scale(0.5f, 5.f, 5.f);
 			RenderMesh(meshList[GEO_TABLE], true);
-		} modelStack.PopMatrix();
+		} modelStack.PopMatrix();*/
 	}modelStack.PopMatrix();
-	if (m_bullet.pos.z < 22) {
+	if (m_bullet.pos.z < 20) {
 		modelStack.PushMatrix(); {
 			modelStack.Translate(m_bullet.pos.x, m_bullet.pos.y, m_bullet.pos.z);
 			modelStack.Rotate(glm::degrees(atan2(m_bullet.dir.x, m_bullet.dir.z)), 0.f, 1.f, 0.f);

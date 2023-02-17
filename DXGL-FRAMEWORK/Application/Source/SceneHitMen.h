@@ -158,11 +158,15 @@ private:
 	float gunVerti;
 	std::vector<GameObject*> doorMen;
 	std::vector<glm::vec3> doorMenInitPos;
-	GameObject m_table;
-	/*std::vector<GameObject*>*/ ;
+	GameObject m_table1;
+	GameObject m_table2;
+	GameObject m_table3;
+	/*std::vector<GameObject*>*/
+
 	CameraFPS mainFPSCam;
 	CameraFPS gunCam;
 	CameraFPS configCam;
+
 	std::vector<CameraFPS> cameraArray;
 	//AltAzCamera zakuCam;
 	int projType = 1; // fix to 0 for orthographic, 1 for projection
