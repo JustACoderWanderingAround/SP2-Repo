@@ -428,11 +428,15 @@ void SceneHitMen::Update(double dt)
 				doorMen[i]->pos.x = sinf(elapsedTime * 1.5f) + doorMenInitPos[i].x;
 			}
 		}
+		for (int k = i; k == NUM_DOORMEN; k++) {
+			if (doorMen[k]->CheckCSCollision(doorMen[i])) {
+				doorMen[k]->CollisionResponse(doorMen[i]);
+			}
+		}
 		doorMen[i]->fixedUpdate(static_cast<float>(dt));
 	}
-	;
-	m_bullet.fixedUpdate(dt);
-	//std::cout << doorMen[0]->pos.x << ", " << doorMen[0]->pos.y << std::endl;
+	std::cout << m_bullet.vel.x << "," << m_bullet.vel.y << "," << m_bullet.vel.z << std::endl;
+	m_bullet.fixedUpdate(static_cast<float>(dt));
 }
 
 void SceneHitMen::Render()

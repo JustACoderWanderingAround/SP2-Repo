@@ -179,7 +179,21 @@ void GameObject::CollisionResponse(GameObject* that)
 	vPrimeTanVel2 = unitTangent * tangentVel2;
 
 	// step 7
+
 	this->vel = vPrimeNormalVel1 + vPrimeTanVel1;
 	that->vel = vPrimeNormalVel2 + vPrimeTanVel2;
+
+	// Calculate the restitution coefficient (bounciness) of the collision
+	float restitution = 0.5f;
+	glm::vec3 relativeVelocity = that->vel - this->vel;
+	float velocityAlongNormal = glm::dot(relativeVelocity, normal);
+	// Calculate the impulse magnitude
+	float impulseMagnitude = -(1 + restitution) * velocityAlongNormal /
+		(1 / this->mass + 1 / that->mass);
+
+	// Apply the impulse to the objects
+	glm::vec3 impulse = impulseMagnitude * normal;
+	this->vel -= impulse / this->mass;
+	that->vel += impulse / that->mass;
 
 }
