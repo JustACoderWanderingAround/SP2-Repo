@@ -382,6 +382,9 @@ void SceneHitMen::Init()
 		m_bullet.scale = glm::vec3(0.3f, 0.3f, 0.3f);
 		m_bullet.active = false;
 		m_bullet.momentOfInertia = m_bullet.mass * pow(m_bullet.scale.x, 2);
+		for (int i = 0; i < 15; i++) {
+			m_ammo[i] = &m_bullet;
+		}
 		gunHori = 0;
 		gunVerti = 0;
 		cameraNum = 0;
@@ -404,9 +407,22 @@ void SceneHitMen::Update(double dt)
 	if (gameTimer > 0) {
 		gameTimer -= dt;
 	}
-
-	
-	std::cout << gameTimer << std::endl;
+	if (reloading && totalAmmo > 0) {
+		if (reloadTimer > 0) {
+			reloadTimer -= dt;
+		}
+		else {
+			reloading = false;
+			reloadTimer = 2;
+			int temp = ammo;
+			totalAmmo -= 15 - temp;
+			if (totalAmmo < 0)
+				totalAmmo = 0;
+			ammo += 15 - temp;
+		}
+	}
+	else
+		reloading = false;
 	glm::vec3 gravity = glm::vec3(0, -5.f, 0.f);
 	if (cameraNum == 0) {
 		gunCam.Update(static_cast<float>(dt));
@@ -607,7 +623,10 @@ void SceneHitMen::Render()
 	if (reloading)
 		RenderTextOnScreen(meshList[GEO_TEXT], std::string("Reloading: " + std::to_string(reloadTimer)), Color(0.f, 0.f, 0.f), 40, 250, 30);
 	else{
-		RenderTextOnScreen(meshList[GEO_TEXT], std::string("Ammo: " + std::to_string(ammo)), Color(0.f, 0.f, 0.f), 40, 500, 30);
+		if (totalAmmo > 0 || ammo > 0)
+			RenderTextOnScreen(meshList[GEO_TEXT], std::string("Ammo:" + std::to_string(ammo) + "/" + std::to_string(totalAmmo)), Color(0.f, 0.f, 0.f), 40, 400, 30);
+		else
+			RenderTextOnScreen(meshList[GEO_TEXT], "No ammo!", Color(0.f, 0.f, 0.f), 40, 400, 30);
 	}
 
 }
@@ -936,8 +955,8 @@ void SceneHitMen::HandleKeyPress()
 			break;
 		}
 	}
-	if (KeyboardController::GetInstance()->IsKeyPressed('R')) {
-		ammo = 15;
-
+	if (KeyboardController::GetInstance()->IsKeyPressed('R') && totalAmmo > 0) {
+		reloading = true;
+		reloadTimer = 2;
 	}
 }

@@ -162,6 +162,8 @@ private:
 	GameObject m_bullet;
 	GameObject m_floor;
 	GameObject* m_grapeShot[NUM_SHELLS];
+	std::vector<GameObject*> m_ammo;
+
 	float gunHori;
 	float gunVerti;
 	std::vector<GameObject*> doorMen;
