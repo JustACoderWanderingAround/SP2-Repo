@@ -201,6 +201,7 @@ private:
 	bool reloading;
 	int totalAmmo;
 	int currBullet;
+	bool gameOver;
 };
 
 #endif
