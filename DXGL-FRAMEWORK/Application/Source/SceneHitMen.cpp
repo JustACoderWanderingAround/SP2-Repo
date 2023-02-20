@@ -164,12 +164,23 @@ void SceneHitMen::Init()
 				doorMen[counter]->vel = glm::vec3(0, 0, 0);
 				doorMen[counter]->force = glm::vec3(0, 0, 0);
 				doorMen[counter]->active = true;
-				doorMen[counter]->mass = 1;
+				doorMen[counter]->mass = 5;
 				doorMen[counter]->momentOfInertia = 1.f;
 				doorMen[counter]->dir = glm::vec3(0, 0, 1);
 				counter += 1;
 			}
 			offSet += 1;
+		}
+		for (int i = 0; i < NUM_SHELLS; i++) {
+			m_grapeShot[i] = new GameObject;
+			m_grapeShot[i]->dir = glm::vec3(0, 0, 1);
+			m_grapeShot[i]->pos = glm::vec3(gunCam.position.x, 6.5f, gunCam.position.z);
+			m_grapeShot[i]->scale = glm::vec3(0.05f, 0.05f, 0.05f);
+			m_grapeShot[i]->force = glm::vec3(0, 0, 0);
+			m_grapeShot[i]->active = true;
+			m_grapeShot[i]->mass = 0.5f;
+			m_grapeShot[i]->momentOfInertia = 1.f;
+			m_grapeShot[i]->vel = glm::vec3(0, 0, 0);
 		}
 		m_table1.pos = glm::vec3(0, 4.5f, 0);
 		m_table1.scale = glm::vec3(28.f, 0.5f, 5.5f);
@@ -364,7 +375,7 @@ void SceneHitMen::Init()
 			glUniform1f(m_parameters[U_LIGHT0_COSINNER + (i * 11)], cosf(glm::radians<float>(light[i].cosInner)));
 			glUniform1f(m_parameters[U_LIGHT0_EXPONENT + (i * 11)], light[i].exponent);
 		}
-		
+		m_bullet.mass = 1;
 		m_bullet.pos = glm::vec3(gunCam.position.x, 6.5f, gunCam.position.z);
 		m_bullet.dir = glm::vec3(0, 0, 1.f);
 		m_bullet.vel = glm::vec3(0, 0, 0.f);
@@ -376,6 +387,11 @@ void SceneHitMen::Init()
 		cameraNum = 0;
 		ammo = 15;
 		score = 0;
+		gameTimer = 30;
+		reloadTimer = 2;
+		bulletType = BULLET_TYPE::BULLET_SINGLE;
+		reloading = false;
+		totalAmmo = 30;
 }
 
 
@@ -385,6 +401,12 @@ void SceneHitMen::Update(double dt)
 		elapsedTime = 0;
 	if (dt > 0)
 		elapsedTime += dt;
+	if (gameTimer > 0) {
+		gameTimer -= dt;
+	}
+
+	
+	std::cout << gameTimer << std::endl;
 	glm::vec3 gravity = glm::vec3(0, -5.f, 0.f);
 	if (cameraNum == 0) {
 		gunCam.Update(static_cast<float>(dt));
@@ -393,13 +415,18 @@ void SceneHitMen::Update(double dt)
 		mainFPSCam.Update(static_cast<float>(dt));
 	}
 	HandleKeyPress();
+	if (reloadTimer > 0) {
+		reloadTimer -= dt;
+	}
 	glm::vec3 view = glm::vec3(gunCam.position - gunCam.target);
 	horiView = glm::degrees(atan2(view.x, view.z));
 	vertiView = -1 * glm::degrees(atan2(view.y, view.z));
 	gunHori = horiView;
 	gunVerti = vertiView;
 	if (m_bullet.CheckCSCollision(&m_table1) || m_bullet.pos.y < 0.0001f) {
-		m_bullet.CollisionResponse(&m_table1);
+		//m_bullet.CollisionResponse(&m_table1);
+		m_bullet.force.y = 0;
+		m_bullet.vel.y = 0;
 	}
 	else {
 		m_bullet.force += gravity;
@@ -407,35 +434,57 @@ void SceneHitMen::Update(double dt)
 	if (m_bullet.pos.z < -5) {
 		m_bullet.active = false;
 	}
+	for (int i = 0; i < NUM_SHELLS; i++) {
+		m_grapeShot[i]->fixedUpdate(static_cast<float>(dt));
+	}
+;
 	for (int i = 0; i < NUM_DOORMEN; i++) {
-		doorMen[i]->force.y = -10.f;
+		doorMen[i]->force.y = -5.f;
+		int hitCounter = 0;
 		if (doorMen[i]->CheckCCCollision(&m_table1) || doorMen[i]->CheckCCCollision(&m_table2) || doorMen[i]->CheckCCCollision(&m_table3) || doorMen[i]->pos.y < 0.0001f) {
 			doorMen[i]->vel.y = 0;
 			doorMen[i]->force.y = 0;
 		}
-		if (m_bullet.CheckCSCollision(doorMen[i])) {
-			m_bullet.CollisionResponse(doorMen[i]);
-			m_bullet.active = false;
-			if (doorMen[i]->active)
+		switch (bulletType) {
+		case (BULLET_TYPE::BULLET_SHOTGUN):
+				for (int j = 0; j < NUM_SHELLS; j++) {
+					if (doorMen[i]->CheckCSCollision(m_grapeShot[j]) && doorMen[i]->active) {
+						m_grapeShot[j]->CollisionResponse(doorMen[i]);
+						m_grapeShot[j]->active = false;
+						doorMen[i]->torque = m_bullet.pos - doorMen[i]->pos;
+						hitCounter += 1;
+
+					}
+				}
+				if (hitCounter > 1) {
+					doorMen[i]->active = false;
+				}
+				if (hitCounter > 3) {
+					score += 1;
+				}
+				break;
+		case (BULLET_TYPE::BULLET_SINGLE):
+			if (doorMen[i]->CheckCSCollision(&m_bullet) && doorMen[i]->active) {
+				m_bullet.CollisionResponse(doorMen[i]);
+				m_bullet.active = false;
+				doorMen[i]->active = false;
+				doorMen[i]->torque = m_bullet.pos - doorMen[i]->pos;
 				score += 1;
-			doorMen[i]->active = false;
-			doorMen[i]->torque = m_bullet.pos - doorMen[i]->pos;
-			
-			//doorMen[i]->pos.y = 20;
-		}
-		else {
-			if (doorMen[i]->active) {
-				doorMen[i]->pos.x = sinf(elapsedTime * 1.5f) + doorMenInitPos[i].x;
 			}
+
+			break;
+		}
+		if (doorMen[i]->active) {
+			doorMen[i]->pos.x = sinf(elapsedTime * 1.5f) + doorMenInitPos[i].x;
 		}
 		for (int k = i; k == NUM_DOORMEN; k++) {
 			if (doorMen[k]->CheckCSCollision(doorMen[i])) {
 				doorMen[k]->CollisionResponse(doorMen[i]);
 			}
 		}
+		
 		doorMen[i]->fixedUpdate(static_cast<float>(dt));
 	}
-	std::cout << m_bullet.vel.x << "," << m_bullet.vel.y << "," << m_bullet.vel.z << std::endl;
 	m_bullet.fixedUpdate(static_cast<float>(dt));
 }
 
@@ -489,17 +538,17 @@ void SceneHitMen::Render()
 				RenderMesh(meshList[GEO_DOORMAN], true);
 				
 			} modelStack.PopMatrix();
-			modelStack.PushMatrix(); {
+			/*modelStack.PushMatrix(); {
 			modelStack.Translate(doorMen[i]->pos.x, doorMen[i]->pos.y, doorMen[i]->pos.z);
 			modelStack.Rotate(glm::degrees(atan2(doorMen[i]->dir.x, doorMen[i]->dir.z)), 0.f, 1.f, 0.f);
 			modelStack.Rotate(glm::degrees(atan2(doorMen[i]->dir.y, doorMen[i]->dir.z)), 1.f, 0.f, 0.f);
 			modelStack.Scale(doorMen[i]->scale.x, doorMen[i]->scale.y, doorMen[i]->scale.z);
 			RenderMesh(meshList[GEO_CUBE], true);
-			} modelStack.PopMatrix();
+			} modelStack.PopMatrix();*/
 		
 	}
 	modelStack.PushMatrix(); {
-		modelStack.Scale(1, 1, 1);
+		modelStack.Scale(1.5f, 1, 1);
 		RenderMesh(meshList[GEO_TENT], true);
 	} modelStack.PopMatrix();
 	modelStack.PushMatrix(); {
@@ -528,11 +577,11 @@ void SceneHitMen::Render()
 			modelStack.Scale(1.f, 2.5f, 1.f);
 			RenderMesh(meshList[GEO_TABLE], true);
 		} modelStack.PopMatrix();
-		/*modelStack.PushMatrix(); {
+		modelStack.PushMatrix(); {
 			modelStack.Translate(0.f, 0.f, 25.f);
 			modelStack.Scale(0.5f, 5.f, 5.f);
 			RenderMesh(meshList[GEO_TABLE], true);
-		} modelStack.PopMatrix();*/
+		} modelStack.PopMatrix();
 	}modelStack.PopMatrix();
 	if (m_bullet.pos.z < 20) {
 		modelStack.PushMatrix(); {
@@ -543,10 +592,23 @@ void SceneHitMen::Render()
 			RenderMesh(meshList[GEO_SPHERE], false);
 		} modelStack.PopMatrix();
 	}
+	for (int i = 0; i < NUM_SHELLS; i++) {
+
+			modelStack.PushMatrix(); {
+				modelStack.Translate(m_grapeShot[i]->pos.x, m_grapeShot[i]->pos.y, m_grapeShot[i]->pos.z);
+				modelStack.Scale(m_grapeShot[i]->scale.x, m_grapeShot[i]->scale.y, m_grapeShot[i]->scale.z);
+				RenderMesh(meshList[GEO_SPHERE], false);
+			} modelStack.PopMatrix();
+		
+	}
 	RenderSkybox();
 	RenderTextOnScreen(meshList[GEO_TEXT], std::string("Score: " + std::to_string(score)), Color(0.f, 0.f, 0.f), 40, 0, 550);
-	RenderTextOnScreen(meshList[GEO_TEXT], "Time: ", Color(0.f, 0.f, 0.f), 40, 600, 550);
-	RenderTextOnScreen(meshList[GEO_TEXT], std::string("Ammo: " + std::to_string(ammo)), Color(0.f, 0.f, 0.f), 40, 500, 30);
+	RenderTextOnScreen(meshList[GEO_TEXT], std::string("Time: " + std::to_string(gameTimer)), Color(0.f, 0.f, 0.f), 40, 400, 550);
+	if (reloading)
+		RenderTextOnScreen(meshList[GEO_TEXT], std::string("Reloading: " + std::to_string(reloadTimer)), Color(0.f, 0.f, 0.f), 40, 250, 30);
+	else{
+		RenderTextOnScreen(meshList[GEO_TEXT], std::string("Ammo: " + std::to_string(ammo)), Color(0.f, 0.f, 0.f), 40, 500, 30);
+	}
 
 }
 
@@ -748,7 +810,6 @@ void SceneHitMen::RenderSkybox()
 
 	modelStack.PushMatrix();
 	{
-		modelStack.Translate(0.f, -10.f, 0.f);
 		modelStack.Rotate(90, -1.f, 0.f, 0.f);
 		modelStack.Rotate(180, 0.f, 0.f, 1.f);
 		meshList[GEO_BOTTOM]->material.kAmbient.Set(0.1f, 0.1f, 0.1f);
@@ -839,16 +900,44 @@ void SceneHitMen::HandleKeyPress()
 		else
 			cameraNum = 0;
 	}
-	if (KeyboardController::GetInstance()->IsKeyPressed(0x20) && ammo > 0) {
-		m_bullet.active = true;
-		m_bullet.vel = glm::vec3(0, 0, 0);
-		m_bullet.pos = gunCam.position;
-		glm::vec3 view = glm::normalize(glm::vec3(gunCam.position - gunCam.target));
-		m_bullet.dir = view;
-		m_bullet.vel = m_bullet.dir * -50.f;
-		ammo -= 1;
+	switch (bulletType) {
+	case BULLET_TYPE::BULLET_SINGLE:
+		if (KeyboardController::GetInstance()->IsKeyPressed(0x20) && ammo > 0) {
+			m_bullet.active = true;
+			m_bullet.vel = glm::vec3(0, 0, 0);
+			m_bullet.pos = gunCam.position;
+			glm::vec3 view = glm::normalize(glm::vec3(gunCam.position - gunCam.target));
+			m_bullet.dir = view;
+			m_bullet.vel = m_bullet.dir * -100.f;
+			ammo -= 1;
+		}
+		break;
+	case BULLET_TYPE::BULLET_SHOTGUN:
+		if (KeyboardController::GetInstance()->IsKeyPressed(0x20) && ammo > 2) {
+			glm::vec3 view = glm::normalize(glm::vec3(gunCam.position - gunCam.target));
+			for (int i = 0; i < NUM_SHELLS; i++) {
+				m_grapeShot[i]->pos = gunCam.position;
+				m_grapeShot[i]->dir = view;
+				m_grapeShot[i]->dir.y += ((rand() % 3) - 1.5f) * ((rand() % 5) * 0.01f);
+				m_grapeShot[i]->dir.x += ((rand() % 3) - 1.5f) * ((rand() % 5) * 0.01f);
+				m_grapeShot[i]->vel = m_grapeShot[i]->dir * -50.f;
+			}
+			ammo -= 5;
+		}
+		break;
+	}
+	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_LEFT_CONTROL)) {
+		switch (bulletType) {
+		case (BULLET_TYPE::BULLET_SINGLE):
+			bulletType = BULLET_TYPE::BULLET_SHOTGUN;
+			break;
+		case (BULLET_TYPE::BULLET_SHOTGUN):
+			bulletType = BULLET_TYPE::BULLET_SINGLE;
+			break;
+		}
 	}
 	if (KeyboardController::GetInstance()->IsKeyPressed('R')) {
 		ammo = 15;
+
 	}
 }

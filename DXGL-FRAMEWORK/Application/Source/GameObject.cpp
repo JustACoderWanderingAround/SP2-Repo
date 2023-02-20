@@ -75,7 +75,7 @@ void GameObject::fixedUpdate(double dt)
 	if (slowdown && this->vel != glm::vec3(0)) {
 		// add in resistance force to slowly, to simplify the whole equation, you could use -(obj->vel.x)
 		// since mass is 1
-		if (this->vel.x > 0) {
+		/*if (this->vel.x > 0) {
 			force.x = -x_resistant;
 		}
 		else
@@ -89,7 +89,7 @@ void GameObject::fixedUpdate(double dt)
 			force.z = -x_resistant;
 		}
 		else
-			force.z = x_resistant;
+			force.z = x_resistant;*/
 	}
 
 	//Calculate the resulting acceleration
@@ -195,5 +195,8 @@ void GameObject::CollisionResponse(GameObject* that)
 	glm::vec3 impulse = impulseMagnitude * normal;
 	this->vel -= impulse / this->mass;
 	that->vel += impulse / that->mass;
+
+	this->force = -normal;
+	that->force = normal;
 
 }

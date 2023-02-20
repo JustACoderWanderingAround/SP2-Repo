@@ -12,6 +12,7 @@
 #define NUM_INTERACTABLES 1
 #define NUM_DIRTBALLS 5
 #define NUM_DOORMEN 15
+#define NUM_SHELLS 20
 class SceneHitMen : public Scene
 {
 public:
@@ -49,6 +50,12 @@ public:
 		GEO_UI,
 		GEO_TEXT,
 		NUM_GEOMETRY,
+	};
+	enum class BULLET_TYPE {
+		BULLET_SINGLE,
+		BULLET_SHOTGUN,
+		BULLET_LASER,
+		NUM_BULLETS,
 	};
 
 	enum UNIFORM_TYPE
@@ -129,7 +136,7 @@ public:
 		U_TEXT_COLOR,
 		U_TOTAL,
 	};
-
+	BULLET_TYPE bulletType;
 	SceneHitMen();
 	~SceneHitMen();
 
@@ -154,6 +161,7 @@ private:
 	GameObject m_player;
 	GameObject m_bullet;
 	GameObject m_floor;
+	GameObject* m_grapeShot[NUM_SHELLS];
 	float gunHori;
 	float gunVerti;
 	std::vector<GameObject*> doorMen;
@@ -180,10 +188,15 @@ private:
 	int score;
 	int ammo;
 	int time;
+	double ballTimer;
 	float horiView;
 	float vertiView;
 	bool showUI;
 	double elapsedTime;
+	double gameTimer;
+	double reloadTimer;
+	bool reloading;
+	int totalAmmo;
 };
 
 #endif
