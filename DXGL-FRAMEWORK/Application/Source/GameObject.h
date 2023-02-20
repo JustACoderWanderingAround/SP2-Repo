@@ -15,6 +15,7 @@ struct GameObject
         GO_BALL,
         GO_CUBE,
         GO_CAN,
+        GO_TABLE,
         GO_BULLET,
         GO_WALL,
         GO_ALIEN,  // aliens

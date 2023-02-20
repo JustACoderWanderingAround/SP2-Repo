@@ -99,8 +99,8 @@ void Application::Init()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); //We don't want the old OpenGL
 
 	//Create a window and create its OpenGL context
-	m_width = 800;
-	m_height = 600;
+	m_width = 1000;
+	m_height = 800;
 	m_window = glfwCreateWindow(m_width, m_height, "Clean The Zaku!", NULL, NULL);
 
 	//If the window couldn't be created
