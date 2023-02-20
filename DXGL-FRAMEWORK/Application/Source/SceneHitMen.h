@@ -13,6 +13,7 @@
 #define NUM_DIRTBALLS 5
 #define NUM_DOORMEN 15
 #define NUM_SHELLS 20
+#define NUM_AMMO 15
 class SceneHitMen : public Scene
 {
 public:
@@ -163,7 +164,7 @@ private:
 	GameObject m_floor;
 	GameObject* m_grapeShot[NUM_SHELLS];
 	std::vector<GameObject*> m_ammo;
-
+	//std::vector<GameObject*> m_shotGunShell;
 	float gunHori;
 	float gunVerti;
 	std::vector<GameObject*> doorMen;
@@ -199,6 +200,7 @@ private:
 	double reloadTimer;
 	bool reloading;
 	int totalAmmo;
+	int currBullet;
 };
 
 #endif
