@@ -15,6 +15,7 @@
 #include "Scene.h"
 #include "Scene1.h"
 #include "SceneAssignment.h"
+#include "SceneHitMen.h"
 GLFWwindow* m_window;
 const unsigned char FPS = 60; // FPS of this game
 const unsigned int frameTime = 1000 / FPS; // time for each frame
@@ -98,9 +99,9 @@ void Application::Init()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); //We don't want the old OpenGL
 
 	//Create a window and create its OpenGL context
-	m_width = 800;
-	m_height = 600;
-	m_window = glfwCreateWindow(m_width, m_height, "Clean The Zaku!", NULL, NULL);
+	m_width = 1000;
+	m_height = 750;
+	m_window = glfwCreateWindow(m_width, m_height, "HitMen!", NULL, NULL);
 
 	//If the window couldn't be created
 	if (!m_window)
@@ -149,7 +150,7 @@ void Application::Init()
 void Application::Run()
 {
 	//Main Loop
-	Scene *scene = new SceneAssignment();
+	Scene *scene = new SceneHitMen();
 	scene->Init();
 
 	m_timer.startTimer();    // Start timer to calculate how long it takes to render this frame
