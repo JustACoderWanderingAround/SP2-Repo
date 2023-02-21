@@ -67,6 +67,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\player.cpp">
+       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SceneHitMen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -132,6 +135,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\player.h">
+     <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SceneHitMen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

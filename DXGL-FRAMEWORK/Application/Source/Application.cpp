@@ -16,6 +16,7 @@
 #include "Scene1.h"
 #include "SceneAssignment.h"
 #include "SceneMain.h"
+#include "SceneHitMen.h"
 GLFWwindow* m_window;
 const unsigned char FPS = 60; // FPS of this game
 const unsigned int frameTime = 1000 / FPS; // time for each frame
@@ -101,7 +102,9 @@ void Application::Init()
 	//Create a window and create its OpenGL context
 	m_width = 1000;
 	m_height = 750;
-	m_window = glfwCreateWindow(m_width, m_height, "Clean The Zaku!", NULL, NULL);
+
+	m_window = glfwCreateWindow(m_width, m_height, "Untitled Carnival Game", NULL, NULL);
+
 
 	//If the window couldn't be created
 	if (!m_window)
@@ -150,7 +153,9 @@ void Application::Init()
 void Application::Run()
 {
 	//Main Loop
+
 	Scene *scene = new SceneMain();
+
 	scene->Init();
 
 	m_timer.startTimer();    // Start timer to calculate how long it takes to render this frame

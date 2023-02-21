@@ -15,6 +15,8 @@ StopWatch::StopWatch()
 
     wTimerRes = min(max(tc.wPeriodMin, TARGET_RESOLUTION), tc.wPeriodMax);
     timeBeginPeriod(wTimerRes); 
+    currTime.QuadPart = 0;
+    prevTime.QuadPart = 0;
 }
 
 StopWatch::~StopWatch()
