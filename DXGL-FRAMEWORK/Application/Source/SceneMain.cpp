@@ -267,6 +267,10 @@ void SceneMain::Init()
 		nearToppled = false;
 		nearPinball = false;
 		nearShop = false;
+		nearFerrisWheel = false;
+		nearMarket = false;
+		nearCottonStore = false;
+		nearGrocery = false;
 
 		mainFPSCam.Init(glm::vec3(0, -7, -40), glm::vec3(0, -12, 0), glm::vec3(0.f, 1, 0.f));
 
@@ -362,8 +366,23 @@ void SceneMain::Init()
 		objs[0] = new GameObject(GameObject::GO_CUBE);
 		objs[0]->pos = glm::vec3(-30, -8, 25);
 		objs[0]->scale = glm::vec3(7, 5, 19);
-		objs[0]->active = false;
+		
+		// game object for market
+		objs[1] = new GameObject(GameObject::GO_CUBE);
+		objs[1]->pos = glm::vec3(0, -8.5, 39);
+		objs[1]->scale = glm::vec3(25, 5, 10);
+
+		// game object for market
+		objs[2] = new GameObject(GameObject::GO_CUBE);
+		objs[2]->pos = glm::vec3(7, -8.5, 7);
+		objs[2]->scale = glm::vec3(2.5, 5, 2);
+
+		// game object for grocery
+		objs[3] = new GameObject(GameObject::GO_CUBE);
+		objs[3]->pos = glm::vec3(24, -8.5, 40);
+		objs[3]->scale = glm::vec3(12, 5, 6);
 }
+
 
 
 void SceneMain::Update(double dt)	
@@ -406,7 +425,6 @@ void SceneMain::Update(double dt)
 			mainFPSCam.position.z = -27.499;
 		}
 
-		
 	
 
 	}
@@ -414,7 +432,7 @@ void SceneMain::Update(double dt)
 	else if (stallHitMan->CheckCSCollision(m_player))
 	{
 		nearHitMan = true;
-		if (mainFPSCam.position.x <= -5 && mainFPSCam.position.x > -6.6
+		if (mainFPSCam.position.x <= -6.6 && mainFPSCam.position.x > -7
 			&& mainFPSCam.position.z >= -5 && mainFPSCam.position.z <= 4)
 		{
 			mainFPSCam.position.x = -6.599;
@@ -430,31 +448,32 @@ void SceneMain::Update(double dt)
 		{
 			mainFPSCam.position.z = 4.999;
 		}
-		else if (mainFPSCam.position.z <= -4.9 && mainFPSCam.position.z >= -5
+		else if (mainFPSCam.position.z <= -3 && mainFPSCam.position.z >= -4.9
 			&& mainFPSCam.position.x <= -6.5 && mainFPSCam.position.x >= -15)
 		{
-			mainFPSCam.position.z = -5.099;
+			mainFPSCam.position.z = -4.909;
 		}
 	}
+	//pinball
 	else if (stallPinball->CheckCSCollision(m_player))
 	{
 		nearPinball = true;
-		if (mainFPSCam.position.x <= -6.5 && mainFPSCam.position.x > -6.6
+		if (mainFPSCam.position.x <= -6.5 && mainFPSCam.position.x > -7
 			&& mainFPSCam.position.z >= -27.5 && mainFPSCam.position.z <= -18.5)
 		{
 			mainFPSCam.position.x = -6.499;
 		}
-		else if (mainFPSCam.position.x <= -15 && mainFPSCam.position.x > -15.1
+		else if (mainFPSCam.position.x <= -14 && mainFPSCam.position.x > -15.1
 			&& mainFPSCam.position.z >= -27.5 && mainFPSCam.position.z <= -18.5)
 		{
-			mainFPSCam.position.x = -15.099;
+			mainFPSCam.position.x = -15.199;
 		}
-		else if (mainFPSCam.position.z <= -17.6 && mainFPSCam.position.z >= -17.7
+		else if (mainFPSCam.position.z <= -17.6 && mainFPSCam.position.z >= -18
 			&& mainFPSCam.position.x <= -6.5 && mainFPSCam.position.x >= -15)
 		{
 			mainFPSCam.position.z = -17.599;
 		}
-		else if (mainFPSCam.position.z <= -27.4 && mainFPSCam.position.z >= -27.5
+		else if (mainFPSCam.position.z <= -26 && mainFPSCam.position.z >= -27.5
 			&& mainFPSCam.position.x <= -6.5 && mainFPSCam.position.x >= -15)
 		{
 			mainFPSCam.position.z = -27.599;
@@ -464,22 +483,22 @@ void SceneMain::Update(double dt)
 	{
 		nearShop = true;
 
-		if (mainFPSCam.position.x >= 6.5 && mainFPSCam.position.x < 6.6
+		if (mainFPSCam.position.x >= 6.5 && mainFPSCam.position.x < 7
 			&& mainFPSCam.position.z >= -14 && mainFPSCam.position.z <= 4 )
 		{
 			mainFPSCam.position.x = 6.499;
 		}
-		else if (mainFPSCam.position.x >= 15 && mainFPSCam.position.x < 15.1
+		else if (mainFPSCam.position.x > 14 && mainFPSCam.position.x <= 15
 			&& mainFPSCam.position.z >= -14 && mainFPSCam.position.z <= 4)
 		{
 			mainFPSCam.position.x = 15.099;
 		}
-		else if (mainFPSCam.position.z <= 4.5 && mainFPSCam.position.z >= 4.4
+		else if (mainFPSCam.position.z > 3 && mainFPSCam.position.z <= 4.5
 			&& mainFPSCam.position.x >= 6.5 && mainFPSCam.position.x <= 15)
 		{
 			mainFPSCam.position.z = 4.599;
 		}
-		else if (mainFPSCam.position.z <= -14.8 && mainFPSCam.position.z >= -14.9
+		else if (mainFPSCam.position.z <= -13 && mainFPSCam.position.z >= -14.9
 			&& mainFPSCam.position.x >= 6.5 && mainFPSCam.position.x <= 15)
 		{
 			mainFPSCam.position.z = -14.999;
@@ -538,7 +557,106 @@ void SceneMain::Update(double dt)
 		
 	if (objs[0]->CheckCSCollision(m_player))
 	{
-		 
+		nearFerrisWheel = true;
+		if (mainFPSCam.position.x >= -33.5 && mainFPSCam.position.x < -32
+			&& mainFPSCam.position.z > 15.5 && mainFPSCam.position.z < 34.5)
+		{
+			mainFPSCam.position.x = -33.599;
+		}
+		else if (mainFPSCam.position.x > -28 && mainFPSCam.position.x <= -26.5
+			&& mainFPSCam.position.z > 15.5 && mainFPSCam.position.z < 34.5)
+		{
+			mainFPSCam.position.x = -26.499;
+		}
+		else if (mainFPSCam.position.z >= 15.5 && mainFPSCam.position.z < 17
+			&& mainFPSCam.position.x > -33.5 && mainFPSCam.position.x < -26.5)
+		{
+			mainFPSCam.position.z = 15.499;
+		}
+		else if (mainFPSCam.position.z > 33 && mainFPSCam.position.z < 34.5
+			&& mainFPSCam.position.x > -33.5 && mainFPSCam.position.x < -26.5)
+		{
+			mainFPSCam.position.z = 34.599;
+		}
+	}
+	else if (objs[1]->CheckCSCollision(m_player))
+	{
+		nearMarket = true;
+		if (mainFPSCam.position.x > 11 && mainFPSCam.position.x <= 12.5
+			&& mainFPSCam.position.z > 34 && mainFPSCam.position.z < 44)
+		{
+			mainFPSCam.position.x = 12.599;
+		}
+		else if (mainFPSCam.position.x >= -12.5&& mainFPSCam.position.x <= -11
+			&& mainFPSCam.position.z > 34 && mainFPSCam.position.z < 44)
+		{
+			mainFPSCam.position.x = -12.599;
+		}
+		else if (mainFPSCam.position.z >= 34 && mainFPSCam.position.z < 36
+			&& mainFPSCam.position.x > -12.5 && mainFPSCam.position.x < 12.5)
+		{
+			mainFPSCam.position.z = 33.99;
+		}
+		else if (mainFPSCam.position.z > 42 && mainFPSCam.position.z <= 44
+			&& mainFPSCam.position.x > -12.5 && mainFPSCam.position.x < 12.5)
+		{
+			mainFPSCam.position.z = 44.99;
+		}
+	}
+	else if (objs[2]->CheckCSCollision(m_player))
+	{
+		nearCottonStore = true;
+		if (mainFPSCam.position.x > 7.5 && mainFPSCam.position.x <= 8.25
+			&& mainFPSCam.position.z > 5 && mainFPSCam.position.z < 9)
+		{
+			mainFPSCam.position.x = 8.2599;
+		}
+		else if (mainFPSCam.position.x >= 5.75 && mainFPSCam.position.x <= 6.5
+			&& mainFPSCam.position.z > 5 && mainFPSCam.position.z < 9)
+		{
+			mainFPSCam.position.x = 5.7599;
+		}
+		else if (mainFPSCam.position.z >= 5 && mainFPSCam.position.z < 6
+			&& mainFPSCam.position.x > 5.75 && mainFPSCam.position.x < 8.25)
+		{
+			mainFPSCam.position.z = 4.99;
+		}
+		else if (mainFPSCam.position.z > 8 && mainFPSCam.position.z <= 9
+			&& mainFPSCam.position.x > 5.75 && mainFPSCam.position.x < 8.25)
+		{
+			mainFPSCam.position.z = 9.099;
+		}
+	}
+	else if (objs[3]->CheckCSCollision(m_player))
+	{
+		nearGrocery = true;
+		if (mainFPSCam.position.x > 29 && mainFPSCam.position.x <= 30
+			&& mainFPSCam.position.z < 42.5 && mainFPSCam.position.z > 37.5)
+		{
+			mainFPSCam.position.x = 30.01;
+		}
+		else if (mainFPSCam.position.x >= 18 && mainFPSCam.position.x <= 19
+			&& mainFPSCam.position.z > 42.5 && mainFPSCam.position.z > 37.5)
+		{
+			mainFPSCam.position.x = 17.99;
+		}
+		else if (mainFPSCam.position.z >= 37.5 && mainFPSCam.position.z < 39
+			&& mainFPSCam.position.x > 18 && mainFPSCam.position.x < 30)
+		{
+			mainFPSCam.position.z = 37.499;
+		}
+		else if (mainFPSCam.position.z > 41 && mainFPSCam.position.z <= 42.5
+			&& mainFPSCam.position.x > 18 && mainFPSCam.position.x < 30)
+		{
+			mainFPSCam.position.z = 42.501;
+		}
+	}
+	else
+	{
+		nearFerrisWheel = false;
+		nearMarket = false;
+		nearCottonStore = false;
+		nearGrocery = false;
 	}
 
 	if (mainFPSCam.position.x >= 49)
@@ -941,7 +1059,7 @@ void SceneMain::Render()
 
 	modelStack.PushMatrix();
 	{
-		modelStack.Translate(6.5, -9, -30);
+		modelStack.Translate(-33.5, -9, 25);
 		modelStack.Scale(0.5, 0.5, 0.5);
 		RenderMesh(meshList[GEO_CUBE], enableLight);
 	}
@@ -994,6 +1112,15 @@ void SceneMain::Render()
 	}
 	modelStack.PopMatrix();
 
+
+	//modelStack.PushMatrix();
+	//{
+	//	modelStack.Translate(objs[1]->pos.x, objs[1]->pos.y, objs[1]->pos.z);
+	//	modelStack.Scale(objs[1]->scale.x, objs[1]->scale.y, objs[1]->scale.z);
+	//	RenderMesh(meshList[GEO_CUBE], enableLight);
+	//}
+	//modelStack.PopMatrix();
+
 	modelStack.PushMatrix();
 	{
 		modelStack.Translate(7, -7.9, 7.55);
@@ -1017,6 +1144,14 @@ void SceneMain::Render()
 		RenderMesh(meshList[GEO_CANDY_STORE], enableLight);
 	}
 	modelStack.PopMatrix();
+
+	//modelStack.PushMatrix();
+	//{
+	//	modelStack.Translate(objs[2]->pos.x, objs[2]->pos.y, objs[2]->pos.z);
+	//	modelStack.Scale(objs[2]->scale.x, objs[2]->scale.y, objs[2]->scale.z);
+	//	RenderMesh(meshList[GEO_CUBE], enableLight);
+	//}
+	//modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	{
@@ -1044,6 +1179,14 @@ void SceneMain::Render()
 		RenderMesh(meshList[GEO_GROCERY_TENT], enableLight);
 	}
 	modelStack.PopMatrix();
+
+	//modelStack.PushMatrix();
+	//{
+	//	modelStack.Translate(objs[3]->pos.x, objs[3]->pos.y, objs[3]->pos.z);
+	//	modelStack.Scale(objs[3]->scale.x, objs[3]->scale.y, objs[3]->scale.z);
+	//	RenderMesh(meshList[GEO_CUBE], enableLight);
+	//}
+	//modelStack.PopMatrix();
 
 
 	for (int i = 0; i < 5; i++)
@@ -1074,6 +1217,33 @@ void SceneMain::Render()
 		meshList[GEO_TABLE]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
 		meshList[GEO_TABLE]->material.kShininess = 1.f;
 		RenderMesh(meshList[GEO_TABLE], enableLight);
+	}
+	modelStack.PopMatrix();
+
+
+	modelStack.PushMatrix();
+	{
+		modelStack.Translate(9, -10, -5);
+		modelStack.Rotate(90, 0, 1, 0);
+		modelStack.Scale(7, 2, 3);
+		meshList[GEO_TABLE]->material.kAmbient.Set(0.5f, 0.5f, 0.5f);
+		meshList[GEO_TABLE]->material.kDiffuse.Set(0.5f, 0.5f, 0.5f);
+		meshList[GEO_TABLE]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
+		meshList[GEO_TABLE]->material.kShininess = 1.f;
+		RenderMesh(meshList[GEO_TABLE], enableLight);
+	}
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	{
+		modelStack.Translate(11.5, -10, -5);
+		modelStack.Rotate(-90, 0, 1, 0);
+		modelStack.Scale(0.75, 0.75, 0.75);
+		meshList[GEO_DOORMAN]->material.kAmbient.Set(0.5f, 0.5f, 0.5f);
+		meshList[GEO_DOORMAN]->material.kDiffuse.Set(0.5f, 0.5f, 0.5f);
+		meshList[GEO_DOORMAN]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
+		meshList[GEO_DOORMAN]->material.kShininess = 1.f;
+		RenderMesh(meshList[GEO_DOORMAN], enableLight);
 	}
 	modelStack.PopMatrix();
 
@@ -1219,13 +1389,13 @@ void SceneMain::Render()
 	}
 	modelStack.PopMatrix();
 
-	modelStack.PushMatrix();
-	{
-		modelStack.Translate(objs[0]->pos.x, objs[0]->pos.y, objs[0]->pos.z);
-		modelStack.Scale(objs[0]->scale.x, objs[0]->scale.y, objs[0]->scale.z);
-		RenderMesh(meshList[GEO_CUBE], enableLight);
-	}
-	modelStack.PopMatrix();
+	//modelStack.PushMatrix();
+	//{
+	//	modelStack.Translate(objs[0]->pos.x, objs[0]->pos.y, objs[0]->pos.z);
+	//	modelStack.Scale(objs[0]->scale.x, objs[0]->scale.y, objs[0]->scale.z);
+	//	RenderMesh(meshList[GEO_CUBE], enableLight);
+	//}
+	//modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	{
@@ -1261,6 +1431,26 @@ void SceneMain::Render()
 		{
 			RenderMeshOnScreen(meshList[GEO_TEXT_BG], 400, 100, 200, 15);
 			RenderTextOnScreen(meshList[GEO_TEXT], " Buy from shop? - [F]", Color(0, 0, 0), 25, 0, 100);
+		}
+		else if (nearFerrisWheel == true)
+		{
+			RenderMeshOnScreen(meshList[GEO_TEXT_BG], 400, 100, 200, 15);
+			RenderTextOnScreen(meshList[GEO_TEXT], "Ferris Wheel is under maintenance.", Color(0, 0, 0), 25, 0, 100);
+		}
+		else if (nearMarket == true)
+		{
+			RenderMeshOnScreen(meshList[GEO_TEXT_BG], 400, 100, 200, 15);
+			RenderTextOnScreen(meshList[GEO_TEXT], "Sold out!!", Color(0, 0, 0), 25, 0, 100);
+		}
+		else if (nearCottonStore == true)
+		{
+			RenderMeshOnScreen(meshList[GEO_TEXT_BG], 400, 100, 200, 15);
+			RenderTextOnScreen(meshList[GEO_TEXT], "Get a Cotton Candy? - [F]", Color(0, 0, 0), 25, 0, 100);
+		}
+		else if (nearGrocery == true)
+		{
+			RenderMeshOnScreen(meshList[GEO_TEXT_BG], 400, 100, 200, 15);
+			RenderTextOnScreen(meshList[GEO_TEXT], "Get an Apple? - [F]", Color(0, 0, 0), 25, 0, 100);
 		}
 
 	}

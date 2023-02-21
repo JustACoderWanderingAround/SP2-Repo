@@ -177,6 +177,10 @@ private:
 	
 	glm::vec3 oldPlayerPos;
 
+	bool nearFerrisWheel;
+	bool nearMarket;
+	bool nearCottonStore;
+	bool nearGrocery;
 
 
 };
