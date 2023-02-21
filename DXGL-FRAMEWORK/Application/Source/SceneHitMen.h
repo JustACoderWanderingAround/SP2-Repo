@@ -55,7 +55,6 @@ public:
 	enum class BULLET_TYPE {
 		BULLET_SINGLE,
 		BULLET_SHOTGUN,
-		BULLET_LASER,
 		NUM_BULLETS,
 	};
 
