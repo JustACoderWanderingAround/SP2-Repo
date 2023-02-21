@@ -1,6 +1,7 @@
 #include "SceneManager.h"
 #include "SceneHitMen.h"
 #include "SceneAssignment.h"
+// todo: import all necessary .h files (main, canTopple, pinball)
 #include <iostream>
 SceneManager* SceneManager::m_instance = nullptr;
 

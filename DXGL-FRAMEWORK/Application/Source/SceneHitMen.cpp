@@ -398,7 +398,7 @@ void SceneHitMen::Init()
 		cameraNum = 0;
 		ammo = 15;
 		score = 0;
-		gameTimer = 15;
+		gameTimer = 30;
 		reloadTimer = 2;
 		bulletType = BULLET_TYPE::BULLET_SINGLE;
 		reloading = false;
