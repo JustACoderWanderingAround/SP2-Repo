@@ -205,9 +205,9 @@ void GameObject::CollisionResponse(GameObject* that)
 	that->force = normal;
 
 
-	// Apply the impulse to the objects
-	glm::vec3 impulse = impulseMagnitude * normal;
-	this->vel -= impulse / this->mass;
-	that->vel += impulse / that->mass;
+	//// Apply the impulse to the objects
+	//glm::vec3 impulse = impulseMagnitude * normal;
+	//this->vel -= impulse / this->mass;
+	//that->vel += impulse / that->mass;
 
 }
