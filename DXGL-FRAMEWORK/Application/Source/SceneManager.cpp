@@ -17,6 +17,7 @@ SceneManager::~SceneManager()
 		delete m_instance;
 		m_instance = nullptr;
 	}
+	delete currScene;
 }
 
 SceneManager* SceneManager::GetInstance()

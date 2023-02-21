@@ -203,8 +203,7 @@ void Application::Run()
 
 	} //Check if the ESC key had been pressed or if the window had been closed
 	SceneManager::GetInstance()->currScene->Exit();
-	delete scene1;
-	delete scene2;
+
 }
 
 int Application::GetWindowWidth()
