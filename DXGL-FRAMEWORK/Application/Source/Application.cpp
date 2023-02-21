@@ -153,7 +153,6 @@ void Application::Run()
 {
 	//Main Loop
 	Scene *scene1 = new SceneHitMen();
-	Scene* scene2 = new SceneAssignment();
 	Scene* scene = scene1;
 	scene->Init();
 	SceneManager::GetInstance()->currScene = scene;

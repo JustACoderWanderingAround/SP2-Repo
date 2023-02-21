@@ -36,6 +36,10 @@ void SceneManager::LoadScene(SCENE_NUM newSceneNum)
 	Scene* temp;
 	switch (newSceneNum) {
 	case SCENE_NUM::SCENE_MAIN:
+		/*temp = new SceneMain();
+		ExitScene();
+		currScene = temp;
+		InitScene();*/
 		break;
 	case SCENE_NUM::SCENE_TEST:
 		temp = new SceneAssignment();
@@ -50,8 +54,16 @@ void SceneManager::LoadScene(SCENE_NUM newSceneNum)
 		InitScene();
 		break;
 	case SCENE_NUM::SCENE_CANTOPPLE:
+		/*temp = new SceneCanTopple();
+		ExitScene();
+		currScene = temp;
+		InitScene();*/
 		break;
 	case SCENE_NUM::SCENE_PINBALL:
+		/*temp = new ScenePinBall();
+		ExitScene();
+		currScene = temp;
+		InitScene();*/
 		break;
 	default:
 		std::cout << "Error!" << std::endl;
