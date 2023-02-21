@@ -156,34 +156,37 @@ void Application::Run()
 	Scene* scene2 = new SceneAssignment();
 	Scene* scene = scene1;
 	scene->Init();
+	SceneManager::GetInstance()->currScene = scene;
+	SceneManager::GetInstance()->InitScene();
 
 
 	m_timer.startTimer();    // Start timer to calculate how long it takes to render this frame
 	while (!glfwWindowShouldClose(m_window) && !IsKeyPressed(VK_ESCAPE))
 	{
-		scene->Update(m_timer.getElapsedTime());
-		scene->Render();
+		//scene->Update(m_timer.getElapsedTime());
+		//scene->Render();
+		SceneManager::GetInstance()->RunScene(m_timer.getElapsedTime());
 		//Swap buffers
 		glfwSwapBuffers(m_window);
-		if (!isEnterUp && KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_ENTER)) {
-			if (sceneNum == SCENE_NUM::SCENE_HITMEN) {
-				scene1->Exit(); // Ensure you exit previous screen and remove the previous shader
-				scene2->Init(); // Initialise the next screen
-				scene = scene2;
-				sceneNum = SCENE_NUM::SCENE_TEST;
-			}
-			else if (sceneNum == SCENE_NUM::SCENE_TEST) {
-				scene2->Exit();
-				scene1->Init();
-				scene = scene1;
-				sceneNum = SCENE_NUM::SCENE_HITMEN;
-			}
-			isEnterUp = true;
-		}
-		else if (isEnterUp && KeyboardController::GetInstance()->IsKeyUp(GLFW_KEY_ENTER))
-		{
-			isEnterUp = false;
-		}
+		//if (!isEnterUp && KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_ENTER)) {
+		//	if (sceneNum == SCENE_NUM::SCENE_HITMEN) {
+		//		scene1->Exit(); // Ensure you exit previous screen and remove the previous shader
+		//		scene2->Init(); // Initialise the next screen
+		//		scene = scene2;
+		//		sceneNum = SCENE_NUM::SCENE_TEST;
+		//	}
+		//	else if (sceneNum == SCENE_NUM::SCENE_TEST) {
+		//		scene2->Exit();
+		//		scene1->Init();
+		//		scene = scene1;
+		//		sceneNum = SCENE_NUM::SCENE_HITMEN;
+		//	}
+		//	isEnterUp = true;
+		//}
+		//else if (isEnterUp && KeyboardController::GetInstance()->IsKeyUp(GLFW_KEY_ENTER))
+		//{
+		//	isEnterUp = false;
+		//}
 		
 
 		KeyboardController::GetInstance()->PostUpdate();
@@ -200,7 +203,7 @@ void Application::Run()
         m_timer.waitUntil(frameTime);       // Frame rate limiter. Limits each frame to a specified time in ms.   
 
 	} //Check if the ESC key had been pressed or if the window had been closed
-	scene->Exit();
+	SceneManager::GetInstance()->currScene->Exit();
 	delete scene1;
 	delete scene2;
 }

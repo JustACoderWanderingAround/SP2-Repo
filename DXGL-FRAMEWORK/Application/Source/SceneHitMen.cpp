@@ -16,6 +16,7 @@
 #include "MeshBuilder.h"
 #include "KeyboardController.h"
 #include "LoadTGA.h"
+#include "SceneManager.h"
 
 SceneHitMen::SceneHitMen()
 {
@@ -397,7 +398,7 @@ void SceneHitMen::Init()
 		cameraNum = 0;
 		ammo = 15;
 		score = 0;
-		gameTimer = 30;
+		gameTimer = 15;
 		reloadTimer = 2;
 		bulletType = BULLET_TYPE::BULLET_SINGLE;
 		reloading = false;
@@ -521,6 +522,12 @@ void SceneHitMen::Update(double dt)
 			doorMen[i]->fixedUpdate(static_cast<float>(dt));
 		}
 	}
+	else
+		{
+		if (KeyboardController::GetInstance()->IsKeyPressed('Z')) {
+			SceneManager::GetInstance()->LoadScene(SceneManager::SCENE_NUM::SCENE_TEST);
+		}
+	 }
 	//m_bullet.fixedUpdate(static_cast<float>(dt));
 }
 
@@ -979,6 +986,7 @@ void SceneHitMen::HandleKeyPress()
 				m_grapeShot[i]->dir = view;
 				m_grapeShot[i]->dir.y += ((rand() % 5) - 1.5f) * ((rand() % 4) * 0.01f);
 				m_grapeShot[i]->dir.x += ((rand() % 3) - 1.5f) * ((rand() % 4) * 0.01f);
+				m_grapeShot[i]->dir = glm::normalize(m_grapeShot[i]->dir);
 				m_grapeShot[i]->vel = m_grapeShot[i]->dir * -50.f;
 			}
 			ammo -= 5;
