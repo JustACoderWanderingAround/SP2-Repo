@@ -10,7 +10,7 @@
 #include <vector>
 #include "GameObject.h"
 #define NUM_INTERACTABLES 1
-#define MAX_CANS 5
+#define MAX_CANS 9
 class SceneCanTopple : public Scene
 {
 public:
@@ -23,6 +23,7 @@ public:
 		GEO_FRONT,
 		GEO_BACK,
 		GEO_GUI,
+		GEO_TEXT,
 		GEO_TABLECOLLIDEBOX,
 		GEO_TOP,
 		GEO_FLOOR,
@@ -32,6 +33,7 @@ public:
 		GEO_BARREL,
 		GEO_BALL,
 		GEO_SODACAN,
+		GEO_CANCOLLIDER,
 		GEO_BOTTOM,
 		GEO_PLAYER,
 
@@ -42,7 +44,6 @@ public:
 		GEO_ARROW,
 
 		GEO_UI,
-		GEO_TEXT,
 		NUM_GEOMETRY,
 	};
 
@@ -149,9 +150,13 @@ private:
 
 	unsigned m_programID;
 	unsigned m_parameters[U_TOTAL];
+	double throwingPower;
 	GameObject m_player;
 	GameObject* m_ball;
 	GameObject* m_table;
+	GameObject* m_floor;
+
+	bool poweringUp;
 	GameObject* m_can[36];
 	GameObject zakuCleaner;
 	std::vector<GameObject*> dirtBalls;
@@ -165,6 +170,7 @@ private:
 	static const int NUM_LIGHTS = 5;
 	Light light[NUM_LIGHTS];
 	bool enableLight;
+	bool gameActive;
 	float initCamY;
 	bool boosting;
 	glm::vec3 zakuPos;

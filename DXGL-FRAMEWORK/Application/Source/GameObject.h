@@ -16,6 +16,7 @@ struct GameObject
         GO_CUBE,
         GO_CAN,
         GO_TABLE,
+        GO_FLOOR,
         GO_BULLET,
         GO_WALL,
         GO_ALIEN,  // aliens
@@ -40,6 +41,7 @@ struct GameObject
     bool CheckCCCollision(GameObject* that);
     void setDirection(const glm::vec3& vec, float radian);
     bool active;
+    bool collidingWithTable;
     float mass;
     float momentOfInertia;
     float anglularVelocity;

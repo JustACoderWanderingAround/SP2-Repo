@@ -39,6 +39,8 @@ void SceneCanTopple::Init()
 	srand(rand() % rand());
 	srand(rand() % rand() % rand());
 	srand(rand() % rand() % rand() % rand() % rand());
+
+	float temp2;
 	
 	// Set background color to dark blue
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
@@ -144,7 +146,7 @@ void SceneCanTopple::Init()
 
 	}
 		// Initialise camera properties
-		camera.Init(glm::vec3(0, 10, 11), glm::vec3(0, 0, 0), glm::vec3(0.f, 1, 0.f), false, false);
+		camera.Init(glm::vec3(0, 10, 11), glm::vec3(0, 0, 0), glm::vec3(0.f, 1, 0.f));
 
 		// Init VBO here
 		for (int i = 0; i < NUM_GEOMETRY; ++i)
@@ -159,8 +161,8 @@ void SceneCanTopple::Init()
 			meshList[GEO_LEFT] = MeshBuilder::GenerateQuad("Plane", Color(1.f, 1.f, 1.f), 100.f);
 			meshList[GEO_LEFT]->textureID = LoadTGA("Image//skyboxleft.tga");
 
-			meshList[GEO_GUI] = MeshBuilder::GenerateQuad("BallTGA", Color(1.f, 1.f, 1.f), 1.f);
-			meshList[GEO_GUI]->textureID = LoadTGA("Image//circle.tga");
+			meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
+			meshList[GEO_TEXT]->textureID = LoadTGA("Image//ComicSans.tga");
 
 			meshList[GEO_RIGHT] = MeshBuilder::GenerateQuad("Plane", Color(1.f, 1.f, 1.f), 100.f);
 			meshList[GEO_RIGHT]->textureID = LoadTGA("Image//skyboxright.tga");
@@ -177,6 +179,9 @@ void SceneCanTopple::Init()
 			meshList[GEO_FRONT] = MeshBuilder::GenerateQuad("Plane", Color(1.f, 1.f, 1.f), 100.f);
 			meshList[GEO_FRONT]->textureID = LoadTGA("Image//skyboxfront.tga");
 			meshList[GEO_FLOOR] = MeshBuilder::GenerateCube("Floor", Color(0, 0.5f, 0), 1.f);
+
+			meshList[GEO_CANCOLLIDER] = MeshBuilder::GenerateCube("Floor", Color(1, 0.5F, 0.5F), 1.f);
+
 
 			meshList[GEO_BALL] = MeshBuilder::GenerateSphere("Sun", Color(1.f, 1.f, 1.f), 1.f, 16, 16);
 			meshList[GEO_TABLECOLLIDEBOX] = MeshBuilder::GenerateCube("TableCollideBox", Color(1.f, 1.f, 1.f), 1.f);
@@ -209,20 +214,30 @@ void SceneCanTopple::Init()
 		m_ball = new GameObject(GameObject::GO_BALL);
 		// Ball Value initialisation
 		m_ball->pos = camera.position;
-		m_ball->scale = glm::vec3(0.5f, 0.5f, 0.5f);
+		m_ball->scale = glm::vec3(1, 1, 1);
 		m_ball->vel = glm::vec3(0.f, 0.f, 0.f);
 		m_ball->force = glm::vec3(0.f, 0.f, 0.f);
 		m_ball->active = false;
-		m_ball->mass = 3;
+		m_ball->mass = 10;
 
 		m_table = new GameObject(GameObject::GO_TABLE);
 		// position set to (half width and 10% of the screen height
-		m_table->pos = glm::vec3(0, 6, -10);
+		m_table->pos = glm::vec3(0, 5.6f, -10);
 		m_table->scale = glm::vec3(12.5f, 1, 10.f);
 		m_table->vel = glm::vec3(0.f, 0.f, 0.f);
 		m_table->force = glm::vec3(0.f, 0.f, 0.f);
 		m_table->active = false;
-		m_table->mass = 1000;
+		m_table->mass = 100.f;
+
+		m_floor = new GameObject(GameObject::GO_FLOOR);
+		// position set to (half width and 10% of the screen height
+		m_floor->pos = glm::vec3(0, -1.f, 0);
+		m_floor->scale = glm::vec3(50, 1.f, 50);
+		m_floor->vel = glm::vec3(0.f, 0.f, 0.f);
+		m_floor->force = glm::vec3(0.f, 0.f, 0.f);
+		m_floor->active = false;
+		m_floor->mass = 50.f;
+
 
 		CreateCanStack(0, -10, 0);
 
@@ -306,8 +321,34 @@ void SceneCanTopple::Update(double dt)
 {
 	HandleKeyPress();
 
+	if (KeyboardController::GetInstance()->IsKeyDown('V'))
+	{
+		poweringUp = true;
+	}
+	
+	if (poweringUp == true)
+	{
+		throwingPower += dt * 5;
+		if (KeyboardController::GetInstance()->IsKeyUp('V'))
+		{
+			m_ball->vel = glm::vec3(0, 0, 0);
+			m_ball->pos = camera.position;
+			m_ball->dir = glm::normalize(camera.position - camera.target);
+			//m_ball->force.x = camera.target.x;
+			//m_ball->force.y = camera.target.y;
+			//m_ball->force.z = camera.target.z;
+			m_ball->vel = -(m_ball->dir * glm::vec3(throwingPower, throwingPower, throwingPower) / m_ball->mass);
+
+			poweringUp = false;
+			m_ball->active = true;
+			throwingPower = 0;
+		}
+	}
+
+	
+
 	//m_ball->dir = glm::normalize(camera.position - camera.target);
-	if (m_ball->active == true)
+	if (gameActive == true)
 	{
 
 
@@ -315,19 +356,38 @@ void SceneCanTopple::Update(double dt)
 
 		if (m_table->CheckCSCollision(m_ball))
 		{
-			m_ball->CollisionResponse(m_table);
+			m_ball->vel.y = (m_ball->vel.y / 3) * -1;
+			m_ball->vel.z = (m_ball->vel.z / 3) * -1;
+		}
+
+		if (m_floor->CheckCSCollision(m_ball))
+		{
+			//m_ball->vel.x = (m_ball->vel.x / 1.5) * -1;
+			m_ball->vel.y = (m_ball->vel.y / 3) * -1;
+			//m_ball->vel.z = (m_ball->vel.z / 1.5) * -1;
+
 		}
 
 		m_ball->fixedUpdate(static_cast<float>(dt));
 
 		for (int i = 0; i < MAX_CANS; i++)
 		{
-			m_can[i]->vel.y -= 0.1f;
 			m_can[i]->fixedUpdate(static_cast<float>(dt));
+			m_can[i]->vel.y -= 0.1f;
+
 
 			if (m_can[i]->CheckCCCollision(m_table))
 			{
-				m_can[i]->vel.y += 0.1f;
+				m_can[i]->vel.y = 0.4f;
+			}
+			else
+			{
+				m_can[i]->collidingWithTable = false;
+			}
+
+			if (m_can[i]->CheckCCCollision(m_floor))
+			{
+				m_can[i]->vel.y = 0.4f;
 			}
 
 			if (m_can[i]->CheckCSCollision(m_ball))
@@ -335,7 +395,6 @@ void SceneCanTopple::Update(double dt)
 				m_can[i]->CollisionResponse(m_ball);
 				std::cout << "Hi";
 			}
-
 			for (int j = 0; j < MAX_CANS; j++)
 			{
 				if (i == j)
@@ -344,10 +403,15 @@ void SceneCanTopple::Update(double dt)
 				}
 				else
 				{
-					if (m_can[j]->CheckCSCollision(m_can[i]))
+					if (m_can[i]->CheckCCCollision(m_can[j]) && m_can)
 					{
-						m_can[j]->CollisionResponse(m_can[i]);
+						m_can[i]->CollisionResponse(m_can[j]);
 					}
+					/*else if (m_can[i]->CheckCCCollision(m_can[j]) && m_can[j]->collidingWithTable == true)
+					{
+						m_can[i]->vel.y = 0;
+						m_can[j]->vel.y = 0;
+					}*/
 				}
 			}
 
@@ -475,7 +539,8 @@ void SceneCanTopple::Render()
 	RenderBarrels(-15, -16);
 	RenderBarrels(-15, -5);
 
-	RenderMeshOnScreen(meshList[GEO_GUI], 50, 50, 1, 1);
+	std::string temp2("Power:" + std::to_string(throwingPower)); // loading in current time
+	RenderTextOnScreen(meshList[GEO_TEXT], temp2.substr(0, 8), Color(1, 1, 0), 40, 0, 60);
 
 }
 
@@ -756,7 +821,9 @@ void SceneCanTopple::HandleKeyPress()
 {
 	if (KeyboardController::GetInstance()->IsKeyPressed('I'))
 	{
-		m_ball->pos.y += 0.5f;
+		camera.position.y += 0.5f;
+		camera.target.y += 0.5f;
+
 	}
 	if (KeyboardController::GetInstance()->IsKeyPressed('J'))
 	{
@@ -764,11 +831,12 @@ void SceneCanTopple::HandleKeyPress()
 	}
 	if (KeyboardController::GetInstance()->IsKeyPressed('K'))
 	{
-		m_ball->pos.y -= 0.5f;
+		camera.position.y -= 0.5f;
+		camera.target.y -= 0.5f;
 	}
 	if (KeyboardController::GetInstance()->IsKeyPressed('L'))
 	{
-		m_ball->pos.x += 0.5f;
+		camera.position.x += 0.5f;
 	}
 
 	if (KeyboardController::GetInstance()->IsKeyPressed(0x31))
@@ -794,6 +862,8 @@ void SceneCanTopple::HandleKeyPress()
 
 	// cam change
 	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_TAB)) {
+		gameActive = true;
+
 		m_ball->vel = glm::vec3(0, 0, 0);
 		m_ball->pos = camera.position;
 		m_ball->dir = glm::normalize(camera.position - camera.target);
@@ -815,11 +885,11 @@ void SceneCanTopple::RenderCanStack()
 		modelStack.Translate(m_can[i]->pos.x, m_can[i]->pos.y, m_can[i]->pos.z);
 		modelStack.Scale(m_can[i]->scale.x, m_can[i]->scale.y, m_can[i]->scale.z);
 		modelStack.Rotate(0, 0, 1, 0);
-		meshList[GEO_SODACAN]->material.kAmbient.Set(0.3f, 0.3f, 0.3f);
-		meshList[GEO_SODACAN]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
-		meshList[GEO_SODACAN]->material.kSpecular.Set(0.9f, 0.9f, 0.9f);
-		meshList[GEO_SODACAN]->material.kShininess = 5.0f;
-		RenderMesh(meshList[GEO_SODACAN], true);
+		meshList[GEO_CANCOLLIDER]->material.kAmbient.Set(0.3f, 0.3f, 0.3f);
+		meshList[GEO_CANCOLLIDER]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
+		meshList[GEO_CANCOLLIDER]->material.kSpecular.Set(0.9f, 0.9f, 0.9f);
+		meshList[GEO_CANCOLLIDER]->material.kShininess = 5.0f;
+		RenderMesh(meshList[GEO_CANCOLLIDER], true);
 		modelStack.PopMatrix();
 	}
 	
@@ -876,32 +946,34 @@ void SceneCanTopple::CreateCanStack(int canStartingX, int canStartingZ, int stac
 {
 	for (int i = 0; i < 5; i++)
 	{
-		m_can[stackIdx * 10 + i] = new GameObject(GameObject::GO_BALL);
-		m_can[stackIdx * 10 + i]->pos = glm::vec3(canStartingX + (i * 1.1f) - 2.f, 6.5f, canStartingZ);
-		m_can[stackIdx * 10 + i]->scale = glm::vec3(1, 1.5f, 1);
-		m_can[stackIdx * 10 + i]->vel = glm::vec3(0.f, 0.f, 0.f);
-		m_can[stackIdx * 10 + i]->force = glm::vec3(0.f, 0.f, 0.f);
-		m_can[stackIdx * 10 + i]->active = false;
-		m_can[stackIdx * 10 + i]->mass = 1;
+		m_can[stackIdx * 12 + i] = new GameObject(GameObject::GO_CAN);
+		m_can[stackIdx * 12 + i]->pos = glm::vec3(canStartingX + (i * 1.1f) - 2.f, 6.7f, canStartingZ);
+		m_can[stackIdx * 12 + i]->scale = glm::vec3(1.f, 1.f, 1);
+		m_can[stackIdx * 12 + i]->vel = glm::vec3(0.f, 0.f, 0.f);
+		m_can[stackIdx * 12 + i]->force = glm::vec3(0.f, 0.f, 0.f);
+		m_can[stackIdx * 12 + i]->active = false;
+		m_can[stackIdx * 12 + i]->collidingWithTable = false;
+		m_can[stackIdx * 12 + i]->mass = 3;
 	}
-	/*for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
-		m_can[stackIdx * 10 + i + 5] = new GameObject(GameObject::GO_BALL);
-		m_can[stackIdx * 10 + i + 5]->pos = glm::vec3(canStartingX + (i * 1.1f)- 1.5f, 8.0F, canStartingZ);
-		m_can[stackIdx * 10 + i + 5]->scale = glm::vec3(1, 1, 1);
-		m_can[stackIdx * 10 + i + 5]->vel = glm::vec3(0.f, 0.f, 0.f);
-		m_can[stackIdx * 10 + i + 5]->force = glm::vec3(0.f, 0.f, 0.f);
-		m_can[stackIdx * 10 + i + 5]->active = false;
-		m_can[stackIdx * 10 + i + 5]->mass = 1;
+		m_can[stackIdx * 12 + i + 5] = new GameObject(GameObject::GO_CAN);
+		m_can[stackIdx * 12 + i + 5]->pos = glm::vec3(canStartingX + (i * 1.1f) - 1.5f, 8.f, canStartingZ);
+		m_can[stackIdx * 12 + i + 5]->scale = glm::vec3(1.f, 1.f, 1);
+		m_can[stackIdx * 12 + i + 5]->vel = glm::vec3(0.f, 0.f, 0.f);
+		m_can[stackIdx * 12 + i + 5]->force = glm::vec3(0.f, 0.f, 0.f);
+		m_can[stackIdx * 12 + i + 5]->active = false;
+		m_can[stackIdx * 12 + 5]->collidingWithTable = false;
+		m_can[stackIdx * 12 + i + 5]->mass = 3;
 	}
-	for (int i = 0; i < 3; i++)
+	/*for (int i = 0; i < 3; i++)
 	{
-		m_can[stackIdx * 10 + i + 9] = new GameObject(GameObject::GO_BALL);
-		m_can[stackIdx * 10 + i + 9]->pos = glm::vec3(canStartingX + (i * 1.1f)- 1.f, 9.8f, canStartingZ);
-		m_can[stackIdx * 10 + i + 9]->scale = glm::vec3(1, 1, 1);
-		m_can[stackIdx * 10 + i + 9]->vel = glm::vec3(0.f, 0.f, 0.f);
-		m_can[stackIdx * 10 + i + 9]->force = glm::vec3(0.f, 0.f, 0.f);
-		m_can[stackIdx * 10 + i + 9]->active = false;
-		m_can[stackIdx * 10 + i + 9]->mass = 1;
+		m_can[stackIdx * 12 + i + 9] = new GameObject(GameObject::GO_CAN);
+		m_can[stackIdx * 12 + i + 9]->pos = glm::vec3(canStartingX + (i * 1.1f)- 1.f, 10.5f, canStartingZ);
+		m_can[stackIdx * 12 + i + 9]->scale = glm::vec3(1, 1, 1);
+		m_can[stackIdx * 12 + i + 9]->vel = glm::vec3(0.f, 0.f, 0.f);
+		m_can[stackIdx * 12 + i + 9]->force = glm::vec3(0.f, 0.f, 0.f);
+		m_can[stackIdx * 12 + i + 9]->active = false;
+		m_can[stackIdx * 12 + i + 9]->mass = 1;
 	}*/
 }
