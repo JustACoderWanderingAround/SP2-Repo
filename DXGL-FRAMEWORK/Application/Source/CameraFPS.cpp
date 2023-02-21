@@ -120,12 +120,12 @@ void CameraFPS::Update(double dt)
 			target -= right * ZOOM_SPEED * static_cast<float>(dt); // Use right vector
 			isDirty = true;
 		}
-		if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_PAGE_DOWN)) {
+		if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_Q)) {
 			position.y -= ZOOM_SPEED * static_cast<float>(dt);
 			target.y -= ZOOM_SPEED * static_cast<float>(dt);
 			isDirty = true;
 		}
-		if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_PAGE_UP)) {
+		if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_E)) {
 			position.y += ZOOM_SPEED * static_cast<float>(dt);
 			target.y += ZOOM_SPEED * static_cast<float>(dt);
 			isDirty = true;
