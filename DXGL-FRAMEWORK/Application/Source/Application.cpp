@@ -16,6 +16,7 @@
 #include "Scene1.h"
 #include "SceneAssignment.h"
 #include "SceneHitMen.h"
+#include "SceneManager.h"
 GLFWwindow* m_window;
 const unsigned char FPS = 60; // FPS of this game
 const unsigned int frameTime = 1000 / FPS; // time for each frame
@@ -145,13 +146,17 @@ void Application::Init()
 		fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
 		//return -1;
 	}
+	sceneNum = SCENE_NUM::SCENE_HITMEN;
 }
 
 void Application::Run()
 {
 	//Main Loop
-	Scene *scene = new SceneHitMen();
+	Scene *scene1 = new SceneHitMen();
+	Scene* scene2 = new SceneAssignment();
+	Scene* scene = scene1;
 	scene->Init();
+
 
 	m_timer.startTimer();    // Start timer to calculate how long it takes to render this frame
 	while (!glfwWindowShouldClose(m_window) && !IsKeyPressed(VK_ESCAPE))
@@ -160,7 +165,25 @@ void Application::Run()
 		scene->Render();
 		//Swap buffers
 		glfwSwapBuffers(m_window);
-
+		if (!isEnterUp && KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_ENTER)) {
+			if (sceneNum == SCENE_NUM::SCENE_HITMEN) {
+				scene1->Exit(); // Ensure you exit previous screen and remove the previous shader
+				scene2->Init(); // Initialise the next screen
+				scene = scene2;
+				sceneNum = SCENE_NUM::SCENE_TEST;
+			}
+			else if (sceneNum == SCENE_NUM::SCENE_TEST) {
+				scene2->Exit();
+				scene1->Init();
+				scene = scene1;
+				sceneNum = SCENE_NUM::SCENE_HITMEN;
+			}
+			isEnterUp = true;
+		}
+		else if (isEnterUp && KeyboardController::GetInstance()->IsKeyUp(GLFW_KEY_ENTER))
+		{
+			isEnterUp = false;
+		}
 		
 
 		KeyboardController::GetInstance()->PostUpdate();
@@ -178,7 +201,8 @@ void Application::Run()
 
 	} //Check if the ESC key had been pressed or if the window had been closed
 	scene->Exit();
-	delete scene;
+	delete scene1;
+	delete scene2;
 }
 
 int Application::GetWindowWidth()

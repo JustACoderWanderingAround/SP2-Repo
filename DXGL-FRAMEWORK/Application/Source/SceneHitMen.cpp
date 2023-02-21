@@ -158,7 +158,7 @@ void SceneHitMen::Init()
 		for (int i = -2; i < 3; i++) {
 			for (int j = -2; j < 3; j++) {
 				doorMen.emplace_back(new GameObject);
-				doorMen[counter]->pos = (glm::vec3(- 1 * j * 3.f + offSet, 7.f + offSet, -1 * i * 1.1f));
+				doorMen[counter]->pos = (glm::vec3(- 1 * j * 3.f + offSet, 7.5f + offSet, -1 * i * 1.1f));
 				doorMenInitPos.emplace_back(doorMen[counter]->pos);
 				doorMen[counter]->scale = glm::vec3(0.5f, 3.5f, 0.5f);
 				doorMen[counter]->vel = glm::vec3(0, 0, 0);
