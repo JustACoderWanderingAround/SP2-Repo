@@ -707,9 +707,9 @@ void SceneMain::Render()
 			RenderMesh(meshList[GEO_SPHERE], false);
 		} modelStack.PopMatrix();
 	}
-	modelStack.PushMatrix(); {
+	/*modelStack.PushMatrix(); {
 		RenderMesh(meshList[GEO_AXES], false);
-	} modelStack.PopMatrix();
+	} modelStack.PopMatrix();*/
 
 	RenderSkybox();
 
