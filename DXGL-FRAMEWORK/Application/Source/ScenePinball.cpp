@@ -499,7 +499,7 @@ void ScenePinball::Update(double dt)
 	}
 
 	//std::cout << "X: " << light[0].position.x << " Y: " << light[0].position.y << " Z: " << light[0].position.z << std::endl;
-	std::cout << "X: " << m_player->pos.x << " Y: " << m_player->pos.y << " Z: " << m_player->pos.z << std::endl;
+	//std::cout << "X: " << m_player->pos.x << " Y: " << m_player->pos.y << " Z: " << m_player->pos.z << std::endl;
 	//std::cout << "X: " << cameraArray[0].position.x << " Y: " << cameraArray[0].position.y << " Z: " << cameraArray[0].position.z << std::endl;
 	//std::cout << "X: " << cameraArray[0].target.x << " Y: " << cameraArray[0].target.y << " Z: " << cameraArray[0].target.z << std::endl;
 }
