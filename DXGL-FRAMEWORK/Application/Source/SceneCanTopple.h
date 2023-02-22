@@ -10,7 +10,7 @@
 #include <vector>
 #include "GameObject.h"
 #define NUM_INTERACTABLES 1
-#define MAX_CANS 9
+#define MAX_CANS 36
 class SceneCanTopple : public Scene
 {
 public:
@@ -177,10 +177,12 @@ private:
 	int cameraNum;
 	int currInteractable;
 	int roomY;
+	int score;
 	bool showUI;
 	bool doorOpen;
 	bool lowered;
 	bool secured;
+	double timer;
 	int strapAngle;
 	glm::vec3 zakuCleanerPos;
 };

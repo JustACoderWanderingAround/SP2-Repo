@@ -46,6 +46,10 @@ struct GameObject
     float momentOfInertia;
     float anglularVelocity;
     float multiplier;
+    bool touched;
+    double despawnTimer;
+    bool touchedOthers;
+    
 
     GameObject(GAMEOBJECT_TYPE typeValue = GO_BALL);
     ~GameObject();

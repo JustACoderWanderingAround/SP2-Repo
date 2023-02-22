@@ -41,6 +41,9 @@ void SceneCanTopple::Init()
 	srand(rand() % rand() % rand() % rand() % rand());
 
 	float temp2;
+	int score = 0;
+	gameActive = true;
+	timer = 10;
 	
 	// Set background color to dark blue
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
@@ -214,11 +217,12 @@ void SceneCanTopple::Init()
 		m_ball = new GameObject(GameObject::GO_BALL);
 		// Ball Value initialisation
 		m_ball->pos = camera.position;
-		m_ball->scale = glm::vec3(1, 1, 1);
+		m_ball->scale = glm::vec3(0.5f, 0.5f, 0.5f);
 		m_ball->vel = glm::vec3(0.f, 0.f, 0.f);
 		m_ball->force = glm::vec3(0.f, 0.f, 0.f);
 		m_ball->active = false;
-		m_ball->mass = 10;
+		m_ball->touchedOthers = false;
+		m_ball->mass = 3;
 
 		m_table = new GameObject(GameObject::GO_TABLE);
 		// position set to (half width and 10% of the screen height
@@ -227,7 +231,7 @@ void SceneCanTopple::Init()
 		m_table->vel = glm::vec3(0.f, 0.f, 0.f);
 		m_table->force = glm::vec3(0.f, 0.f, 0.f);
 		m_table->active = false;
-		m_table->mass = 100.f;
+		m_table->mass = 10;
 
 		m_floor = new GameObject(GameObject::GO_FLOOR);
 		// position set to (half width and 10% of the screen height
@@ -240,6 +244,10 @@ void SceneCanTopple::Init()
 
 
 		CreateCanStack(0, -10, 0);
+		CreateCanStack(-3, -7, 1);
+		CreateCanStack(3, -7, 2);
+
+
 
 		glUniform1i(m_parameters[U_NUMLIGHTS], NUM_LIGHTS);
 		// light params
@@ -321,227 +329,242 @@ void SceneCanTopple::Update(double dt)
 {
 	HandleKeyPress();
 
-	if (KeyboardController::GetInstance()->IsKeyDown('V'))
+	if (timer <= 0)
 	{
-		poweringUp = true;
-	}
-	
-	if (poweringUp == true)
-	{
-		throwingPower += dt * 5;
-		if (KeyboardController::GetInstance()->IsKeyUp('V'))
-		{
-			m_ball->vel = glm::vec3(0, 0, 0);
-			m_ball->pos = camera.position;
-			m_ball->dir = glm::normalize(camera.position - camera.target);
-			//m_ball->force.x = camera.target.x;
-			//m_ball->force.y = camera.target.y;
-			//m_ball->force.z = camera.target.z;
-			m_ball->vel = -(m_ball->dir * glm::vec3(throwingPower, throwingPower, throwingPower) / m_ball->mass);
-
-			poweringUp = false;
-			m_ball->active = true;
-			throwingPower = 0;
-		}
+		gameActive = false;
 	}
 
-	
-
-	//m_ball->dir = glm::normalize(camera.position - camera.target);
 	if (gameActive == true)
 	{
-
-
-		m_ball->vel.y -= 0.1f;
-
-		if (m_table->CheckCSCollision(m_ball))
+		timer -= dt;
+		if (KeyboardController::GetInstance()->IsKeyDown('V'))
 		{
-			m_ball->vel.y = (m_ball->vel.y / 3) * -1;
-			m_ball->vel.z = (m_ball->vel.z / 3) * -1;
+			poweringUp = true;
 		}
 
-		if (m_floor->CheckCSCollision(m_ball))
+		if (poweringUp == true)
 		{
-			//m_ball->vel.x = (m_ball->vel.x / 1.5) * -1;
-			m_ball->vel.y = (m_ball->vel.y / 3) * -1;
-			//m_ball->vel.z = (m_ball->vel.z / 1.5) * -1;
+			if (throwingPower < 60)
+			{
+				throwingPower += dt * 50;
+			}
+			if (KeyboardController::GetInstance()->IsKeyUp('V'))
+			{
+				m_ball->vel = glm::vec3(0, 0, 0);
+				m_ball->pos = camera.position;
+				m_ball->dir = glm::normalize(camera.position - camera.target);
+				//m_ball->force.x = camera.target.x;
+				//m_ball->force.y = camera.target.y;
+				//m_ball->force.z = camera.target.z;
+				m_ball->vel = -(m_ball->dir * glm::vec3(throwingPower, throwingPower, throwingPower) / m_ball->mass);
 
+				poweringUp = false;
+				m_ball->active = true;
+				throwingPower = 0;
+			}
 		}
 
-		m_ball->fixedUpdate(static_cast<float>(dt));
-
-		for (int i = 0; i < MAX_CANS; i++)
-		{
-			m_can[i]->fixedUpdate(static_cast<float>(dt));
-			m_can[i]->vel.y -= 0.1f;
 
 
-			if (m_can[i]->CheckCCCollision(m_table))
+		//m_ball->dir = glm::normalize(camera.position - camera.target);
+
+
+			m_ball->vel.y -= 0.1f;
+
+			if (m_table->CheckCSCollision(m_ball))
 			{
-				m_can[i]->vel.y = 0.4f;
-			}
-			else
-			{
-				m_can[i]->collidingWithTable = false;
+				m_ball->CollisionResponse(m_table);
+
 			}
 
-			if (m_can[i]->CheckCCCollision(m_floor))
+			if (m_floor->CheckCSCollision(m_ball))
 			{
-				m_can[i]->vel.y = 0.4f;
+				//m_ball->vel.x = (m_ball->vel.x / 1.5) * -1;
+				m_ball->CollisionResponse(m_floor);
+				//m_ball->vel.z = (m_ball->vel.z / 1.5) * -1;
+
 			}
 
-			if (m_can[i]->CheckCSCollision(m_ball))
+
+			m_ball->fixedUpdate(static_cast<float>(dt));
+
+			for (int i = 0; i < MAX_CANS; i++)
 			{
-				m_can[i]->CollisionResponse(m_ball);
-				std::cout << "Hi";
-			}
-			for (int j = 0; j < MAX_CANS; j++)
-			{
-				if (i == j)
+				m_can[i]->fixedUpdate(static_cast<float>(dt));
+				if (m_can[i]->touched == true)
 				{
-					//skips
+					m_can[i]->vel.y -= 0.1f;
 				}
-				else
+
+				if (m_can[i]->CheckCCCollision(m_table))
 				{
-					if (m_can[i]->CheckCCCollision(m_can[j]) && m_can)
+					m_can[i]->vel.y = 0;
+					m_can[i]->collidingWithTable = true;
+				}
+
+				if (m_can[i]->CheckCCCollision(m_floor))
+				{
+					m_can[i]->vel.y = 0.4f;
+				}
+
+				if (m_can[i]->CheckCSCollision(m_ball))
+				{
+					m_ball->CollisionResponse(m_can[i]);
+					m_ball->touchedOthers = true;
+					if (m_can[i]->touched == true)
 					{
-						m_can[i]->CollisionResponse(m_can[j]);
+
 					}
-					/*else if (m_can[i]->CheckCCCollision(m_can[j]) && m_can[j]->collidingWithTable == true)
+					else
 					{
-						m_can[i]->vel.y = 0;
-						m_can[j]->vel.y = 0;
-					}*/
+						m_can[i]->touched = true;
+						score += 1;
+					}
+					//std::cout << "Hi";
 				}
+
+
+
 			}
-
-		} 
-	}
+		}
 
 
-	std::cout << camera.target.x << "," << camera.target.y << "," << camera.target.z << std::endl;
-	//std::cout << "Pos: " << cameraArray[0].position.x << ", " << cameraArray[0].position.y << ", " << cameraArray[0].position.z << std::endl;
+		std::cout << camera.target.x << "," << camera.target.y << "," << camera.target.z << std::endl;
+		//std::cout << "Pos: " << cameraArray[0].position.x << ", " << cameraArray[0].position.y << ", " << cameraArray[0].position.z << std::endl;
 
-	// spotlight for zaku cleaner view
-	light[0].position = glm::vec3(camera.position.x, camera.position.y, camera.position.z);
-	light[0].spotDirection = glm::normalize(camera.position - camera.target);
-	camera.Update(dt);
+		// spotlight for zaku cleaner view
+		light[0].position = glm::vec3(camera.position.x, camera.position.y, camera.position.z);
+		light[0].spotDirection = glm::normalize(camera.position - camera.target);
+		camera.Update(dt);
+	
 }
 
 void SceneCanTopple::Render()
 {
-	// Clear color buffer every frame
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// Load view matrix stack and set it with camera position, target position and up direction
-	viewStack.LoadIdentity(); {
-		viewStack.LookAt(
-			camera.position.x, camera.position.y, camera.position.z,
-			camera.target.x, camera.target.y, camera.target.z,
-			camera.up.x, camera.up.y, camera.up.z
-		);
-		// Load identity matrix into the model stack
-	} modelStack.LoadIdentity();
-
-	for (int i = 0; i < NUM_LIGHTS; i++) {
-
-		RenderLight(i);
-
-	}
-
-	for (int i = 0; i < NUM_LIGHTS; i++) {
-		modelStack.PushMatrix(); {
-			modelStack.Translate(light[i].position.x, light[i].position.y, light[i].position.z);
-			modelStack.Scale(0.01f, 0.01f, 0.01f);
-			//RenderMesh(meshList[GEO_SPHERE], false);
-		} modelStack.PopMatrix();
-	}
-	modelStack.PushMatrix(); {
-		RenderMesh(meshList[GEO_AXES], false);
-	} modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	// Render Sun
-
-	RenderSkybox();
-
-	modelStack.PushMatrix(); // Render light visualiser
-	modelStack.Translate(light[1].position.x, light[1].position.y, light[1].position.z);
-	RenderMesh(meshList[GEO_SPHERE], false);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix(); // Render floor
-	modelStack.Scale(50, 0.2f, 50);
-	modelStack.Translate(0, -0.2f, 0);
-	meshList[GEO_FLOOR]->material.kAmbient.Set(0.5f, 0.5, 0.5f);
-	meshList[GEO_FLOOR]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
-	meshList[GEO_FLOOR]->material.kSpecular.Set(0.9f, 0.9f, 0.9f);
-	meshList[GEO_FLOOR]->material.kShininess = 2.5f;
-	RenderMesh(meshList[GEO_FLOOR], true);
-	modelStack.PopMatrix();
-
-	if (m_ball->active == true)
+	if (gameActive == true)
 	{
+		// Clear color buffer every frame
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		// Load view matrix stack and set it with camera position, target position and up direction
+		viewStack.LoadIdentity(); {
+			viewStack.LookAt(
+				camera.position.x, camera.position.y, camera.position.z,
+				camera.target.x, camera.target.y, camera.target.z,
+				camera.up.x, camera.up.y, camera.up.z
+			);
+			// Load identity matrix into the model stack
+		} modelStack.LoadIdentity();
+
+		for (int i = 0; i < NUM_LIGHTS; i++) {
+
+			RenderLight(i);
+
+		}
+
+		for (int i = 0; i < NUM_LIGHTS; i++) {
+			modelStack.PushMatrix(); {
+				modelStack.Translate(light[i].position.x, light[i].position.y, light[i].position.z);
+				modelStack.Scale(0.01f, 0.01f, 0.01f);
+				//RenderMesh(meshList[GEO_SPHERE], false);
+			} modelStack.PopMatrix();
+		}
+		modelStack.PushMatrix(); {
+			RenderMesh(meshList[GEO_AXES], false);
+		} modelStack.PopMatrix();
+
 		modelStack.PushMatrix();
-		modelStack.Translate(m_ball->pos.x, m_ball->pos.y, m_ball->pos.z);
-		modelStack.Scale(m_ball->scale.x, m_ball->scale.y, m_ball->scale.z);
-		meshList[GEO_BALL]->material.kAmbient.Set(0.5f, 0.5, 0.5f);
-		meshList[GEO_BALL]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
-		meshList[GEO_BALL]->material.kSpecular.Set(0.9f, 0.9f, 0.9f);
-		meshList[GEO_BALL]->material.kShininess = 2.5f;
-		RenderMesh(meshList[GEO_BALL], true);
+		// Render Sun
+
+
+
+		modelStack.PushMatrix(); // Render light visualiser
+		modelStack.Translate(light[1].position.x, light[1].position.y, light[1].position.z);
+		RenderMesh(meshList[GEO_SPHERE], false);
 		modelStack.PopMatrix();
+
+		modelStack.PushMatrix(); // Render floor
+		modelStack.Scale(50, 0.2f, 50);
+		modelStack.Translate(0, -0.2f, 0);
+		meshList[GEO_FLOOR]->material.kAmbient.Set(0.5f, 0.5, 0.5f);
+		meshList[GEO_FLOOR]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
+		meshList[GEO_FLOOR]->material.kSpecular.Set(0.9f, 0.9f, 0.9f);
+		meshList[GEO_FLOOR]->material.kShininess = 2.5f;
+		RenderMesh(meshList[GEO_FLOOR], true);
+		modelStack.PopMatrix();
+
+		if (m_ball->active == true)
+		{
+			modelStack.PushMatrix();
+			modelStack.Translate(m_ball->pos.x, m_ball->pos.y, m_ball->pos.z);
+			modelStack.Scale(m_ball->scale.x, m_ball->scale.y, m_ball->scale.z);
+			meshList[GEO_BALL]->material.kAmbient.Set(0.5f, 0.5, 0.5f);
+			meshList[GEO_BALL]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
+			meshList[GEO_BALL]->material.kSpecular.Set(0.9f, 0.9f, 0.9f);
+			meshList[GEO_BALL]->material.kShininess = 2.5f;
+			RenderMesh(meshList[GEO_BALL], true);
+			modelStack.PopMatrix();
+		}
+
+		modelStack.PushMatrix();  // Render Player / Steve
+		modelStack.Translate(-1.5f, 0, -10);
+		modelStack.Scale(0.5f, 0.5f, 0.5f);
+		modelStack.Rotate(0, 0, 1, 0);
+		meshList[GEO_TABLE]->material.kAmbient.Set(0.3f, 0.3f, 0.3f);
+		meshList[GEO_TABLE]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
+		meshList[GEO_TABLE]->material.kSpecular.Set(0.9f, 0.9f, 0.9f);
+		meshList[GEO_TABLE]->material.kShininess = 5.0f;
+		RenderMesh(meshList[GEO_TABLE], true);
+		modelStack.PopMatrix();
+
+		/*modelStack.PushMatrix();
+		modelStack.Translate(m_table->pos.x, m_table->pos.y, m_table->pos.z);
+		modelStack.Scale(m_table->scale.x, m_table->scale.y, m_table->scale.z);
+		RenderMesh(meshList[GEO_TABLECOLLIDEBOX], true);
+		modelStack.PopMatrix();*/
+
+		modelStack.PushMatrix();  // Render Player / Steve
+		modelStack.Translate(0, 0, -10);
+		modelStack.Scale(1, 1, 1);
+		modelStack.Rotate(0, 0, 1, 0);
+		meshList[GEO_TENT]->material.kAmbient.Set(0.3f, 0.3f, 0.3f);
+		meshList[GEO_TENT]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
+		meshList[GEO_TENT]->material.kSpecular.Set(0.9f, 0.9f, 0.9f);
+		meshList[GEO_TENT]->material.kShininess = 5.0f;
+		RenderMesh(meshList[GEO_TENT], true);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();  // Render Player / Steve
+		modelStack.Translate(2, 0, 8);
+		modelStack.Scale(1.5, 1.5, 1.5);
+		modelStack.Rotate(180, 0, 1, 0);
+		meshList[GEO_BALLER]->material.kAmbient.Set(0.3f, 0.3f, 0.3f);
+		meshList[GEO_BALLER]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
+		meshList[GEO_BALLER]->material.kSpecular.Set(0.9f, 0.9f, 0.9f);
+		meshList[GEO_BALLER]->material.kShininess = 5.0f;
+		RenderMesh(meshList[GEO_BALLER], true);
+		modelStack.PopMatrix();
+
+		RenderCanStack();
+
+		RenderBarrels(-12, -20);
+		RenderBarrels(-15, -20);
+		RenderBarrels(-15, -16);
+		RenderBarrels(-15, -5);
+
+		RenderSkybox();
+
+		std::string temp2("Power:" + std::to_string(throwingPower)); // loading in current time
+		RenderTextOnScreen(meshList[GEO_TEXT], temp2.substr(0, 8), Color(1, 1, 0), 40, 0, 20);
+
+		std::string temp3("Score:" + std::to_string(timer)); // loading in current time
+		RenderTextOnScreen(meshList[GEO_TEXT], temp3.substr(0, 8), Color(1, 1, 0), 40, 0, 80);
 	}
-
-	modelStack.PushMatrix();  // Render Player / Steve
-	modelStack.Translate(-1.5f, 0, -10);
-	modelStack.Scale(0.5f, 0.5f, 0.5f);
-	modelStack.Rotate(0, 0, 1, 0);
-	meshList[GEO_TABLE]->material.kAmbient.Set(0.3f, 0.3f, 0.3f);
-	meshList[GEO_TABLE]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
-	meshList[GEO_TABLE]->material.kSpecular.Set(0.9f, 0.9f, 0.9f);
-	meshList[GEO_TABLE]->material.kShininess = 5.0f;
-	RenderMesh(meshList[GEO_TABLE], true);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	modelStack.Translate(m_table->pos.x, m_table->pos.y, m_table->pos.z);
-	modelStack.Scale(m_table->scale.x, m_table->scale.y, m_table->scale.z);
-	RenderMesh(meshList[GEO_TABLECOLLIDEBOX], true);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();  // Render Player / Steve
-	modelStack.Translate(0, 0, -10);
-	modelStack.Scale(1, 1, 1);
-	modelStack.Rotate(0, 0, 1, 0);
-	meshList[GEO_TENT]->material.kAmbient.Set(0.3f, 0.3f, 0.3f);
-	meshList[GEO_TENT]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
-	meshList[GEO_TENT]->material.kSpecular.Set(0.9f, 0.9f, 0.9f);
-	meshList[GEO_TENT]->material.kShininess = 5.0f;
-	RenderMesh(meshList[GEO_TENT], true);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();  // Render Player / Steve
-	modelStack.Translate(2, 0, 8);
-	modelStack.Scale(1.5, 1.5, 1.5);
-	modelStack.Rotate(180, 0, 1, 0);
-	meshList[GEO_BALLER]->material.kAmbient.Set(0.3f, 0.3f, 0.3f);
-	meshList[GEO_BALLER]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
-	meshList[GEO_BALLER]->material.kSpecular.Set(0.9f, 0.9f, 0.9f);
-	meshList[GEO_BALLER]->material.kShininess = 5.0f;
-	RenderMesh(meshList[GEO_BALLER], true);
-	modelStack.PopMatrix();
-
-	RenderCanStack();
-
-	RenderBarrels(-12, -20);
-	RenderBarrels(-15, -20);
-	RenderBarrels(-15, -16);
-	RenderBarrels(-15, -5);
-
-	std::string temp2("Power:" + std::to_string(throwingPower)); // loading in current time
-	RenderTextOnScreen(meshList[GEO_TEXT], temp2.substr(0, 8), Color(1, 1, 0), 40, 0, 60);
-
+	else
+	{
+	std::string temp3("Score:" + std::to_string(timer)); // loading in current time
+	RenderTextOnScreen(meshList[GEO_TEXT], temp3.substr(0, 8), Color(1, 1, 0), 40, 0, 80);
+	}
 }
 
 
@@ -881,16 +904,30 @@ void SceneCanTopple::RenderCanStack()
 {
 	for (int i = 0; i < MAX_CANS; i++)
 	{
-		modelStack.PushMatrix();  // Render Player / Steve
-		modelStack.Translate(m_can[i]->pos.x, m_can[i]->pos.y, m_can[i]->pos.z);
-		modelStack.Scale(m_can[i]->scale.x, m_can[i]->scale.y, m_can[i]->scale.z);
-		modelStack.Rotate(0, 0, 1, 0);
-		meshList[GEO_CANCOLLIDER]->material.kAmbient.Set(0.3f, 0.3f, 0.3f);
-		meshList[GEO_CANCOLLIDER]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
-		meshList[GEO_CANCOLLIDER]->material.kSpecular.Set(0.9f, 0.9f, 0.9f);
-		meshList[GEO_CANCOLLIDER]->material.kShininess = 5.0f;
-		RenderMesh(meshList[GEO_CANCOLLIDER], true);
-		modelStack.PopMatrix();
+		if (m_can[i]->active == true)
+		{
+			modelStack.PushMatrix();  // Render Player / Steve
+			modelStack.Translate(m_can[i]->pos.x, m_can[i]->pos.y - 0.7f, m_can[i]->pos.z);
+			modelStack.Scale(m_can[i]->scale.x, 1, m_can[i]->scale.z);
+			modelStack.Rotate(0, 0, 1, 0);
+			meshList[GEO_SODACAN]->material.kAmbient.Set(0.3f, 0.3f, 0.3f);
+			meshList[GEO_SODACAN]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
+			meshList[GEO_SODACAN]->material.kSpecular.Set(0.9f, 0.9f, 0.9f);
+			meshList[GEO_SODACAN]->material.kShininess = 5.0f;
+			RenderMesh(meshList[GEO_SODACAN], true);
+			modelStack.PopMatrix();
+		}
+
+		//modelStack.PushMatrix();  // Render Player / Steve
+		//modelStack.Translate(m_can[i]->pos.x, m_can[i]->pos.y, m_can[i]->pos.z);
+		//modelStack.Scale(m_can[i]->scale.x, m_can[i]->scale.y, m_can[i]->scale.z);
+		//modelStack.Rotate(0, 0, 1, 0);
+		//meshList[GEO_CANCOLLIDER]->material.kAmbient.Set(0.3f, 0.3f, 0.3f);
+		//meshList[GEO_CANCOLLIDER]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
+		//meshList[GEO_CANCOLLIDER]->material.kSpecular.Set(0.9f, 0.9f, 0.9f);
+		//meshList[GEO_CANCOLLIDER]->material.kShininess = 5.0f;
+		//RenderMesh(meshList[GEO_CANCOLLIDER], true);
+		//modelStack.PopMatrix();
 	}
 	
 }
@@ -947,33 +984,37 @@ void SceneCanTopple::CreateCanStack(int canStartingX, int canStartingZ, int stac
 	for (int i = 0; i < 5; i++)
 	{
 		m_can[stackIdx * 12 + i] = new GameObject(GameObject::GO_CAN);
-		m_can[stackIdx * 12 + i]->pos = glm::vec3(canStartingX + (i * 1.1f) - 2.f, 6.7f, canStartingZ);
-		m_can[stackIdx * 12 + i]->scale = glm::vec3(1.f, 1.f, 1);
+		m_can[stackIdx * 12 + i]->pos = glm::vec3(canStartingX + (i * 1.2f) - 2.f, 6.6f ,canStartingZ);
+		m_can[stackIdx * 12 + i]->scale = glm::vec3(1.f, 1.5f, 1);
 		m_can[stackIdx * 12 + i]->vel = glm::vec3(0.f, 0.f, 0.f);
 		m_can[stackIdx * 12 + i]->force = glm::vec3(0.f, 0.f, 0.f);
-		m_can[stackIdx * 12 + i]->active = false;
+		m_can[stackIdx * 12 + i]->active = true;
+		m_can[stackIdx * 12 + i]->collidingWithTable = false;
 		m_can[stackIdx * 12 + i]->collidingWithTable = false;
 		m_can[stackIdx * 12 + i]->mass = 3;
 	}
 	for (int i = 0; i < 4; i++)
 	{
 		m_can[stackIdx * 12 + i + 5] = new GameObject(GameObject::GO_CAN);
-		m_can[stackIdx * 12 + i + 5]->pos = glm::vec3(canStartingX + (i * 1.1f) - 1.5f, 8.f, canStartingZ);
-		m_can[stackIdx * 12 + i + 5]->scale = glm::vec3(1.f, 1.f, 1);
+		m_can[stackIdx * 12 + i + 5]->pos = glm::vec3(canStartingX + (i * 1.2f) - 1.6f, 8.1f, canStartingZ);
+		m_can[stackIdx * 12 + i + 5]->scale = glm::vec3(1.f, 2.f, 1);
 		m_can[stackIdx * 12 + i + 5]->vel = glm::vec3(0.f, 0.f, 0.f);
 		m_can[stackIdx * 12 + i + 5]->force = glm::vec3(0.f, 0.f, 0.f);
-		m_can[stackIdx * 12 + i + 5]->active = false;
-		m_can[stackIdx * 12 + 5]->collidingWithTable = false;
+		m_can[stackIdx * 12 + i + 5]->active = true;
+		m_can[stackIdx * 12 + i + 5]->collidingWithTable = false;
+		m_can[stackIdx * 12 + i + 5]->touched = false;
 		m_can[stackIdx * 12 + i + 5]->mass = 3;
 	}
-	/*for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		m_can[stackIdx * 12 + i + 9] = new GameObject(GameObject::GO_CAN);
-		m_can[stackIdx * 12 + i + 9]->pos = glm::vec3(canStartingX + (i * 1.1f)- 1.f, 10.5f, canStartingZ);
-		m_can[stackIdx * 12 + i + 9]->scale = glm::vec3(1, 1, 1);
+		m_can[stackIdx * 12 + i + 9]->pos = glm::vec3(canStartingX + (i * 1.2f)- 1.f, 9.6f, canStartingZ);
+		m_can[stackIdx * 12 + i + 9]->scale = glm::vec3(1, 2.f, 1);
 		m_can[stackIdx * 12 + i + 9]->vel = glm::vec3(0.f, 0.f, 0.f);
 		m_can[stackIdx * 12 + i + 9]->force = glm::vec3(0.f, 0.f, 0.f);
-		m_can[stackIdx * 12 + i + 9]->active = false;
-		m_can[stackIdx * 12 + i + 9]->mass = 1;
-	}*/
+		m_can[stackIdx * 12 + i + 9]->active = true;
+		m_can[stackIdx * 12 + i + 9]->collidingWithTable = false;
+		m_can[stackIdx * 12 + 9]->touched = false;
+		m_can[stackIdx * 12 + i + 9]->mass = 3;
+	}
 }
