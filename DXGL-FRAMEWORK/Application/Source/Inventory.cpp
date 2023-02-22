@@ -8,16 +8,20 @@ Inventory::Inventory()
 	items[1] = "Ball";
 	items[2] = "Rubik's Cube";
 	items[3] = "Potion of Change";
-
+	items[4] = "Cotton Candy";
+	items[5] = "Apple";
+ 
 	descriptions[0] = "Robot From Moblie Suit Gundam.";
 	descriptions[1] = "A normal ball.";
 	descriptions[2] = "3D puzzle.";
-	descriptions[3] = "Potion that changes the person's appearnce";
+	descriptions[3] = "Potion that changes the person's appearance.";
+	descriptions[4] = "Candy that melts in the mouth.";
+	descriptions[5] = "An apple a day keeps the doctor away.";
 }
 
 Inventory::~Inventory()
 {
-	item* delItems;
+	Item* delItems;
 	delItems = headptr;
 	while (delItems != nullptr)
 	{
@@ -29,7 +33,7 @@ Inventory::~Inventory()
 	temp = nullptr;
 }
 
-item* Inventory::findTail()
+Item* Inventory::findTail()
 {
 	if (headptr == nullptr)
 	{
@@ -37,7 +41,7 @@ item* Inventory::findTail()
 	}
 	else
 	{
-		item* tailptr;
+		Item* tailptr;
 		tailptr = headptr;
 		while (tailptr->getNextItem() != nullptr)
 		{
@@ -47,15 +51,20 @@ item* Inventory::findTail()
 	}
 }
 
-item* Inventory::findName(std::string NAME)
+Item* Inventory::findName(std::string NAME)
 {
-	item* finder;
+	Item* finder;
 	finder = headptr;
-	while (finder->getName() != NAME && finder->getNextItem() != nullptr
-		&& finder != nullptr)
+	while (finder != nullptr)
 	{
-		// check next one when the prev is not NAME and and next is Not nullptr 
-		finder = finder->nextItem;
+		if (finder->getName() != NAME)
+		{
+			finder = finder->nextItem;
+		}
+		else
+		{
+			break;
+		}
 	}
 
 	return finder;
@@ -70,19 +79,19 @@ void Inventory::addItem(std::string NAME)
 	desNo = 0;
 	// find name in LL
 	
-	if (findName(NAME)->name == NAME)
+	if (findName(NAME) != nullptr)
 	{
 		findName(NAME)->addAmt();
 	}
-	else
+	else 
 	{
 		// find if name  exist in items[4]
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 6; i++)
 		{
 			if (NAME == items[i])
 			{
 				nameFinder = true;
-				desNo = 1;
+				desNo = i;
 				break;
 			}
 			else
@@ -93,9 +102,9 @@ void Inventory::addItem(std::string NAME)
 
 		if (nameFinder == true)
 		{
-			item* temp2;
-			temp = new item(NAME, descriptions[desNo]);
-			if (findName(NAME) == nullptr)
+			Item* temp2;
+			temp = new Item(NAME, descriptions[desNo]);
+			if (headptr == nullptr)
 			{
 				headptr = temp;
 			}
@@ -117,6 +126,14 @@ void Inventory::addItem(std::string NAME)
 		
 	}
 	
+	Item* print;
+	print = headptr;
+	while (print != nullptr)
+	{
+		std::cout << print->getName() << print->getAmt() << std::endl;
+		print = print->getNextItem();
+	}
+	print = nullptr;
 }
 
 void Inventory::deleteUsedItem(std::string NAME)

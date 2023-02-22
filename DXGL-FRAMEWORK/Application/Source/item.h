@@ -1,28 +1,28 @@
 #ifndef ITEM_H
 #define ITEM_H
 #include <iostream>
-class item
+class Item
 {
 public:
-	item(std::string NAME, std::string DESCRIPTION);
-	~item();
+	Item(std::string NAME, std::string DESCRIPTION);
+	~Item();
 
 	std::string name;
 	int amtOfItems;
 	std::string description;
-	item* nextItem;
-	item* prevItem;
+	Item* nextItem;
+	Item* prevItem;
 
 	std::string getName();
 	int getAmt();
 	std::string getDescription();
-	item* getNextItem();
-	item* getPrevItem();
+	Item* getNextItem();
+	Item* getPrevItem();
 
 	void addAmt();
 	void delAmt();
-	void setNextItem(item* NEXTITEM);
-	void setPrevItem(item* PREVITEM);
+	void setNextItem(Item* NEXTITEM);
+	void setPrevItem(Item* PREVITEM);
 
 
 };

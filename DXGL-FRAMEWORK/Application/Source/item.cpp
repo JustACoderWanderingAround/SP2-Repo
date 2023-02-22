@@ -1,6 +1,6 @@
-#include "item.h"
+#include "Item.h"
 
-item::item(std::string NAME, std::string DESCRIPTION)
+Item::Item(std::string NAME, std::string DESCRIPTION)
 {
 	name = NAME;
 	amtOfItems = 1;
@@ -10,53 +10,53 @@ item::item(std::string NAME, std::string DESCRIPTION)
 
 }
 
-item::~item()
+Item::~Item()
 {
 	nextItem = nullptr;
 	prevItem = nullptr;
 }
 
-std::string item::getName()
+std::string Item::getName()
 {
 	return std::string(name);
 }
 
-int item::getAmt()
+int Item::getAmt()
 {
 	return amtOfItems;
 }
 
-std::string item::getDescription()
+std::string Item::getDescription()
 {
 	return std::string(description);
 }
 
-item* item::getNextItem()
+Item* Item::getNextItem()
 {
 	return nextItem;
 }
 
-item* item::getPrevItem()
+Item* Item::getPrevItem()
 {
 	return prevItem;
 }
 
-void item::addAmt()
+void Item::addAmt()
 {
-	amtOfItems + 1;
+	amtOfItems += 1;
 }
 
-void item::delAmt()
+void Item::delAmt()
 {
-	amtOfItems - 1;
+	amtOfItems -= 1;
 }
 
-void item::setNextItem(item* NEXTITEM)
+void Item::setNextItem(Item* NEXTITEM)
 {
 	nextItem = NEXTITEM;
 }
 
-void item::setPrevItem(item* PREVITEM)
+void Item::setPrevItem(Item* PREVITEM)
 {
 	prevItem = PREVITEM;
 }

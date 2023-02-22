@@ -6,13 +6,13 @@ public:
 	Inventory();
 	~Inventory();
 
-	item* headptr;
-	item* temp;
-	item* findTail();
-	std::string items[4];
-	std::string descriptions[4];
+	Item* headptr;
+	Item* temp;
+	Item* findTail();
+	std::string items[6];
+	std::string descriptions[6];
 
-	item *findName(std::string NAME);
+	Item*findName(std::string NAME);
 	void addItem(std::string NAME);
 	void deleteUsedItem(std::string NAME);
 

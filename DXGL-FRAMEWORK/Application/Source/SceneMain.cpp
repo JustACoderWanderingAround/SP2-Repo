@@ -153,7 +153,7 @@ void SceneMain::Init()
 
 	{
 		meshList[GEO_AXES] = MeshBuilder::GenerateAxes("Axes", 10000.f, 10000.f, 10000.f);
-		meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sun", Color(1.f, 1.f, 1.f), 1.f, 16, 16);
+		meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("ball", Color(1.f, 0.f, 0.f), 1.f, 16, 16);
 		meshList[GEO_CUBE] = MeshBuilder::GenerateCube("Arm", Color(1, 0, 0), 1.f);
 		meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 		meshList[GEO_TEXT]->textureID = LoadTGA("Image//ComicSans.tga");
@@ -247,6 +247,15 @@ void SceneMain::Init()
 
 		meshList[GEO_ZAKU] = MeshBuilder::GenerateQuad("zaku", Color(1, 1, 1), 1);
 		meshList[GEO_ZAKU]->textureID = LoadTGA("Image//zaku.tga");
+
+		meshList[GEO_BALL] = MeshBuilder::GenerateQuad("ball pic", Color(1, 1, 1), 1);
+		meshList[GEO_BALL]->textureID = LoadTGA("Image//ball.tga");
+
+		meshList[GEO_RUBIK_PNG] = MeshBuilder::GenerateQuad("rubik pic", Color(1, 1, 1), 1);
+		meshList[GEO_RUBIK_PNG]->textureID = LoadTGA("Image//rubikspng.tga");
+
+		meshList[GEO_POTION_PNG] = MeshBuilder::GenerateQuad("potion pic", Color(1, 1, 1), 1);
+		meshList[GEO_POTION_PNG]->textureID = LoadTGA("Image//potionpng.tga");
 
 	}
 
@@ -488,8 +497,8 @@ void SceneMain::Update(double dt)
 
 
 	m_player->pos = glm::vec3(mainFPSCam.position.x, mainFPSCam.position.y, mainFPSCam.position.z);
-	std::cout << mainFPSCam.position.x << "," << mainFPSCam.position.y << "," << mainFPSCam.position.z << std::endl;
-	std::cout << m_player->pos.x << "," << m_player->pos.y << "," << m_player->pos.z << std::endl;
+	//std::cout << mainFPSCam.position.x << "," << mainFPSCam.position.y << "," << mainFPSCam.position.z << std::endl;
+	//std::cout << m_player->pos.x << "," << m_player->pos.y << "," << m_player->pos.z << std::endl;
 	//oldPlayerPos = glm::vec3(m_player->pos.x, m_player->pos.y, m_player->pos.z);
 	//m_player->vel = oldPlayerPos - m_player->pos;
 	//cameraArray[cameraNum].Update(dt);
@@ -1607,30 +1616,32 @@ void SceneMain::Render()
 	if (nearShop == true && shopUI == true)
 	{
 		RenderMeshOnScreen(meshList[GEO_QUAD], 400, 300, 770, 600);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Press [X] or walk away to exit.", Color(0, 0, 0), 25, 20, 50);
 		if (shopItems == 0)
 		{
 			RenderMeshOnScreen(meshList[GEO_ZAKU], 400, 300, 150, 200);
-			RenderTextOnScreen(meshList[GEO_TEXT], "Purchase 'Zaku Toy'? ", Color(0, 0, 0), 25, 100, 100);
+			RenderTextOnScreen(meshList[GEO_TEXT], "Purchase 'Zaku Toy'? - [B] ", Color(0, 0, 0), 25, 100, 150);
 			RenderTextOnScreen(meshList[GEO_TEXT], "Press Right to see next item", Color(0, 0, 0), 25, 50, 500);
 		}
 		else if (shopItems == 1)
 		{
-			RenderMeshOnScreen(meshList[GEO_ZAKU], 400, 300, 150, 200);
-			RenderTextOnScreen(meshList[GEO_TEXT], "Purchase 'Ball'? ", Color(0, 0, 0), 25, 100, 100);
+			RenderMeshOnScreen(meshList[GEO_BALL], 400, 300, 150, 150);
+			RenderTextOnScreen(meshList[GEO_TEXT], "Purchase 'Ball'? - [B]", Color(0, 0, 0), 25, 125, 150);
 			RenderTextOnScreen(meshList[GEO_TEXT], "Press Left to see previous item", Color(0, 0, 0), 25, 20, 500);
 			RenderTextOnScreen(meshList[GEO_TEXT], "Press Right to see next item", Color(0, 0, 0), 25, 50, 450);
 		}
 		else if (shopItems == 2)
 		{
-			RenderMeshOnScreen(meshList[GEO_ZAKU], 400, 300, 150, 200);
-			RenderTextOnScreen(meshList[GEO_TEXT], "Purchase 'Rubik's Cube'? ", Color(0, 0, 0), 25, 100, 100);
+			RenderMeshOnScreen(meshList[GEO_RUBIK_PNG], 400, 300, 150, 150);
+			RenderTextOnScreen(meshList[GEO_TEXT], "Purchase 'Rubik's Cube'? - [B]", Color(0, 0, 0), 25, 50, 150);
 			RenderTextOnScreen(meshList[GEO_TEXT], "Press Left to see previous item", Color(0, 0, 0), 25, 20, 500);
 			RenderTextOnScreen(meshList[GEO_TEXT], "Press Right to see next item", Color(0, 0, 0), 25, 50, 450);
 		}
 		else if (shopItems == 3)
 		{
-			RenderMeshOnScreen(meshList[GEO_ZAKU], 400, 300, 150, 200);
-			RenderTextOnScreen(meshList[GEO_TEXT], "Purchase 'Potion of Change'? ", Color(0, 0, 0), 25, 100, 100);
+			RenderMeshOnScreen(meshList[GEO_POTION_PNG], 400, 300, 150, 150);
+			RenderTextOnScreen(meshList[GEO_TEXT], "Purchase 'Potion of Change'?", Color(0, 0, 0), 25, 25, 150);
+			RenderTextOnScreen(meshList[GEO_TEXT], "- [B] ", Color(0, 0, 0), 25, 350, 100);
 			RenderTextOnScreen(meshList[GEO_TEXT], "Press Left to see previous item", Color(0, 0, 0), 25, 20, 500);
 			RenderTextOnScreen(meshList[GEO_TEXT], "Press Right to see next item", Color(0, 0, 0), 25, 50, 450);
 		}
@@ -2400,6 +2411,15 @@ void SceneMain::HandleKeyPress()
 		{
 			shopUI = false;
 		}
+
+		if (nearCottonStore == true)
+		{
+			inventory->addItem("Cotton Candy");
+		}
+		else if (nearGrocery == true) 
+		{
+			inventory->addItem("Apple");
+		}
 	}
 
 	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_B))
@@ -2470,5 +2490,11 @@ void SceneMain::HandleKeyPress()
 		}
 	}
 
-
+	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_X))
+	{
+		if (shopUI == true)
+		{
+			shopUI = false;
+		}
+	}
 }
