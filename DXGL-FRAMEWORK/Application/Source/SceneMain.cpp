@@ -257,6 +257,9 @@ void SceneMain::Init()
 		meshList[GEO_POTION_PNG] = MeshBuilder::GenerateQuad("potion pic", Color(1, 1, 1), 1);
 		meshList[GEO_POTION_PNG]->textureID = LoadTGA("Image//potionpng.tga");
 
+		meshList[GEO_COTTON_CANDY] = MeshBuilder::GenerateQuad("cotton candy pic", Color(1, 1, 1), 1);
+		meshList[GEO_COTTON_CANDY]->textureID = LoadTGA("Image//cottoncandy.tga");
+
 	}
 
 	// for zaku 
@@ -1651,7 +1654,62 @@ void SceneMain::Render()
 	// render inventory 
 	if (ivt == true)
 	{
+		// x & y = 120 difference
 		RenderMeshOnScreen(meshList[GEO_INVENTORY], 400, 300, 600, 600);
+		/*for (int i = 0; i < 4 ;i++)
+		{
+			for (int j = 0; j < 4; j++)
+			{
+				RenderMeshOnScreen(meshList[GEO_CUBE], 400 + i * 120, 180 + j * 120, 50, 50);
+			}
+			
+		}*/
+		
+		// starting 160, 540
+		Item* print;
+		int x, y;
+		x = 0; 
+		y = 0;
+		print = inventory->headptr;
+		while (print != nullptr)
+		{
+			if (print->getName() == "Zaku Toy")
+			{
+				RenderMeshOnScreen(meshList[GEO_ZAKU], 160 + x, 540 + y, 100, 100);
+			}
+			else if (print->getName() == "Ball")
+			{
+				RenderMeshOnScreen(meshList[GEO_BALL], 160 + x, 540 + y, 100, 100);
+			}
+			else if (print->getName() == "Rubik's Cube")
+			{
+				RenderMeshOnScreen(meshList[GEO_RUBIK_PNG], 160 + x, 540 + y, 100, 100);
+			}
+			else if (print->getName() == "Potion of Change")
+			{
+				RenderMeshOnScreen(meshList[GEO_POTION_PNG], 160 + x, 540 + y, 100, 100);
+			}
+			else if (print->getName() == "Cotton Candy")
+			{
+				RenderMeshOnScreen(meshList[GEO_COTTON_CANDY], 160 + x, 540 + y, 100, 100);
+			}
+			else if (print->getName() == "Apple")
+			{
+				RenderMeshOnScreen(meshList[GEO_APPLE], 160 + x, 540 + y, 100, 100);
+			}
+			if (x < 480)
+			{
+				x += 120;
+			}
+			else
+			{
+				y += 120;
+			}
+			//std::cout << print->getName() << print->getAmt() << std::endl;
+			print = print->getNextItem();
+		}
+		print = nullptr;
+		
 		RenderTextOnScreen(meshList[GEO_TEXT], "Press [I] to exit.", Color(1, 1, 1), 25, 10, 100);
 	}
 

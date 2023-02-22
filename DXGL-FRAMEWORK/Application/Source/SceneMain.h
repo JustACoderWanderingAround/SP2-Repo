@@ -60,6 +60,7 @@ public:
 		GEO_BALL,
 		GEO_RUBIK_PNG,
 		GEO_POTION_PNG,
+		GEO_COTTON_CANDY,
 
 		GEO_SPHERE_BLACK,
 		GEO_ZAKU_HEAD,
@@ -194,7 +195,6 @@ private:
 	Inventory* inventory;
 
 	CameraFPS mainFPSCam;
-	std::vector<CameraFPS> cameraArray;
 	int projType = 1; // fix to 0 for orthographic, 1 for projection
 	MatrixStack modelStack, viewStack, projectionStack;
 	static const int NUM_LIGHTS = 1;
