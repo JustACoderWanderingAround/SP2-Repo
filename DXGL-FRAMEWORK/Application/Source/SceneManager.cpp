@@ -2,6 +2,7 @@
 #include "SceneHitMen.h"
 #include "SceneAssignment.h"
 #include "SceneMain.h"
+#include "SceneCanTopple.h"
 // todo: import all necessary .h files (main, canTopple, pinball)
 #include <iostream>
 SceneManager* SceneManager::m_instance = nullptr;
@@ -65,8 +66,8 @@ void SceneManager::LoadScene(SCENE_NUM newSceneNum)
 		SwapScene(temp);
 		break;
 	case SCENE_NUM::SCENE_CANTOPPLE:
-		/*temp = new SceneCanTopple();
-		SwapScene(temp);*/
+		temp = new SceneCanTopple();
+		SwapScene(temp);
 		break;
 	case SCENE_NUM::SCENE_PINBALL:
 		/*temp = new ScenePinBall();
