@@ -685,6 +685,9 @@ void SceneMain::Update(double dt)
 	if (nearToppled && KeyboardController::GetInstance()->IsKeyPressed('F')) {
 		SceneManager::GetInstance()->LoadScene(SceneManager::SCENE_NUM::SCENE_CANTOPPLE);
 	}
+	if (nearPinball && KeyboardController::GetInstance()->IsKeyPressed('F')) {
+		SceneManager::GetInstance()->LoadScene(SceneManager::SCENE_NUM::SCENE_PINBALL);
+	}
 
 }
 

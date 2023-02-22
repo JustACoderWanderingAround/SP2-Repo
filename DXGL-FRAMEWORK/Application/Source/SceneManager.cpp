@@ -2,8 +2,8 @@
 #include "SceneHitMen.h"
 #include "SceneAssignment.h"
 #include "SceneMain.h"
-#include "SceneCanTopple.h"
-// todo: import all necessary .h files (main, canTopple, pinball)
+#include "SceneCanTopple.h" 
+#include "ScenePinball.h"
 #include <iostream>
 SceneManager* SceneManager::m_instance = nullptr;
 
@@ -56,10 +56,7 @@ void SceneManager::LoadScene(SCENE_NUM newSceneNum)
 	case SCENE_NUM::SCENE_MAIN:
 		temp = new SceneMain();
 		SwapScene(temp);
-		break;
-	case SCENE_NUM::SCENE_TEST:
-		temp = new SceneAssignment();
-		SwapScene(temp);
+
 		break;
 	case SCENE_NUM::SCENE_HITMEN:
 		temp = new SceneHitMen();
@@ -70,8 +67,8 @@ void SceneManager::LoadScene(SCENE_NUM newSceneNum)
 		SwapScene(temp);
 		break;
 	case SCENE_NUM::SCENE_PINBALL:
-		/*temp = new ScenePinBall();
-		SwapScene(temp);*/
+		temp = new ScenePinball();
+		SwapScene(temp);
 		break;
 	default:
 		std::cout << "Error!" << std::endl;

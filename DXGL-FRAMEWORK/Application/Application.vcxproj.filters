@@ -65,6 +65,7 @@
     </ClCompile>
     <ClCompile Include="Source\SceneCanTopple.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="Source\SceneMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -140,7 +141,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\SceneCanTopple.h">
-       <Filter>Header Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\SceneMain.h">
       <Filter>Header Files</Filter>

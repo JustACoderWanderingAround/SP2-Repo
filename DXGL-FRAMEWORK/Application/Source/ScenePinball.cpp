@@ -16,6 +16,7 @@
 #include "MeshBuilder.h"
 #include "KeyboardController.h"
 #include "LoadTGA.h"
+#include "SceneManager.h"
 
 ScenePinball::ScenePinball()
 {
@@ -496,6 +497,11 @@ void ScenePinball::Update(double dt)
 		CollisionCheck();
 		m_player->fixedUpdate(dt);
 		ScoreAndCoin();
+	}
+	if (BallLeft == 0 && !m_player->active) {
+		if (KeyboardController::GetInstance()->IsKeyPressed('Z')) {
+			SceneManager::GetInstance()->LoadScene(SceneManager::SCENE_NUM::SCENE_MAIN);
+		}
 	}
 
 	//std::cout << "X: " << light[0].position.x << " Y: " << light[0].position.y << " Z: " << light[0].position.z << std::endl;
