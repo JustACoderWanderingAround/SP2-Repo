@@ -15,6 +15,7 @@
 #include "Scene.h"
 #include "Scene1.h"
 #include "SceneAssignment.h"
+#include "SceneMain.h"
 #include "SceneHitMen.h"
 #include "SceneManager.h"
 GLFWwindow* m_window;
@@ -102,7 +103,9 @@ void Application::Init()
 	//Create a window and create its OpenGL context
 	m_width = 1000;
 	m_height = 750;
-	m_window = glfwCreateWindow(m_width, m_height, "HitMen!", NULL, NULL);
+
+	m_window = glfwCreateWindow(m_width, m_height, "Untitled Carnival Game", NULL, NULL);
+
 
 	//If the window couldn't be created
 	if (!m_window)
@@ -148,7 +151,6 @@ void Application::Init()
 	}
 	sceneNum = SCENE_NUM::SCENE_HITMEN;
 }
-
 void Application::Run()
 {
 	//Main Loop
@@ -182,7 +184,6 @@ void Application::Run()
 	SceneManager::GetInstance()->currScene->Exit();
 
 }
-
 int Application::GetWindowWidth()
 {
 	return m_width;

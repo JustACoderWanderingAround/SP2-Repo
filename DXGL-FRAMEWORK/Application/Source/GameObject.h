@@ -43,8 +43,7 @@ struct GameObject
 	float anglularVelocity;
 	float multiplier;
 
-	GameObject(GAMEOBJECT_TYPE typeValue = GO_BALL);
-	~GameObject();
+    GameObject(GAMEOBJECT_TYPE typeValue = GO_BALL);
+    ~GameObject();
 };
 #endif
-
