@@ -181,7 +181,6 @@ void GameObject::CollisionResponse(GameObject* that)
 	// v2prime
 	vPrimeNormalVel2 = normal * vNormalVel2;
 	vPrimeTanVel2 = unitTangent * tangentVel2;
-
 	// step 7
 
 	this->vel = vPrimeNormalVel1 + vPrimeTanVel1;

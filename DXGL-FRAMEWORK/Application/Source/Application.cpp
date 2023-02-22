@@ -15,6 +15,7 @@
 #include "Scene.h"
 #include "Scene1.h"
 #include "SceneAssignment.h"
+#include "SceneCanTopple.h"
 #include "SceneMain.h"
 #include "SceneHitMen.h"
 #include "SceneManager.h"

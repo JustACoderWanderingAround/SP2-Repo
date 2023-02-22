@@ -162,6 +162,7 @@
     <ClCompile Include="Source\player.cpp" />
     <ClCompile Include="Source\Scene1.cpp" />
     <ClCompile Include="Source\SceneAssignment.cpp" />
+    <ClCompile Include="Source\SceneCanTopple.cpp" />
     <ClCompile Include="Source\SceneMain.cpp" />
     <ClCompile Include="Source\SceneHitMen.cpp" />
     <ClCompile Include="Source\SceneManager.cpp" />
@@ -186,6 +187,7 @@
     <ClInclude Include="Source\Scene.h" />
     <ClInclude Include="Source\Scene1.h" />
     <ClInclude Include="Source\SceneAssignment.h" />
+    <ClInclude Include="Source\SceneCanTopple.h" />
     <ClInclude Include="Source\SceneMain.h" />
     <ClInclude Include="Source\SceneHitMen.h" />
     <ClInclude Include="Source\SceneManager.h" />
