@@ -90,6 +90,12 @@ Mesh* MeshBuilder::GenerateQuad(const std::string &meshName, Color color, float 
 	index_buffer_data.push_back(1);
 	index_buffer_data.push_back(2);
 	index_buffer_data.push_back(3);
+	//tri2
+	index_buffer_data.push_back(0);
+	index_buffer_data.push_back(2);
+	index_buffer_data.push_back(1);
+	index_buffer_data.push_back(3);
+
 	// Create the new mesh
 	Mesh* mesh = new Mesh(meshName);
 
@@ -164,6 +170,7 @@ Mesh* MeshBuilder::GenerateSphere(const std::string& meshName, Color color, floa
 				radius * cos(phi) * sin(theta));
 			v.color.Set(color.r, color.g, color.b);
 			v.normal = glm::vec3(cosf(phi) * cosf(theta), sinf(phi), cosf(phi) * sinf(theta));
+			//v.texCoord = glm::vec2(cosf(phi) * cosf(theta), sinf(phi));
 			vertex_buffer_data.push_back(v);
 		}
 	}
@@ -243,21 +250,21 @@ Mesh* MeshBuilder::GenerateCube(const std::string& meshName, Color color, float 
 
 	// Add the vertices here
 	// face 1 triangle 1
-	v.pos.Set(-0.5, 0.5f, -0.5f); v.color.Set(color.r, color.g, color.b); v.normal = glm::vec3(0.f, 1.0f, 0.f); vertex_buffer_data.push_back(v);
-	v.pos.Set(-0.5, 0.5f, 0.5f); v.color.Set(color.r, color.g, color.b);  v.normal = glm::vec3(0, 1.0f, 0); vertex_buffer_data.push_back(v);
-	v.pos.Set(0.5, 0.5f, 0.5f); v.color.Set(color.r, color.g, color.b);  v.normal = glm::vec3(0, 1.0f, 0.f); vertex_buffer_data.push_back(v);
+	v.pos.Set(-0.5, 0.5f, -0.5f); v.color.Set(color.r, color.g, color.b); v.normal = glm::vec3(0.f, 1.0f, 0.f); v.texCoord = glm::vec3(v.pos.x,v.pos.y,v.pos.z); vertex_buffer_data.push_back(v);
+	v.pos.Set(-0.5, 0.5f, 0.5f); v.color.Set(color.r, color.g, color.b);  v.normal = glm::vec3(0, 1.0f, 0); v.texCoord = glm::vec3(v.pos.x, v.pos.y, v.pos.z); vertex_buffer_data.push_back(v);
+	v.pos.Set(0.5, 0.5f, 0.5f); v.color.Set(color.r, color.g, color.b);  v.normal = glm::vec3(0, 1.0f, 0.f); v.texCoord = glm::vec3(v.pos.x, v.pos.y, v.pos.z); vertex_buffer_data.push_back(v);
 	// face 1 triangle 2
 	v.pos.Set(-0.5, 0.5f, -0.5f); v.color.Set(color.r, color.g, color.b); v.normal = glm::vec3(0, 1.f, 0); vertex_buffer_data.push_back(v);
-	v.pos.Set(0.5, 0.5f, 0.5f); v.color.Set(color.r, color.g, color.b); v.normal = glm::vec3(0.0, 1.f, 0.f); vertex_buffer_data.push_back(v);
-	v.pos.Set(0.5, 0.5f, -0.5f); v.color.Set(color.r, color.g, color.b); v.normal = glm::vec3(0.f, 1.f, 0); vertex_buffer_data.push_back(v);
+	v.pos.Set(0.5, 0.5f, 0.5f); v.color.Set(color.r, color.g, color.b); v.normal = glm::vec3(0, 1.f, 0.f); vertex_buffer_data.push_back(v);
+	v.pos.Set(0.5, 0.5f, -0.5f); v.color.Set(color.r, color.g, color.b); v.normal = glm::vec3(0.f, 1.f, 0); v.texCoord = glm::vec3(v.pos.x, v.pos.y, v.pos.z); vertex_buffer_data.push_back(v);
 	// face 2 triangle 1
-	v.pos.Set(0.5, -0.5f, 0.5f); v.color.Set(color.r, color.g, color.b); v.normal = glm::vec3(-0.f, -1.0, 0.0); vertex_buffer_data.push_back(v);
-	v.pos.Set(-0.5, -0.5f, 0.5f); v.color.Set(color.r, color.g, color.b); v.normal = glm::vec3(-0.0, -1.0, 0.f); vertex_buffer_data.push_back(v);
-	v.pos.Set(-0.5, -0.5f, -0.5f); v.color.Set(color.r, color.g, color.b); v.normal = glm::vec3(0.f, -1.0, 0.f); vertex_buffer_data.push_back(v);
+	v.pos.Set(0.5, -0.5f, 0.5f); v.color.Set(color.r, color.g, color.b); v.normal = glm::vec3(-0.f, -1.0, 0.0); v.texCoord = glm::vec3(v.pos.x, v.pos.y, v.pos.z); vertex_buffer_data.push_back(v);
+	v.pos.Set(-0.5, -0.5f, 0.5f); v.color.Set(color.r, color.g, color.b); v.normal = glm::vec3(-0.0, -1.0, 0.f); v.texCoord = glm::vec3(v.pos.x, v.pos.y, v.pos.z); vertex_buffer_data.push_back(v);
+	v.pos.Set(-0.5, -0.5f, -0.5f); v.color.Set(color.r, color.g, color.b); v.normal = glm::vec3(0.f, -1.0, 0.f); v.texCoord = glm::vec3(v.pos.x, v.pos.y, v.pos.z); vertex_buffer_data.push_back(v);
 	// face 2 triangle 2
 	v.pos.Set(0.5, -0.5f, 0.5f); v.color.Set(color.r, color.g, color.b); v.normal = glm::vec3(0.f, -1.0, 0.f); vertex_buffer_data.push_back(v);
 	v.pos.Set(-0.5, -0.5f, -0.5f); v.color.Set(color.r, color.g, color.b); v.normal = glm::vec3(0.f, -1.0, 0.f); vertex_buffer_data.push_back(v);
-	v.pos.Set(0.5, -0.5f, -0.5f); v.color.Set(color.r, color.g, color.b); v.normal = glm::vec3(0.0, -1.0, 0.f); vertex_buffer_data.push_back(v);
+	v.pos.Set(0.5, -0.5f, -0.5f); v.color.Set(color.r, color.g, color.b); v.normal = glm::vec3(0.0, -1.0, 0.f); v.texCoord = glm::vec3(v.pos.x, v.pos.y, v.pos.z); vertex_buffer_data.push_back(v);
 	// face 3 triangle 1
 	v.pos.Set(0.5, 0.5f, 0.5f); v.color.Set(color.r, color.g, color.b);  v.normal = glm::vec3(-0.f, -0.f, 1.0); vertex_buffer_data.push_back(v);
 	v.pos.Set(-0.5, -0.5f, 0.5f); v.color.Set(color.r, color.g, color.b); v.normal = glm::vec3(0, 0, 1.0); vertex_buffer_data.push_back(v);
@@ -292,6 +299,7 @@ Mesh* MeshBuilder::GenerateCube(const std::string& meshName, Color color, float 
 	v.pos.Set(0.5, -0.5f, -0.5f); v.color.Set(color.r, color.g, color.b); v.normal = glm::vec3(1.0, 0.f, -0.0); vertex_buffer_data.push_back(v);
 
 	//extra vertice starts here set 1
+
 	v.pos.Set(0.5, 0.5f, 0.5f); v.color.Set(color.r, color.g, color.b); vertex_buffer_data.push_back(v); v.normal = glm::vec3(0.5f, 0.05, 0.5f);
 	v.pos.Set(-0.5, 0.5f, 0.5f); v.color.Set(color.r, color.g, color.b); vertex_buffer_data.push_back(v); v.normal = glm::vec3(-0.5, 0.5, 0.5);
 	v.pos.Set(-0.5, 0.5f, -0.5f); v.color.Set(color.r, color.g, color.b); vertex_buffer_data.push_back(v); v.normal = glm::vec3(-0.5, 0.5, -0.5);
@@ -333,12 +341,14 @@ Mesh* MeshBuilder::GenerateCylinder(const std::string& meshName, Color color, un
 	// circle 1 vertices
 	v.pos.Set(0, (height / 2), 0);
 	v.color.Set(color.r, color.g, color.b);
+	v.texCoord = glm::vec2(0, (height / 2));
 	vertex_buffer_data.push_back(v);
 	for (unsigned slice = 0; slice < sliceCount + 1; slice++) {
 		float theta = anglePerSlice * slice;
 		// set positional vertice to (x = cos theta, y = height, z = sin theta)
 		v.pos.Set(radius * cos(theta * (pi / 180)), (height / 2), radius * sin(theta * (pi / 180)));
 		v.color.Set(color.r, color.g, color.b);
+		v.texCoord = glm::vec3(radius * cos(theta * (pi / 180)), (height / 2), radius * sin(theta * (pi / 180)));
 		vertex_buffer_data.push_back(v);
 
 	}
@@ -346,12 +356,14 @@ Mesh* MeshBuilder::GenerateCylinder(const std::string& meshName, Color color, un
 	// circle 2 vertices
 	v.pos.Set(0, ((height / 2.f) - height), 0);
 	v.color.Set(color.r, color.g, color.b);
+	v.texCoord = glm::vec2(0, (height / 2)-height);
 	vertex_buffer_data.push_back(v);
 	for (unsigned slice = sliceCount; slice <= sliceCount * 2; slice++) {
 		float theta = anglePerSlice * slice;
 		// set positional vertice to (x = cos theta, y = height, z = sin theta)
 		v.pos.Set(radius * cos(theta * (pi / 180)), ((height / 2.f) - height), radius * sin(theta * (pi / 180)));
 		v.color.Set(color.r, color.g, color.b);
+		v.texCoord = glm::vec3(radius * cos(theta * (pi / 180)), ((height / 2.f) - height), radius * sin(theta * (pi / 180)));
 		vertex_buffer_data.push_back(v);
 
 	}
@@ -557,3 +569,74 @@ Mesh* MeshBuilder::GenerateText(const std::string& meshName, unsigned numRow, un
 }
 
 
+/******************************************************************************/
+/*!
+\brief
+Generate the vertices of a Triangle; Use random color for each vertex
+Then generate the VBO/IBO and store them in Mesh object
+
+\param meshName - name of mesh
+\param color - color of the mesh (red, green, blue)
+
+\return Pointer to mesh storing VBO/IBO of quad
+*/
+/******************************************************************************/
+
+Mesh* MeshBuilder::GenerateTri(const std::string& meshName, Color color)
+{
+	Vertex v;
+	std::vector<Vertex> vertex_buffer_data;
+	std::vector<GLuint> index_buffer_data;
+
+	// Add the vertices here
+	v.pos.Set(0.f, 0.5f, 0.f); v.color.Set(color.r, color.g, color.b); v.normal = glm::vec3(0.f, 0.5f, 0.f); vertex_buffer_data.push_back(v);// front face top-middle
+	v.pos.Set(0.f, 0.f, 0.5f); v.color.Set(color.r, color.g, color.b); v.normal = glm::vec3(0.f, 0.f, 0.5f); vertex_buffer_data.push_back(v);// front face bottom-left
+	v.pos.Set(0.f, 0.f, -0.5f); v.color.Set(color.r, color.g, color.b); v.normal = glm::vec3(0.f, 0.f, -0.5f); vertex_buffer_data.push_back(v);// front face bottom-right
+	v.pos.Set(-0.5f, 0.5f, 0.f); v.color.Set(color.r, color.g, color.b); v.normal = glm::vec3(-0.5f, 0.5f, 0.f); vertex_buffer_data.push_back(v);// back face top-middle
+	v.pos.Set(-0.5f, 0.f, 0.5f); v.color.Set(color.r, color.g, color.b); v.normal = glm::vec3(-0.5f, 0.f, 0.5f); vertex_buffer_data.push_back(v);// back face bottom-left
+	v.pos.Set(-0.5f, 0.f, -0.5f); v.color.Set(color.r, color.g, color.b); v.normal = glm::vec3(-0.5f, 0.f, -0.5f); vertex_buffer_data.push_back(v);// back face bottom-right
+
+	//Default winding order is Counter-clockwise (CCW)
+	//front
+	index_buffer_data.push_back(0);
+	index_buffer_data.push_back(1);
+	index_buffer_data.push_back(2);
+	//left
+	index_buffer_data.push_back(0);
+	index_buffer_data.push_back(3);
+	index_buffer_data.push_back(4);
+	index_buffer_data.push_back(0);
+	index_buffer_data.push_back(4);
+	index_buffer_data.push_back(1);
+	//back
+	index_buffer_data.push_back(3);
+	index_buffer_data.push_back(5);
+	index_buffer_data.push_back(4);
+	//right
+	index_buffer_data.push_back(0);
+	index_buffer_data.push_back(2);
+	index_buffer_data.push_back(5);
+	index_buffer_data.push_back(0);
+	index_buffer_data.push_back(5);
+	index_buffer_data.push_back(3);
+	//bottom
+	index_buffer_data.push_back(1);
+	index_buffer_data.push_back(4);
+	index_buffer_data.push_back(5);
+	index_buffer_data.push_back(1);
+	index_buffer_data.push_back(5);
+	index_buffer_data.push_back(2);
+
+	// Create the new mesh
+	Mesh* mesh = new Mesh(meshName);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, vertex_buffer_data.size() * sizeof(Vertex), &vertex_buffer_data[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indexBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_buffer_data.size() * sizeof(GLuint), &index_buffer_data[0], GL_STATIC_DRAW);
+
+	mesh->indexSize = index_buffer_data.size();
+	mesh->mode = Mesh::DRAW_TRIANGLES;
+
+	return mesh;
+}

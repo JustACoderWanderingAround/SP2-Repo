@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -162,6 +162,7 @@
     <ClCompile Include="Source\player.cpp" />
     <ClCompile Include="Source\Scene1.cpp" />
     <ClCompile Include="Source\SceneAssignment.cpp" />
+    <ClCompile Include="Source\ScenePinball.cpp" />
     <ClCompile Include="Source\SceneCanTopple.cpp" />
     <ClCompile Include="Source\SceneMain.cpp" />
     <ClCompile Include="Source\SceneHitMen.cpp" />
@@ -187,6 +188,7 @@
     <ClInclude Include="Source\Scene.h" />
     <ClInclude Include="Source\Scene1.h" />
     <ClInclude Include="Source\SceneAssignment.h" />
+    <ClInclude Include="Source\ScenePinball.h" />
     <ClInclude Include="Source\SceneCanTopple.h" />
     <ClInclude Include="Source\SceneMain.h" />
     <ClInclude Include="Source\SceneHitMen.h" />

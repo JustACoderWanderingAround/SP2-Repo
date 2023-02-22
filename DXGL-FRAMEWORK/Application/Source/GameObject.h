@@ -14,6 +14,10 @@ struct GameObject
         GO_TEXT,
         GO_BALL,
         GO_CUBE,
+        GO_BULLET,
+        GO_WALL,
+        GO_ALIEN,
+        GO_FLIPPER,
         GO_CAN,
         GO_TABLE,
         GO_FLOOR,
@@ -53,4 +57,3 @@ struct GameObject
     GameObject(GAMEOBJECT_TYPE typeValue = GO_BALL);
     ~GameObject();
 };
-#endif

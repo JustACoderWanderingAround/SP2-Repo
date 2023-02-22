@@ -33,7 +33,9 @@ bool GameObject::CheckLineCollision(GameObject* that)
 {
 	glm::vec3 diff = this->pos - that->pos;
 	glm::vec3 axisX = that->normal;
+
 	glm::vec3 axisY = glm::vec3(-that->normal.y, that->normal.x, 0);
+
 
 	float projectedDist = dot(diff, axisX);
 
@@ -42,6 +44,9 @@ bool GameObject::CheckLineCollision(GameObject* that)
 	return dot(this->vel, axisX) >= 0 && //Check 1: Travelling towards the wall ?
 
 		that->scale.x * 0.5 + this->scale.x > -dot(diff, axisX) && //Check 2: Radius + Thickness vs Distance
+
+
+
 
 		that->scale.y * 0.5 > fabs(dot(diff, axisY)); //Check 3: Length check
 }
@@ -57,7 +62,6 @@ bool GameObject::CheckCSCollision(GameObject* that)
 	float distY = fabs(this->pos.y - that->pos.y);
 	float distZ = fabs(this->pos.z - that->pos.z);
 	return !((distX > this->scale.x / 2 + that->scale.x) || (distY > this->scale.y / 2 + that->scale.y) || (distZ > this->scale.z / 2 + that->scale.z));
-
 }
 
 bool GameObject::CheckCCCollision(GameObject* that)
@@ -92,7 +96,9 @@ void GameObject::fixedUpdate(double dt)
 		}
 		else
 
+
 			force.z = x_resistant;*/
+
 
 	}
 
@@ -200,13 +206,9 @@ void GameObject::CollisionResponse(GameObject* that)
 	this->vel -= impulse / this->mass;
 	that->vel += impulse / that->mass;
 
+
 	this->force = -normal;
 	that->force = normal;
 
-
-	//// Apply the impulse to the objects
-	//glm::vec3 impulse = impulseMagnitude * normal;
-	//this->vel -= impulse / this->mass;
-	//that->vel += impulse / that->mass;
 
 }
