@@ -16,6 +16,7 @@
 #include "MeshBuilder.h"
 #include "KeyboardController.h"
 #include "LoadTGA.h"
+#include "SceneManager.h"
 
 SceneHitMen::SceneHitMen()
 {
@@ -158,7 +159,7 @@ void SceneHitMen::Init()
 		for (int i = -2; i < 3; i++) {
 			for (int j = -2; j < 3; j++) {
 				doorMen.emplace_back(new GameObject);
-				doorMen[counter]->pos = (glm::vec3(- 1 * j * 3.f + offSet, 7.f + offSet, -1 * i * 1.1f));
+				doorMen[counter]->pos = (glm::vec3(- 1 * j * 3.f + offSet, 7.5f + offSet, -1 * i * 1.1f));
 				doorMenInitPos.emplace_back(doorMen[counter]->pos);
 				doorMen[counter]->scale = glm::vec3(0.5f, 3.5f, 0.5f);
 				doorMen[counter]->vel = glm::vec3(0, 0, 0);
@@ -397,7 +398,7 @@ void SceneHitMen::Init()
 		cameraNum = 0;
 		ammo = 15;
 		score = 0;
-		gameTimer = 30;
+		gameTimer = 20;
 		reloadTimer = 2;
 		bulletType = BULLET_TYPE::BULLET_SINGLE;
 		reloading = false;
@@ -521,6 +522,12 @@ void SceneHitMen::Update(double dt)
 			doorMen[i]->fixedUpdate(static_cast<float>(dt));
 		}
 	}
+	else
+		{
+		if (KeyboardController::GetInstance()->IsKeyPressed('Z')) {
+			SceneManager::GetInstance()->LoadScene(SceneManager::SCENE_NUM::SCENE_TEST);
+		}
+	 }
 	//m_bullet.fixedUpdate(static_cast<float>(dt));
 }
 
@@ -911,7 +918,6 @@ void SceneHitMen::Exit()
 	// Cleanup VBO here
 	for (int i = 0; i < NUM_GEOMETRY; ++i)
 	{
-		std::cout << i << std::endl;
 		if (meshList[i])
 		{
 			delete meshList[i];
@@ -979,6 +985,7 @@ void SceneHitMen::HandleKeyPress()
 				m_grapeShot[i]->dir = view;
 				m_grapeShot[i]->dir.y += ((rand() % 5) - 1.5f) * ((rand() % 4) * 0.01f);
 				m_grapeShot[i]->dir.x += ((rand() % 3) - 1.5f) * ((rand() % 4) * 0.01f);
+				m_grapeShot[i]->dir = glm::normalize(m_grapeShot[i]->dir);
 				m_grapeShot[i]->vel = m_grapeShot[i]->dir * -50.f;
 			}
 			ammo -= 5;
