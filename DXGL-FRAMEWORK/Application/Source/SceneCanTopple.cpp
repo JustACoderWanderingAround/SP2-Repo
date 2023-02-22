@@ -221,8 +221,7 @@ void SceneCanTopple::Init()
 		m_ball->vel = glm::vec3(0.f, 0.f, 0.f);
 		m_ball->force = glm::vec3(0.f, 0.f, 0.f);
 		m_ball->active = false;
-		m_ball->touchedOthers = false;
-		m_ball->mass = 3;
+		m_ball->mass = 2;
 
 		m_table = new GameObject(GameObject::GO_TABLE);
 		// position set to (half width and 10% of the screen height
@@ -409,8 +408,7 @@ void SceneCanTopple::Update(double dt)
 
 				if (m_can[i]->CheckCSCollision(m_ball))
 				{
-					m_ball->CollisionResponse(m_can[i]);
-					m_ball->touchedOthers = true;
+					m_can[i]->CollisionResponse(m_ball);
 					if (m_can[i]->touched == true)
 					{
 
@@ -554,10 +552,10 @@ void SceneCanTopple::Render()
 
 		RenderSkybox();
 
-		std::string temp2("Power:" + std::to_string(timer)); // loading in current time
+		std::string temp2("Power:" + std::to_string(throwingPower)); // loading in current time
 		RenderTextOnScreen(meshList[GEO_TEXT], temp2.substr(0, 8), Color(1, 1, 0), 40, 0, 40);
 
-		std::string temp3("Timer:" + std::to_string(throwingPower)); // loading in current time
+		std::string temp3("Timer:" + std::to_string(timer)); // loading in current time
 		RenderTextOnScreen(meshList[GEO_TEXT], temp3.substr(0, 8), Color(1, 1, 0), 40, 0, 560);
 
 		std::string temp4("Score:" + std::to_string(score)); // loading in current time
@@ -566,7 +564,7 @@ void SceneCanTopple::Render()
 	else
 	{
 	std::string temp5("Time's up!"); // loading in current time
-	RenderTextOnScreen(meshList[GEO_TEXT], temp5.substr(0, 10), Color(1, 1, 0), 120, 0, 250);
+	RenderTextOnScreen(meshList[GEO_TEXT], temp5.substr(0, 10), Color(1, 1, 0), 40, 0, 280);
 	}
 }
 
@@ -887,19 +885,19 @@ void SceneCanTopple::HandleKeyPress()
 	}
 
 	// cam change
-	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_TAB)) {
-		gameActive = true;
+	//if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_TAB)) {
+	//	gameActive = true;
 
-		m_ball->vel = glm::vec3(0, 0, 0);
-		m_ball->pos = camera.position;
-		m_ball->dir = glm::normalize(camera.position - camera.target);
-		//m_ball->force.x = camera.target.x;
-		//m_ball->force.y = camera.target.y;
-		//m_ball->force.z = camera.target.z;
-		m_ball->vel = -(m_ball->dir * 25.f);
+	//	m_ball->vel = glm::vec3(0, 0, 0);
+	//	m_ball->pos = camera.position;
+	//	m_ball->dir = glm::normalize(camera.position - camera.target);
+	//	//m_ball->force.x = camera.target.x;
+	//	//m_ball->force.y = camera.target.y;
+	//	//m_ball->force.z = camera.target.z;
+	//	m_ball->vel = -(m_ball->dir * 25.f);
 
-		m_ball->active = true;
-	}
+	//	m_ball->active = true;
+	//}
 	
 }
 
