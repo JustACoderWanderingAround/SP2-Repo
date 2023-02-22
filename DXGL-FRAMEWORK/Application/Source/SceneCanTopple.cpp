@@ -43,7 +43,7 @@ void SceneCanTopple::Init()
 	float temp2;
 	int score = 0;
 	gameActive = true;
-	timer = 10;
+	timer = 30;
 	
 	// Set background color to dark blue
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
@@ -165,7 +165,7 @@ void SceneCanTopple::Init()
 			meshList[GEO_LEFT]->textureID = LoadTGA("Image//skyboxleft.tga");
 
 			meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
-			meshList[GEO_TEXT]->textureID = LoadTGA("Image//ComicSans.tga");
+			meshList[GEO_TEXT]->textureID = LoadTGA("Image//OpaqueComicSans.tga");
 
 			meshList[GEO_RIGHT] = MeshBuilder::GenerateQuad("Plane", Color(1.f, 1.f, 1.f), 100.f);
 			meshList[GEO_RIGHT]->textureID = LoadTGA("Image//skyboxright.tga");
@@ -554,16 +554,19 @@ void SceneCanTopple::Render()
 
 		RenderSkybox();
 
-		std::string temp2("Power:" + std::to_string(throwingPower)); // loading in current time
-		RenderTextOnScreen(meshList[GEO_TEXT], temp2.substr(0, 8), Color(1, 1, 0), 40, 0, 20);
+		std::string temp2("Power:" + std::to_string(timer)); // loading in current time
+		RenderTextOnScreen(meshList[GEO_TEXT], temp2.substr(0, 8), Color(1, 1, 0), 40, 0, 40);
 
-		std::string temp3("Score:" + std::to_string(timer)); // loading in current time
-		RenderTextOnScreen(meshList[GEO_TEXT], temp3.substr(0, 8), Color(1, 1, 0), 40, 0, 80);
+		std::string temp3("Timer:" + std::to_string(throwingPower)); // loading in current time
+		RenderTextOnScreen(meshList[GEO_TEXT], temp3.substr(0, 8), Color(1, 1, 0), 40, 0, 560);
+
+		std::string temp4("Score:" + std::to_string(score)); // loading in current time
+		RenderTextOnScreen(meshList[GEO_TEXT], temp4.substr(0, 8), Color(1, 1, 0), 40, 0, 0);
 	}
 	else
 	{
-	std::string temp3("Score:" + std::to_string(timer)); // loading in current time
-	RenderTextOnScreen(meshList[GEO_TEXT], temp3.substr(0, 8), Color(1, 1, 0), 40, 0, 80);
+	std::string temp5("Time's up!"); // loading in current time
+	RenderTextOnScreen(meshList[GEO_TEXT], temp5.substr(0, 10), Color(1, 1, 0), 120, 0, 250);
 	}
 }
 
