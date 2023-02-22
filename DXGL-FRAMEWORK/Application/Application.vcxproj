@@ -163,6 +163,7 @@
     <ClCompile Include="Source\SceneAssignment.cpp" />
     <ClCompile Include="Source\ScenePinball.cpp" />
     <ClCompile Include="Source\shader.cpp" />
+    <ClCompile Include="Source\Shop.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\AltAzCamera.h" />
@@ -183,6 +184,7 @@
     <ClInclude Include="Source\SceneAssignment.h" />
     <ClInclude Include="Source\ScenePinball.h" />
     <ClInclude Include="Source\shader.hpp" />
+    <ClInclude Include="Source\Shop.h" />
     <ClInclude Include="Source\Vertex.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

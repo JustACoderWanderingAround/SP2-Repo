@@ -43,7 +43,6 @@ struct GameObject
     float momentOfInertia;
     float anglularVelocity;
     float multiplier;
-    int Score;
 
     GameObject(GAMEOBJECT_TYPE typeValue = GO_BALL);
     ~GameObject();

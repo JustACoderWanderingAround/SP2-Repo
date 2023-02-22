@@ -10,7 +10,7 @@
 #include <vector>
 #include "GameObject.h"
 #define NUM_INTERACTABLES 1
-#define MAX_PARTS 21
+#define MAX_PARTS 24
 #define MAX_SPEED 20
 class ScenePinball : public Scene
 {
@@ -49,6 +49,8 @@ public:
 		GEO_LAUNCHER_UI,
 		GEO_POWER_UI,
 		GEO_TEXT,
+		GEO_SCORE_TEXT,
+		GEO_GAMEOVER,
 		NUM_GEOMETRY,
 	};
 
@@ -148,7 +150,7 @@ private:
 	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y);
 	void RenderPinballMachine();
 	void BallMovement(double dt);
-	void ScoreAndCoin(GameObject* Obj1);
+	void ScoreAndCoin();
 	void RenderLight(int lightIndex);
 	void CollisionCheck();
 	unsigned m_vertexArrayID;
@@ -158,8 +160,7 @@ private:
 	unsigned m_parameters[U_TOTAL];
 	GameObject* m_player;
 	GameObject* PinballMachine[MAX_PARTS];
-	GameObject* m_flipper1;
-	GameObject* m_flipper2;
+	GameObject* m_flipper[2];
 	std::vector<GameObject*> interactables;
 	CameraFPS mainFPSCam;
 	CameraFPS launcherCam;
@@ -171,15 +172,14 @@ private:
 	static const int NUM_LIGHTS = 5;
 	Light light[NUM_LIGHTS];
 	bool enableLight;
-	float initCamY;
 	int cameraNum;
 	int currInteractable;
-	int roomY;
 	bool showUI;
-	bool bRKeyStateZ, bRKeyStateX, bRKeyStateSpace, bRKeyState, ballLaunch;
+	bool bRKeyStateZ, bRKeyStateX, bRKeyStateSpace, bRKeyStateR, bRKeyState,  ballLaunch;
 	float rotation1, rotation2, power;
-	int BallLeft,coins;
+	int BallLeft,coins, score;
 	float posAdd = 0;
+	float yaw;
 	glm::vec3 gravity;
 };
 

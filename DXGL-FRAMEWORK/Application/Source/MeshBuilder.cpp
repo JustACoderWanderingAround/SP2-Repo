@@ -170,6 +170,7 @@ Mesh* MeshBuilder::GenerateSphere(const std::string& meshName, Color color, floa
 				radius * cos(phi) * sin(theta));
 			v.color.Set(color.r, color.g, color.b);
 			v.normal = glm::vec3(cosf(phi) * cosf(theta), sinf(phi), cosf(phi) * sinf(theta));
+			//v.texCoord = glm::vec2(cosf(phi) * cosf(theta), sinf(phi));
 			vertex_buffer_data.push_back(v);
 		}
 	}

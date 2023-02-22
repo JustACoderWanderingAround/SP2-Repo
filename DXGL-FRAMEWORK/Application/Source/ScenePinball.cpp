@@ -143,11 +143,9 @@ void ScenePinball::Init()
 			m_parameters[U_TEXT_COLOR] = glGetUniformLocation(m_programID, "textColor");
 	
 		}
-		roomY = 8.f;
-		initCamY = roomY - 3.3;
 		// Initialise camera properties
-		mainFPSCam.Init(glm::vec3(3, initCamY, 0.f), glm::vec3(0, initCamY, 0), glm::vec3(0.f, 1, 0.f));
-		launcherCam.Init(glm::vec3(-1, initCamY + 2, -1.f), glm::vec3(-1, initCamY + 2, 0), glm::vec3(0.f, 1, 0.f), false);
+		mainFPSCam.Init(glm::vec3(3, 8, -2.4f), glm::vec3(3.02, 6.6f, -1.01f), glm::vec3(0.f, 1, 0.f));
+		launcherCam.Init(glm::vec3(-0.5f, 6, -1.f), glm::vec3(-0.5, 4.8f, 0), glm::vec3(0.f, 1, 0.f), false);
 		cameraArray.push_back(mainFPSCam);
 		cameraArray.push_back(launcherCam);
 
@@ -163,6 +161,9 @@ void ScenePinball::Init()
 			meshList[GEO_AXES] = MeshBuilder::GenerateAxes("Axes", 10000.f, 10000.f, 10000.f);
 			meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sun", Color(1.f, 1.f, 1.f), 1.f, 16, 16);
 			meshList[GEO_SILVER_SPHERE] = MeshBuilder::GenerateSphere("Player", Color(168 / 255, 169 / 255, 173 / 255), 1, 32, 32);
+			//meshList[GEO_SILVER_SPHERE]->textureID = LoadTGA("Image//ball.tga");
+			//meshList[GEO_SILVER_SPHERE] = MeshBuilder::GenerateOBJMTL("Player", "OBJ//Ball3.obj", "OBJ//Ball3.mtl");
+
 
 			meshList[GEO_TENT] = MeshBuilder::GenerateOBJ("Tent", "OBJ//tent.obj");
 			meshList[GEO_TENT]->textureID = LoadTGA("Image//tent.tga");
@@ -174,6 +175,8 @@ void ScenePinball::Init()
 			meshList[GEO_POWER_UI] = MeshBuilder::GenerateQuad("Power", Color(0.f, 1.f, 0.f), 10);
 			meshList[GEO_TEXT] = MeshBuilder::GenerateText("comicsans",16 , 16);
 			meshList[GEO_TEXT]->textureID = LoadTGA("Image//ComicSans.tga");
+			meshList[GEO_GAMEOVER] = MeshBuilder::GenerateQuad("GameOver", Color(1.f, 1.f, 1.f), 10);
+			meshList[GEO_GAMEOVER]->textureID = LoadTGA("Image//CarnivalUI.tga");
 
 			//skybox
 			meshList[GEO_TOP] = MeshBuilder::GenerateQuad("Top", Color(1.f, 1.f, 1.f), 1);
@@ -215,9 +218,9 @@ void ScenePinball::Init()
 					meshList[GEO_SPHERE_WHITE]->material.kDiffuse.Set(0.2f, 0.4f, 0.2f);
 					meshList[GEO_SPHERE_WHITE]->material.kSpecular.Set(0.3f, 0.5f, 0.3f);
 					meshList[GEO_SPHERE_WHITE]->material.kShininess = 100.0f;
-					meshList[GEO_SILVER_SPHERE]->material.kAmbient.Set(168 / 255, 169 / 255, 173 / 255);
-					meshList[GEO_SILVER_SPHERE]->material.kDiffuse.Set(168 / 255, 169 / 255, 173 / 255);
-					meshList[GEO_SILVER_SPHERE]->material.kSpecular.Set(168 / 255, 169 / 255, 173 / 255);
+					meshList[GEO_SILVER_SPHERE]->material.kAmbient.Set(168 / 255, 171 / 255, 168 / 255);
+					meshList[GEO_SILVER_SPHERE]->material.kDiffuse.Set(170 / 255, 176 / 255, 170 / 255);
+					meshList[GEO_SILVER_SPHERE]->material.kSpecular.Set(171 / 255, 180 / 255, 171 / 255);
 					meshList[GEO_SILVER_SPHERE]->material.kShininess = 68.f;
 					meshList[GEO_BASE]->material.kAmbient.Set(247 / 255.f, 181 / 255.f, 0);
 					meshList[GEO_BASE]->material.kDiffuse.Set(247 / 255.f, 181 / 255.f, 0);
@@ -246,38 +249,40 @@ void ScenePinball::Init()
 		//ball
 		{
 		m_player = new GameObject(GameObject::GO_BALL);
-		//m_player->pos = glm::vec3(-0.6f, 2.62f, 0.f);
-		m_player->pos = glm::vec3(3.6f, 2.62f, 10.f);
+		m_player->pos = glm::vec3(-0.6f, 2.42f, 0.f);
+		//m_player->pos = glm::vec3(3.6f, 2.62f, 10.f);
 		m_player->scale = glm::vec3(0.1f, 0.1f, 0.1f);
 		m_player->vel = glm::vec3(0.f, 0.f, 0.f);
 		m_player->active = true;
-		m_player->mass = 3; //13.6
+		m_player->mass = 1;
 		m_player->dir = glm::vec3(0.f, 1.f, 0.f); 
-		m_player->force = glm::vec3(0.f,0.f,0.f);
-		m_player->Score = 0;
+		m_player->force = glm::vec3(0.f,0.f,-9.81f);
+		score = 0;
 		m_player->normal = glm::vec3(0, 0, 1);
 		}
 
 		//Flipper
 		{
 			//left
-			m_flipper1 = new GameObject(GameObject::GO_FLIPPER);
-			m_flipper1->pos = glm::vec3(4.1f, 2.5f, 1.5f);
-			m_flipper1->scale = glm::vec3(0.9f, 1.2f, 0.2f);
-			m_flipper1->vel = glm::vec3(0.f, 0.f, 0.f);
-			m_flipper1->active = true;
-			m_flipper1->mass = 5.f;
-			m_flipper1->dir = glm::vec3(0.f, 1.f, 0.f);
+			m_flipper[0] = new GameObject(GameObject::GO_FLIPPER);
+			m_flipper[0]->pos = glm::vec3(3.9f, 2.31f, 1.6f);
+			m_flipper[0]->scale = glm::vec3(1.f, 0.4f, 0.1f);
+			m_flipper[0]->vel = glm::vec3(0.f, 0.f, 0.f);
+			m_flipper[0]->active = true;
+			m_flipper[0]->mass = 1.f;
+			m_flipper[0]->dir = glm::vec3(0.f, 1.f, 0.f);
+			m_flipper[0]->normal = glm::vec3(0.f, 0.f, 1.f);
 			rotation1 = -10;
 
 			//right
-			m_flipper2 = new GameObject(GameObject::GO_FLIPPER);
-			m_flipper2->pos = glm::vec3(2.3f, 2.05f, 1.55f);
-			m_flipper2->scale = glm::vec3(0.9f, 1.2f, 0.2f);
-			m_flipper2->vel = glm::vec3(0.f, 0.f, 0.f);
-			m_flipper2->active = true;
-			m_flipper2->mass = 5.f;
-			m_flipper2->dir = glm::vec3(0.f, 1.f, 0.f);
+			m_flipper[1] = new GameObject(GameObject::GO_FLIPPER);
+			m_flipper[1]->pos = glm::vec3(2.4f, 2.31f, 1.6f);
+			m_flipper[1]->scale = glm::vec3(1.f, 0.4f, 0.1f);
+			m_flipper[1]->vel = glm::vec3(0.f, 0.f, 0.f);
+			m_flipper[1]->active = true;
+			m_flipper[1]->mass = 1.f;
+			m_flipper[1]->dir = glm::vec3(0.f, 1.f, 0.f);
+			m_flipper[1]->normal = glm::vec3(0.f, 0.f, 1.f);
 			rotation2 = 10; }
 
 		// Machine Parts
@@ -288,7 +293,6 @@ void ScenePinball::Init()
 				PinballMachine[i]->active = true;
 				PinballMachine[i]->mass = 1.f;
 				PinballMachine[i]->vel = glm::vec3(0, 0, 0);
-				//PinballMachine[i]->normal = glm::vec3(1, 0, 0);
 				PinballMachine[i]->dir = glm::vec3(0, 0, 0);
 				PinballMachine[i]->torque = glm::vec3(0, 0, 0);
 			}
@@ -322,17 +326,17 @@ void ScenePinball::Init()
 			PinballMachine[6]->scale = glm::vec3(6.4f, 1.f, 1.6f);
 			PinballMachine[6]->normal = glm::vec3(0, 0, 1);
 			// 7 = catcher left slope
-			PinballMachine[7]->pos = glm::vec3(5.1f, 2.51f, 0.7f);
-			PinballMachine[7]->scale = glm::vec3(1.f, 2.f, 3.5f);
+			PinballMachine[7]->pos = glm::vec3(5.1f, 2.29f, 0.2f);
+			PinballMachine[7]->scale = glm::vec3(1.f, 0.5f, 2.5f);
 			PinballMachine[7]->normal = glm::vec3(0, 0, 1);
 			// 8 = catcher right slope
-			PinballMachine[8]->pos = glm::vec3(1.3f, 2.01f, 0.7f);
-			PinballMachine[8]->scale = glm::vec3(1.f, 2.f, 3.5f);
+			PinballMachine[8]->pos = glm::vec3(1.f, 2.29f, 0.2f);
+			PinballMachine[8]->scale = glm::vec3(1.f, 0.5f, 2.5f);
 			PinballMachine[8]->normal = glm::vec3(0, 0, 1);
 			// 9 = laucher slot blocker
 			PinballMachine[9]->pos = glm::vec3(-0.6f, 1.5f, 7.35f);
 			PinballMachine[9]->scale = glm::vec3(1.5f, 0.7f, 0.2f);
-			PinballMachine[9]->normal = glm::vec3(1, 0, 0);
+			PinballMachine[9]->normal = glm::vec3(1, 0, 1);
 			// 10 = top left ball obstacle
 			PinballMachine[10]->pos = glm::vec3(3.f, 2.3f, 9.f);
 			PinballMachine[10]->scale = glm::vec3(0.3f, 0.3f, 0.3f);
@@ -349,10 +353,10 @@ void ScenePinball::Init()
 			PinballMachine[13]->pos = glm::vec3(1.8f, 2.3f, 6.3f);
 			PinballMachine[13]->scale = glm::vec3(0.3f, 0.3f, 0.3f);
 			PinballMachine[13]->normal = glm::vec3(0, 0, 1);
-			// 14 = left wall slope
-			PinballMachine[14]->pos = glm::vec3(6.2f, 2.4f, 4.f);
-			PinballMachine[14]->scale = glm::vec3(1.f, 1.8f, 1.8f);
-			PinballMachine[14]->normal = glm::vec3(0, 0, 1);
+			// 14 = right flipper wall part 3
+			PinballMachine[14]->pos = glm::vec3(2.21f, 2.3f, 1.6f);
+			PinballMachine[14]->scale = glm::vec3(0.4f, 0.4f, 0.2f);
+			PinballMachine[14]->normal = glm::vec3(1, 0, 0);
 			// 15 = left flipper wall part 1
 			PinballMachine[15]->pos = glm::vec3(5.f, 2.3f, 2.2f);
 			PinballMachine[15]->scale = glm::vec3(0.2f, 0.4f, 1.5f);
@@ -360,7 +364,7 @@ void ScenePinball::Init()
 			// 16 = left flipper wall part 2
 			PinballMachine[16]->pos = glm::vec3(4.5f, 2.3f, 1.6f);
 			PinballMachine[16]->scale = glm::vec3(1.f, 0.4f, 0.4f);
-			PinballMachine[16]->normal = glm::vec3(1, 0, 0);
+			PinballMachine[16]->normal = glm::vec3(0, 0, 1);
 			// 17 = right flipper wall part 1
 			PinballMachine[17]->pos = glm::vec3(1.3f, 2.3f, 2.2f);
 			PinballMachine[17]->scale = glm::vec3(0.2f, 0.4f, 1.5f);
@@ -368,15 +372,28 @@ void ScenePinball::Init()
 			// 18 = right flipper wall part 2
 			PinballMachine[18]->pos = glm::vec3(1.8f, 2.3f, 1.6f);
 			PinballMachine[18]->scale = glm::vec3(1.f, 0.4f, 0.4f);
-			PinballMachine[18]->normal = glm::vec3(1, 0, 0);
-			// 19 = right exit triangle
-			PinballMachine[19]->pos = glm::vec3(-0.3f, 2.1f, 10.5f);
+			PinballMachine[18]->normal = glm::vec3(0, 0, 1);
+			// 19 = right corner
+			PinballMachine[19]->pos = glm::vec3(-0.8f, 2.1f, 10.5f);
 			PinballMachine[19]->scale = glm::vec3(1.5f, 1.5f, 1.f);
-			PinballMachine[19]->normal = glm::vec3(1, 0, 0);
-			// 20 = left exit triangle
-			PinballMachine[20]->pos = glm::vec3(6.3f, 2.1f, 10.5f);
-			PinballMachine[20]->scale = glm::vec3(1.f, 0.4f, 0.4f);
-			PinballMachine[20]->normal = glm::vec3(0, 0, 1);
+			PinballMachine[19]->normal = glm::vec3(0.7, 0, -1);
+			yaw = glm::degrees(atan2(PinballMachine[19]->pos.x + PinballMachine[19]->scale.x, PinballMachine[19]->pos.z + PinballMachine[19]->scale.z));
+			// 20 = left corner
+			PinballMachine[20]->pos = glm::vec3(5.9f, 2.1f, 10.5f);
+			PinballMachine[20]->scale = glm::vec3(1.5f, 1.5f, 1.f);
+			PinballMachine[20]->normal = glm::vec3(-1, 0, -1);
+			// 21 = left wall slope down
+			PinballMachine[21]->pos = glm::vec3(6.09f, 2.4f, 4.08f);
+			PinballMachine[21]->scale = glm::vec3(1.f, 0.5f, 0.4f);
+			PinballMachine[21]->normal = glm::vec3(-1, 0, -1);
+			// 22 = left wall slope up
+			PinballMachine[22]->pos = glm::vec3(6.2f, 2.4f, 4.5f);
+			PinballMachine[22]->scale = glm::vec3(1.f, 0.5f, 0.4f);
+			PinballMachine[22]->normal = glm::vec3(-1, 0, 1);
+			// 23 = right wall slope
+			PinballMachine[23]->pos = glm::vec3(2.09f, 2.4f, 4.08f);
+			PinballMachine[23]->scale = glm::vec3(1.f, 0.5f, 0.4f);
+			PinballMachine[23]->normal = glm::vec3(1, 0, 1);
 		}
 
 		glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
@@ -431,7 +448,7 @@ void ScenePinball::Init()
 			light[3].cosInner = 10.f;
 			light[3].exponent = 3.f;
 
-			light[4].position = glm::vec3(0, 9.f, -1.5f);
+			light[4].position = glm::vec3(5, 9.f, -1.5f);
 			light[4].color.Set(251 / 255.f, 139 / 255.f, 35/255.f);
 			light[4].power = 0.f;
 			light[4].type = Light::LIGHT_DIRECTIONAL;
@@ -470,15 +487,21 @@ void ScenePinball::Update(double dt)
 	// spotlight for zaku cleaner view
 	light[0].position = glm::vec3(cameraArray[1].position.x, cameraArray[1].position.y, cameraArray[1].position.z);
 	light[0].spotDirection = glm::normalize(cameraArray[1].position - cameraArray[1].target);
-	cameraArray[cameraNum].Update(dt);
 	
-	CollisionCheck();
-	
-	//BallMovement(dt);
+	if (BallLeft >= 0 && m_player->active || BallLeft > 0 && !m_player->active) cameraArray[cameraNum].Update(dt);
 
-	m_player->fixedUpdate(dt);
+	if (m_player->active)
+	{
+		m_player->pos.y = 2.42f;
+		CollisionCheck();
+		m_player->fixedUpdate(dt);
+		ScoreAndCoin();
+	}
 
-	ScoreAndCoin(PinballMachine[12]);
+	//std::cout << "X: " << light[0].position.x << " Y: " << light[0].position.y << " Z: " << light[0].position.z << std::endl;
+	std::cout << "X: " << m_player->pos.x << " Y: " << m_player->pos.y << " Z: " << m_player->pos.z << std::endl;
+	//std::cout << "X: " << cameraArray[0].position.x << " Y: " << cameraArray[0].position.y << " Z: " << cameraArray[0].position.z << std::endl;
+	//std::cout << "X: " << cameraArray[0].target.x << " Y: " << cameraArray[0].target.y << " Z: " << cameraArray[0].target.z << std::endl;
 }
 
 void ScenePinball::Render()
@@ -538,15 +561,25 @@ void ScenePinball::Render()
 	modelStack.Translate(4.5f, 6.5f, 10.3f);
 	modelStack.Rotate(180, 0, 1, 0);
 	modelStack.Scale(1.f, 1.f, 1.f);
-	RenderText(meshList[GEO_TEXT], std::to_string(m_player->Score), Color(1, 1, 1));
+	RenderText(meshList[GEO_TEXT], std::to_string(score), Color(1, 1, 1));
 	modelStack.PopMatrix();
 
 	//GUI
-	RenderMeshOnScreen(meshList[GEO_UI], 100, 50, 20, 10);
-	RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(power), Color(50 / 255.f, 205 / 255.f, 50 / 255.f), 50, 600, 0);
-	//RenderMeshOnScreen(meshList[GEO_LAUNCHER_UI], 800, 50, 6, 10);
-	//(meshList[GEO_POWER_UI], 800, 50, 6, posAdd);
-	RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(coins), Color(50 / 255.f, 205 / 255.f, 50 / 255.f), 100, 100, 0);
+	if (BallLeft > 0 && m_player->active || BallLeft > 0 && !m_player->active)
+	{
+		RenderMeshOnScreen(meshList[GEO_UI], 100, 50, 20, 10);
+		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(power), Color(50 / 255.f, 205 / 255.f, 50 / 255.f), 50, 600, 0);
+		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(coins), Color(50 / 255.f, 205 / 255.f, 50 / 255.f), 100, 100, 0);
+	}
+	else if (BallLeft == 0 && !m_player->active)
+	{
+		RenderMeshOnScreen(meshList[GEO_GAMEOVER], 400, 300, 80, 60);
+		RenderTextOnScreen(meshList[GEO_TEXT], "GAME OVER", Color(50 / 255.f, 205 / 255.f, 50 / 255.f), 50, 220, 350);
+		RenderMeshOnScreen(meshList[GEO_UI], 300, 190, 20, 10);
+		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(coins), Color(50 / 255.f, 205 / 255.f, 50 / 255.f), 100, 300, 140);
+		//RenderTextOnScreen(meshList[GEO_TEXT], "Score: ", Color(50 / 255.f, 205 / 255.f, 50 / 255.f), 50, 200, 160);
+		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(score), Color(50 / 255.f, 205 / 255.f, 50 / 255.f), 50, 300, 270);
+	}
 }
 
 void ScenePinball::RenderMesh(Mesh* mesh, bool enableLight)
@@ -730,18 +763,20 @@ void ScenePinball::RenderPinballMachine()
 			RenderMesh(meshList[GEO_BASE], true);
 			modelStack.PopMatrix();
 
-			//Right Curved portion
+			//Right Corner
 			modelStack.PushMatrix();
 			modelStack.Translate(PinballMachine[19]->pos.x, PinballMachine[19]->pos.y, PinballMachine[19]->pos.z);
+			modelStack.Rotate(-30,0, 1, 0);
 			modelStack.Scale(PinballMachine[19]->scale.x, PinballMachine[19]->scale.y, PinballMachine[19]->scale.z);
 			RenderMesh(meshList[GEO_SIDE], true);
 			modelStack.PopMatrix();
 
-			//left Curved portion
+			//left Corner
 			modelStack.PushMatrix();
 			modelStack.Translate(PinballMachine[20]->pos.x, PinballMachine[20]->pos.y, PinballMachine[20]->pos.z);
+			modelStack.Rotate(30, 0, 1, 0);
 			modelStack.Scale(PinballMachine[20]->scale.x, PinballMachine[20]->scale.y, PinballMachine[20]->scale.z);
-			RenderMesh(meshList[GEO_SLOPE], true);
+			RenderMesh(meshList[GEO_SIDE], true);
 			modelStack.PopMatrix();
 			
 			//funnel
@@ -750,28 +785,16 @@ void ScenePinball::RenderPinballMachine()
 				modelStack.PushMatrix();
 				modelStack.Translate(PinballMachine[7]->pos.x, PinballMachine[7]->pos.y, PinballMachine[7]->pos.z);
 				modelStack.Rotate(-110.f, 0.f, 1.f, 0.f);
-				modelStack.Rotate(90.f, 0.f, 0.f, 1.f);
+				//modelStack.Rotate(90.f, 0.f, 0.f, 1.f);
 				modelStack.Scale(PinballMachine[7]->scale.x, PinballMachine[7]->scale.y, PinballMachine[7]->scale.z);
-				RenderMesh(meshList[GEO_TRIANGLE], true);
+				RenderMesh(meshList[GEO_SIDE], true);
 				modelStack.PopMatrix();
 				//right slope
 				modelStack.PushMatrix();
 				modelStack.Translate(PinballMachine[8]->pos.x, PinballMachine[8]->pos.y, PinballMachine[8]->pos.z);
 				modelStack.Rotate(110.f, 0.f, 1.f, 0.f);
-				modelStack.Rotate(-90.f, 0.f, 0.f, 1.f);
+				//modelStack.Rotate(-90.f, 0.f, 0.f, 1.f);
 				modelStack.Scale(PinballMachine[8]->scale.x, PinballMachine[8]->scale.y, PinballMachine[8]->scale.z);
-				RenderMesh(meshList[GEO_TRIANGLE], true);
-				modelStack.PopMatrix();
-				//left cover
-				modelStack.PushMatrix();
-				modelStack.Translate(PinballMachine[7]->pos.x + 0.9f, PinballMachine[7]->pos.y - 0.61f, PinballMachine[7]->pos.z - 0.2f);
-				modelStack.Scale(0.8f, 1.2f, 0.7f);
-				RenderMesh(meshList[GEO_SIDE], true);
-				modelStack.PopMatrix();
-				//right cover
-				modelStack.PushMatrix();
-				modelStack.Translate(PinballMachine[8]->pos.x - 0.9f, PinballMachine[8]->pos.y - 0.11f, PinballMachine[7]->pos.z - 0.2f);
-				modelStack.Scale(0.9f, 1.2f, 0.7f);
 				RenderMesh(meshList[GEO_SIDE], true);
 				modelStack.PopMatrix();
 
@@ -796,6 +819,7 @@ void ScenePinball::RenderPinballMachine()
 			modelStack.PushMatrix();
 				//Board
 				modelStack.PushMatrix();
+				//ball left display
 				for (int i = 0; i < BallLeft; i++)
 				{
 					modelStack.PushMatrix();
@@ -896,21 +920,29 @@ void ScenePinball::RenderPinballMachine()
 
 			//Left wall slope
 			modelStack.PushMatrix();
-			modelStack.Translate(PinballMachine[14]->pos.x, PinballMachine[14]->pos.y, PinballMachine[14]->pos.z);
-			modelStack.Rotate(90.f, 0.f, 0.f, 1.f);
-			modelStack.Scale(PinballMachine[14]->scale.x, PinballMachine[14]->scale.y, PinballMachine[14]->scale.z);
-			RenderMesh(meshList[GEO_SLOPE], true);
+			modelStack.Translate(PinballMachine[22]->pos.x, PinballMachine[22]->pos.y, PinballMachine[22]->pos.z);
+			modelStack.Rotate(-30.f, 0.f, 1.f, 0.f);
+			modelStack.Scale(PinballMachine[22]->scale.x, PinballMachine[22]->scale.y, PinballMachine[22]->scale.z);
+			RenderMesh(meshList[GEO_SIDE], true);
+			modelStack.PopMatrix();
+			modelStack.PushMatrix();
+			modelStack.Translate(PinballMachine[21]->pos.x, PinballMachine[21]->pos.y, PinballMachine[21]->pos.z);
+			modelStack.Rotate(-120.f, 0.f, 1.f, 0.f);
+			modelStack.Scale(PinballMachine[21]->scale.x, PinballMachine[21]->scale.y, PinballMachine[21]->scale.z);
+			RenderMesh(meshList[GEO_SIDE], true);
 			modelStack.PopMatrix();
 
+
 			//right side triangle
+			/*
 			modelStack.PushMatrix();
 			modelStack.Translate(2.6f, 2.4f, 3.5f);
 			modelStack.Rotate(90.f, 0.f, 0.f, 1.f);
 			modelStack.Scale(1.f, 1.8f, 1.8f);
 			RenderMesh(meshList[GEO_SLOPE], true);
-			modelStack.PopMatrix();
+			modelStack.PopMatrix();*/
 		
-			//left side
+			//left side flipper area
 			modelStack.PushMatrix();
 				modelStack.PushMatrix();
 				modelStack.Translate(PinballMachine[15]->pos.x, PinballMachine[15]->pos.y, PinballMachine[15]->pos.z);
@@ -919,56 +951,51 @@ void ScenePinball::RenderPinballMachine()
 				RenderMesh(meshList[GEO_SIDE], true);
 				modelStack.PopMatrix();
 			modelStack.Translate(PinballMachine[16]->pos.x, PinballMachine[16]->pos.y, PinballMachine[16]->pos.z);
-			modelStack.Rotate(-10.f, 0.f, 1.f, 0.f);
+			//modelStack.Rotate(-10.f, 0.f, 1.f, 0.f);
 			modelStack.Scale(PinballMachine[16]->scale.x, PinballMachine[16]->scale.y, PinballMachine[16]->scale.z);
 			RenderMesh(meshList[GEO_SIDE], true);
 			modelStack.PopMatrix();
 
-			//right side
+			//right side flipper area
 			modelStack.PushMatrix();
 				modelStack.PushMatrix();
 				modelStack.Translate(PinballMachine[17]->pos.x, PinballMachine[17]->pos.y, PinballMachine[17]->pos.z);
 				//modelStack.Rotate(-10.f, 0.f, 1.f, 0.f);
 				modelStack.Scale(PinballMachine[17]->scale.x, PinballMachine[17]->scale.y, PinballMachine[17]->scale.z);
 				RenderMesh(meshList[GEO_SIDE], true);
-			modelStack.PopMatrix();
+				modelStack.PopMatrix();
+
+				modelStack.PushMatrix();
+				modelStack.Translate(PinballMachine[14]->pos.x, PinballMachine[14]->pos.y, PinballMachine[14]->pos.z);
+				modelStack.Rotate(-90.f, 0.f, 1.f, 0.f);
+				modelStack.Scale(PinballMachine[14]->scale.x, PinballMachine[14]->scale.y, PinballMachine[14]->scale.z);
+				RenderMesh(meshList[GEO_SIDE], true);
+				modelStack.PopMatrix();
 			modelStack.Translate(PinballMachine[18]->pos.x, PinballMachine[18]->pos.y, PinballMachine[18]->pos.z);
-			modelStack.Rotate(10.f, 0.f, 1.f, 0.f);
+			//modelStack.Rotate(10.f, 0.f, 1.f, 0.f);
 			modelStack.Scale(PinballMachine[18]->scale.x, PinballMachine[18]->scale.y, PinballMachine[18]->scale.z);
 			RenderMesh(meshList[GEO_SIDE], true);
 			modelStack.PopMatrix();
 
 			//flipper 1
 			modelStack.PushMatrix();
-				modelStack.PushMatrix();
-				modelStack.Translate(4.1f,2.35f,1.5f);
-				modelStack.Scale(0.22f,0.22f,0.22f);
-				RenderMesh(meshList[GEO_SPHERE], true);
-				modelStack.PopMatrix();
-			modelStack.Translate(m_flipper1->pos.x, m_flipper1->pos.y, m_flipper1->pos.z);
+			modelStack.Translate(m_flipper[0]->pos.x, m_flipper[0]->pos.y, m_flipper[0]->pos.z);
 			modelStack.Rotate(rotation1, 0.f, 1.f, 0.f);
-			modelStack.Rotate(90, 0.f, 0.f, 1.f);
-			modelStack.Scale(m_flipper1->scale.x, m_flipper1->scale.y, m_flipper1->scale.z);
-			RenderMesh(meshList[GEO_TRIANGLE], true);
+			modelStack.Scale(m_flipper[0]->scale.x, m_flipper[0]->scale.y, m_flipper[0]->scale.z);
+			RenderMesh(meshList[GEO_SIDE], true);
 			modelStack.PopMatrix();
 
 			//flipper 2
 			modelStack.PushMatrix();
-				modelStack.PushMatrix();
-				modelStack.Translate(2.3f,2.35f,1.5f);
-				modelStack.Scale(0.2f,0.2f,0.2f);
-				RenderMesh(meshList[GEO_SPHERE], true);
-				modelStack.PopMatrix();
-			modelStack.Translate(m_flipper2->pos.x, m_flipper2->pos.y, m_flipper2->pos.z);
+			modelStack.Translate(m_flipper[1]->pos.x, m_flipper[1]->pos.y, m_flipper[1]->pos.z);
 			modelStack.Rotate(rotation2, 0.f, 1.f, 0.f);
-			modelStack.Rotate(-90, 0.f, 0.f, 1.f);
-			modelStack.Scale(m_flipper2->scale.x, m_flipper2->scale.y, m_flipper2->scale.z);
-			RenderMesh(meshList[GEO_TRIANGLE], true);
+			modelStack.Scale(m_flipper[1]->scale.x, m_flipper[1]->scale.y, m_flipper[1]->scale.z);
+			RenderMesh(meshList[GEO_SIDE], true);
 			modelStack.PopMatrix();
 		}
 		modelStack.PopMatrix();
-		}
-		modelStack.PopMatrix();
+	}
+	modelStack.PopMatrix();
 }
 
 void ScenePinball::RenderSkybox()
@@ -1055,19 +1082,26 @@ void ScenePinball::BallMovement(double dt) {
 		// s = 0.5*(u+v)t
 		m_player->pos += 0.5f * (float)dt * 2 * (m_player->vel + temp);
 		//m_Disc[i]->pos += (float)dt * 2 * (m_Disc[i]->vel);
+
+		//p = mass * velo
+
 	}*/
 }
 
-void ScenePinball::ScoreAndCoin(GameObject* Obj1) {
-	if (m_player->CheckSSCollision(Obj1))
+void ScenePinball::ScoreAndCoin() {
+	for (int i = 10; i < 14; i++)
 	{
-		m_player->Score += 1000;
+		if (PinballMachine[i]->CheckSSCollision(m_player))
+		{
+			score += 1000;
+		}
 	}
 
-	if (m_player->Score%3000 == 0 && m_player->Score !=0)
+	if (BallLeft == 0)
 	{
-		//coin code here
-		coins = coins + 1;
+		float coin_convert;
+		coin_convert = score / 3000;
+		coins = static_cast<int>(coin_convert);
 	}
 }
 
@@ -1076,29 +1110,88 @@ void ScenePinball::CollisionCheck()
 	if (PinballMachine[0]->CheckCSCollision(m_player))
 	{
 	}
-		for (int i = 1; i < MAX_PARTS; i++)
+	//machine and launcher wall
+		for (int i = 1; i < 6; i++)
 		{
 			if (PinballMachine[i]->CheckCSCollision(m_player))
 			{
 				m_player->vel = m_player->vel - (2.0f * dot(m_player->vel, PinballMachine[i]->normal)) * PinballMachine[i]->normal;
-				//m_player->CollisionResponse(PinballMachine[4]);
-				//m_player->WallCollisionResponse(PinballMachine[i]);
-				//m_player->vel = glm::vec3(1, 0, 0);
-				std::cout << "Collision sphere cube Hit" << std::endl;
+				m_player->vel.x -= 0.5f;
+				std::cout << "Collision wall Hit" << std::endl;
 			}
 		}
-		/*
+
+		//launcher
+		if (PinballMachine[9]->CheckCSCollision(m_player))
+		{
+			m_player->vel = m_player->vel - (2.0f * dot(m_player->vel, PinballMachine[9]->normal)) * PinballMachine[9]->normal;
+			//m_player->CollisionResponse(PinballMachine[4]);
+			//m_player->WallCollisionResponse(PinballMachine[i]);
+			//m_player->vel = glm::vec3(1, 0, 0);
+			std::cout << "Collision launch blocker Hit" << std::endl;
+		}
+
+		//bottom funnel wall and slope
+		for (int i = 6; i < 9; i++)
+		{
+			if (PinballMachine[i]->CheckCSCollision(m_player))
+			{
+				m_player->active = false;
+				ballLaunch = false;
+				std::cout << "hit the bottom" << std::endl;
+			}
+		}
+
+		//corner
+		for (int i = 19; i < 21; i++)
+		{
+			if (PinballMachine[i]->CheckCSCollision(m_player))
+			{
+				m_player->vel = m_player->vel.x - (2.0f * dot(m_player->vel, PinballMachine[i]->normal)) * PinballMachine[i]->normal;
+				PinballMachine[9]->pos = glm::vec3(-0.6f, 2.15f, 7.37f);
+				std::cout << "Collision slope Hit" << std::endl;
+			}
+		}
+		
+		//sphere obstacle
 		for (int i = 10; i < 14; i++)
 		{
 			if (PinballMachine[i]->CheckSSCollision(m_player))
 			{
-				//m_player->CollisionResponse(PinballMachine[4]);
-				m_player->WallCollisionResponse(PinballMachine[i]);
-				//m_player->vel = glm::vec3(0, 0, 0);
+				m_player->vel = m_player->vel - (2.0f * dot(m_player->vel, PinballMachine[i]->normal)) * PinballMachine[i]->normal;
 				std::cout << "Collision Sphere Hit" << std::endl;
 			}
-		}*/
-	
+		}
+
+		//funnel
+		for (int i = 15; i < 19; i++)
+		{
+			if (PinballMachine[i]-> CheckCSCollision(m_player))
+			{
+				m_player->vel = m_player->vel - (2.0f * dot(m_player->vel, PinballMachine[i]->normal)) * PinballMachine[i]->normal;
+				std::cout << "Collision funnel Hit" << std::endl;
+			}
+		}
+
+		//Flipper
+		for (int i = 0; i < 2; i++)
+		{
+			if (m_flipper[i]->CheckCSCollision(m_player))
+			{
+				m_player->vel = m_player->vel - (2.0f * dot(m_player->vel, m_flipper[i]->normal)) * m_flipper[i]->normal;
+				std::cout << "Collision flipper Hit" << std::endl;
+			}
+		}
+
+		//wall slope
+		for (int i = 21; i < 23; i++)
+		{
+			if (PinballMachine[i]->CheckCSCollision(m_player))
+			{
+				m_player->vel = m_player->vel.x - (2.0f * dot(m_player->vel, PinballMachine[i]->normal)) * PinballMachine[i]->normal;
+				std::cout << "Collision wall slope Hit" << std::endl;
+			}
+		}
 }
 
 void ScenePinball::Exit()
@@ -1146,99 +1239,116 @@ void ScenePinball::HandleKeyPress()
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //wireframe mode
 	}
 
-	// cam change
-	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_TAB)) {
-		if (cameraNum == 0) {//fps
-			cameraNum = 1;
+	if (BallLeft >= 0 && m_player->active || BallLeft > 0 && !m_player->active)
+	{
+		// cam change
+		if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_TAB)) {
+			if (cameraNum == 0) {//fps
+				cameraNum = 1;
+			}
+			else if (cameraNum == 1)//launcher
+				cameraNum = 0;
+			else
+				cameraNum = 0;
 		}
-		else if (cameraNum == 1)//launcher
-			cameraNum = 0;
-		else
-			cameraNum = 0;
-	}
 
-	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_F1))
-	{
-		posAdd += 1.2;
-	}
-	else if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_F2))
-	{
-		posAdd -= 0.2;
-	}
-	
-	// Power Control
-	if (Application::IsKeyPressed(GLFW_KEY_K))
-	{
-		if (power < 50)
+		if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_F1))
 		{
-			power += 0.5;
+			posAdd += 1.2;
 		}
-	}
-	else if (Application::IsKeyPressed(GLFW_KEY_L))
-	{
-		if (power > 0)
+		else if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_F2))
 		{
-			power -= 0.5;
+			posAdd -= 0.2;
 		}
-	}
-	//to fire
-	if (!bRKeyStateSpace && Application::IsKeyPressed(GLFW_KEY_SPACE))
-	{
-		bRKeyStateSpace = true;
-		if (ballLaunch == true)
+
+		// Power Control
+		if (Application::IsKeyPressed(GLFW_KEY_K))
 		{
-			ballLaunch = false;
-			m_player->pos = glm::vec3(-0.6f, 2.62f, 0.f);
+			if (power < 25)
+			{
+				power += 0.5;
+			}
+		}
+		else if (Application::IsKeyPressed(GLFW_KEY_L))
+		{
+			if (power > 5)
+			{
+				power -= 0.5;
+			}
+		}
+		//to fire
+		if (!bRKeyStateSpace && !ballLaunch && Application::IsKeyPressed(GLFW_KEY_SPACE))
+		{
+			bRKeyStateSpace = true;
+			if (!m_player->active && BallLeft > 0)
+			{
+				m_player->pos = glm::vec3(-0.6f, 2.42f, 0.f);
+				m_player->vel = glm::vec3(0, 0, 0);
+				PinballMachine[9]->pos = glm::vec3(-0.6f, 1.5f, 7.35f);
+				m_player->active = true;
+			}
+		}
+		else if (bRKeyStateSpace && !Application::IsKeyPressed(GLFW_KEY_SPACE))
+		{
+			bRKeyStateSpace = false;
+			ballLaunch = true;
+			m_player->vel = glm::vec3(0.f, 0.f, power);
+			std::cout << m_player->vel.x << std::endl;
 			BallLeft--;
+			//PinballMachine[9]->pos = glm::vec3(-0.6f, 2.15f, 7.35f);
+			if (power != 0)
+			{
+				power = 0;
+			}
 		}
-	}
-	else if (bRKeyStateSpace && !Application::IsKeyPressed(GLFW_KEY_SPACE))
-	{
-		bRKeyStateSpace = false;
-		ballLaunch = true;
-		m_player->active = true;
-		m_player->vel = glm::vec3(0.f, 0.f, power);
-		std::cout << m_player->vel.x << std::endl;
-		//PinballMachine[9]->pos = glm::vec3(-0.6f, 2.15f, 7.35f);
-		if (power != 0)
+
+		// Flipper control left
+		if (!bRKeyStateZ && Application::IsKeyPressed(GLFW_KEY_Z))
 		{
-			power = 0;
+			bRKeyStateZ = true;
+			rotation1 = 15;
+		}
+		else if (bRKeyStateZ && !Application::IsKeyPressed(GLFW_KEY_Z))
+		{
+			bRKeyStateZ = false;
+			rotation1 = -10;
+		}
+
+		// Flipper control right
+		if (!bRKeyStateX && Application::IsKeyPressed(GLFW_KEY_X))
+		{
+			bRKeyStateX = true;
+			rotation2 = -15;
+		}
+		else if (bRKeyStateX && !Application::IsKeyPressed(GLFW_KEY_X))
+		{
+			bRKeyStateX = false;
+			rotation2 = 10;
+		}
+
+		//Test score
+		if (!bRKeyState && Application::IsKeyPressed(GLFW_KEY_O))
+		{
+			bRKeyState = true;
+			score += 1000;
+		}
+		else if (bRKeyState && !Application::IsKeyPressed(GLFW_KEY_O))
+		{
+			bRKeyState = false;
 		}
 	}
-
-	// Flipper control left
-	if (!bRKeyStateZ && Application::IsKeyPressed(GLFW_KEY_Z))
+	if (!bRKeyStateR && Application::IsKeyPressed(GLFW_KEY_R))
 	{
-		bRKeyStateZ = true;
-		rotation1 = 15;
+		bRKeyStateR = true;
 	}
-	else if (bRKeyStateZ && !Application::IsKeyPressed(GLFW_KEY_Z))
+	else if (bRKeyStateR && !Application::IsKeyPressed(GLFW_KEY_R))
 	{
-		bRKeyStateZ = false;
-		rotation1 = -10;
+		bRKeyStateR = false;
+		m_player->pos = glm::vec3(-0.6f, 2.42f, 0.f);
+		m_player->vel = glm::vec3(0, 0, 0);
+		PinballMachine[9]->pos = glm::vec3(-0.6f, 1.5f, 7.35f);
+		m_player->active = true;
+		score = 0;
+		BallLeft = 5;
 	}
-
-	// Flipper control right
-	if (!bRKeyStateX && Application::IsKeyPressed(GLFW_KEY_X))
-	{
-		bRKeyStateX = true;
-		rotation2 = -15;
-	}
-	else if (bRKeyStateX && !Application::IsKeyPressed(GLFW_KEY_X))
-	{
-		bRKeyStateX = false;
-		rotation2 = 10;
-	}
-
-	//Test score
-	if (!bRKeyState && Application::IsKeyPressed(GLFW_KEY_O))
-	{
-		bRKeyState = true;
-		m_player->Score += 1000;
-	}
-	else if (bRKeyState && !Application::IsKeyPressed(GLFW_KEY_O))
-	{
-		bRKeyState = false;
-	}
-
 }
