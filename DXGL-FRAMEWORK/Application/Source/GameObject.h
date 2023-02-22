@@ -16,13 +16,10 @@ struct GameObject
         GO_CUBE,
         GO_BULLET,
         GO_WALL,
-        GO_ALIEN,
         GO_FLIPPER,
         GO_CAN,
         GO_TABLE,
         GO_FLOOR,
-        GO_BULLET,
-        GO_WALL,
         GO_ALIEN,  // aliens
         GO_TOTAL, //must be last
     };
@@ -57,3 +54,4 @@ struct GameObject
     GameObject(GAMEOBJECT_TYPE typeValue = GO_BALL);
     ~GameObject();
 };
+#endif

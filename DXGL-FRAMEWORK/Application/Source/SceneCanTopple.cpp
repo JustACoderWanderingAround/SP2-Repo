@@ -16,7 +16,7 @@
 #include "MeshBuilder.h"
 #include "KeyboardController.h"
 #include "LoadTGA.h"
-
+#include "SceneManager.h"
 SceneCanTopple::SceneCanTopple()
 {
 	srand(rand());
@@ -425,7 +425,9 @@ void SceneCanTopple::Update(double dt)
 
 			}
 		}
+	else {
 
+	}
 
 		std::cout << camera.target.x << "," << camera.target.y << "," << camera.target.z << std::endl;
 		//std::cout << "Pos: " << cameraArray[0].position.x << ", " << cameraArray[0].position.y << ", " << cameraArray[0].position.z << std::endl;
