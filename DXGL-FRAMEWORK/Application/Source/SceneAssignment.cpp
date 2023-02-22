@@ -16,6 +16,7 @@
 #include "MeshBuilder.h"
 #include "KeyboardController.h"
 #include "LoadTGA.h"
+#include "SceneManager.h"
 
 SceneAssignment::SceneAssignment()
 {
@@ -326,7 +327,9 @@ void SceneAssignment::Update(double dt)
 	HandleKeyPress();
 
 	//std::cout << "Pos: " << cameraArray[0].position.x << ", " << cameraArray[0].position.y << ", " << cameraArray[0].position.z << std::endl;
-
+	if (KeyboardController::GetInstance()->IsKeyPressed('Z')) {
+		SceneManager::GetInstance()->LoadScene(SceneManager::SCENE_NUM::SCENE_HITMEN);
+	}
 	// spotlight for zaku cleaner view
 	light[0].position = glm::vec3(cameraArray[1].position.x, cameraArray[1].position.y, cameraArray[1].position.z);
 	light[0].spotDirection = glm::normalize(cameraArray[1].position - cameraArray[1].target);

@@ -152,10 +152,6 @@ void Application::Init()
 void Application::Run()
 {
 	//Main Loop
-	Scene *scene1 = new SceneHitMen();
-	Scene* scene = scene1;
-	scene->Init();
-	SceneManager::GetInstance()->currScene = scene;
 	SceneManager::GetInstance()->InitScene();
 
 
@@ -167,25 +163,6 @@ void Application::Run()
 		SceneManager::GetInstance()->RunScene(m_timer.getElapsedTime());
 		//Swap buffers
 		glfwSwapBuffers(m_window);
-		//if (!isEnterUp && KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_ENTER)) {
-		//	if (sceneNum == SCENE_NUM::SCENE_HITMEN) {
-		//		scene1->Exit(); // Ensure you exit previous screen and remove the previous shader
-		//		scene2->Init(); // Initialise the next screen
-		//		scene = scene2;
-		//		sceneNum = SCENE_NUM::SCENE_TEST;
-		//	}
-		//	else if (sceneNum == SCENE_NUM::SCENE_TEST) {
-		//		scene2->Exit();
-		//		scene1->Init();
-		//		scene = scene1;
-		//		sceneNum = SCENE_NUM::SCENE_HITMEN;
-		//	}
-		//	isEnterUp = true;
-		//}
-		//else if (isEnterUp && KeyboardController::GetInstance()->IsKeyUp(GLFW_KEY_ENTER))
-		//{
-		//	isEnterUp = false;
-		//}
 		
 
 		KeyboardController::GetInstance()->PostUpdate();

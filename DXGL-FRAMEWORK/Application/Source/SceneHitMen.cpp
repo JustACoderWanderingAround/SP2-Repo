@@ -918,7 +918,6 @@ void SceneHitMen::Exit()
 	// Cleanup VBO here
 	for (int i = 0; i < NUM_GEOMETRY; ++i)
 	{
-		std::cout << i << std::endl;
 		if (meshList[i])
 		{
 			delete meshList[i];

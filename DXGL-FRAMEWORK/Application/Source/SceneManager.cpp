@@ -8,7 +8,7 @@ SceneManager* SceneManager::m_instance = nullptr;
 SceneManager::SceneManager()
 {
 	sceneNum = SCENE_NUM::SCENE_HITMEN;
-	currScene = new SceneHitMen;
+	currScene = new SceneAssignment();
 }
 
 SceneManager::~SceneManager()
@@ -27,6 +27,11 @@ SceneManager* SceneManager::GetInstance()
 	}
 	return m_instance;
 }
+void SceneManager::SwapScene(Scene* scene) {
+	ExitScene();
+	currScene = scene;
+	InitScene();
+}
 
 void SceneManager::InitScene()
 {
@@ -39,33 +44,23 @@ void SceneManager::LoadScene(SCENE_NUM newSceneNum)
 	switch (newSceneNum) {
 	case SCENE_NUM::SCENE_MAIN:
 		/*temp = new SceneMain();
-		ExitScene();
-		currScene = temp;
-		InitScene();*/
+		SwapScene(temp);*/
 		break;
 	case SCENE_NUM::SCENE_TEST:
 		temp = new SceneAssignment();
-		ExitScene();
-		currScene = temp;
-		InitScene();
+		SwapScene(temp);
 		break;
 	case SCENE_NUM::SCENE_HITMEN:
 		temp = new SceneHitMen();
-		ExitScene();
-		currScene = temp;
-		InitScene();
+		SwapScene(temp);
 		break;
 	case SCENE_NUM::SCENE_CANTOPPLE:
 		/*temp = new SceneCanTopple();
-		ExitScene();
-		currScene = temp;
-		InitScene();*/
+		SwapScene(temp);*/
 		break;
 	case SCENE_NUM::SCENE_PINBALL:
 		/*temp = new ScenePinBall();
-		ExitScene();
-		currScene = temp;
-		InitScene();*/
+		SwapScene(temp);*/
 		break;
 	default:
 		std::cout << "Error!" << std::endl;
