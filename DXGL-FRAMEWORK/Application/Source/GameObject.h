@@ -4,7 +4,7 @@
 #include "Vector3.h"
 #include <glm\glm.hpp>
 
-#define x_resistant 3
+#define x_resistant 1
 
 struct GameObject
 {
@@ -41,11 +41,11 @@ struct GameObject
     bool CheckCCCollision(GameObject* that);
     void setDirection(const glm::vec3& vec, float radian);
     bool active;
-    bool collidingWithTable;
     float mass;
     float momentOfInertia;
     float anglularVelocity;
     float multiplier;
+    bool collidingWithTable;
     bool touched;
     double despawnTimer;
     

@@ -62,6 +62,20 @@
     </ClCompile>
     <ClCompile Include="Source\SceneCanTopple.cpp">
       <Filter>Source Files</Filter>
+    <ClCompile Include="Source\SceneMain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\stall.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\player.cpp">
+       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SceneHitMen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SceneManager.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -120,6 +134,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\SceneCanTopple.h">
+       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SceneMain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\stall.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\player.h">
+     <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SceneHitMen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SceneManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

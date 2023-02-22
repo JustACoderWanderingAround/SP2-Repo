@@ -16,6 +16,9 @@
 #include "Scene1.h"
 #include "SceneAssignment.h"
 #include "SceneCanTopple.h"
+#include "SceneMain.h"
+#include "SceneHitMen.h"
+#include "SceneManager.h"
 GLFWwindow* m_window;
 const unsigned char FPS = 60; // FPS of this game
 const unsigned int frameTime = 1000 / FPS; // time for each frame
@@ -100,8 +103,10 @@ void Application::Init()
 
 	//Create a window and create its OpenGL context
 	m_width = 1000;
-	m_height = 800;
-	m_window = glfwCreateWindow(m_width, m_height, "Clean The Zaku!", NULL, NULL);
+	m_height = 750;
+
+	m_window = glfwCreateWindow(m_width, m_height, "Untitled Carnival Game", NULL, NULL);
+
 
 	//If the window couldn't be created
 	if (!m_window)
@@ -145,22 +150,22 @@ void Application::Init()
 		fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
 		//return -1;
 	}
+	sceneNum = SCENE_NUM::SCENE_MAIN;
 }
-
 void Application::Run()
 {
 	//Main Loop
-	Scene *scene = new SceneCanTopple();
-	scene->Init();
+	SceneManager::GetInstance()->InitScene();
+
 
 	m_timer.startTimer();    // Start timer to calculate how long it takes to render this frame
 	while (!glfwWindowShouldClose(m_window) && !IsKeyPressed(VK_ESCAPE))
 	{
-		scene->Update(m_timer.getElapsedTime());
-		scene->Render();
+		//scene->Update(m_timer.getElapsedTime());
+		//scene->Render();
+		SceneManager::GetInstance()->RunScene(m_timer.getElapsedTime());
 		//Swap buffers
 		glfwSwapBuffers(m_window);
-
 		
 
 		KeyboardController::GetInstance()->PostUpdate();
@@ -177,10 +182,9 @@ void Application::Run()
         m_timer.waitUntil(frameTime);       // Frame rate limiter. Limits each frame to a specified time in ms.   
 
 	} //Check if the ESC key had been pressed or if the window had been closed
-	scene->Exit();
-	delete scene;
-}
+	SceneManager::GetInstance()->currScene->Exit();
 
+}
 int Application::GetWindowWidth()
 {
 	return m_width;

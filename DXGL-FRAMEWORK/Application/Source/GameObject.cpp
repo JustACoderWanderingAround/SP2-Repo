@@ -40,7 +40,9 @@ bool GameObject::CheckLineCollision(GameObject* that)
 	if (projectedDist > 0) axisX = -axisX;
 
 	return dot(this->vel, axisX) >= 0 && //Check 1: Travelling towards the wall ?
-		that->scale.x * 0.5 + this->scale.x > -dot(diff ,axisX) && //Check 2: Radius + Thickness vs Distance
+
+		that->scale.x * 0.5 + this->scale.x > -dot(diff, axisX) && //Check 2: Radius + Thickness vs Distance
+
 		that->scale.y * 0.5 > fabs(dot(diff, axisY)); //Check 3: Length check
 }
 
@@ -89,7 +91,9 @@ void GameObject::fixedUpdate(double dt)
 			force.z = -x_resistant;
 		}
 		else
+
 			force.z = x_resistant;*/
+
 	}
 
 	//Calculate the resulting acceleration
@@ -177,17 +181,32 @@ void GameObject::CollisionResponse(GameObject* that)
 	// v2prime
 	vPrimeNormalVel2 = normal * vNormalVel2;
 	vPrimeTanVel2 = unitTangent * tangentVel2;
+	// step 7
+
+	this->vel = vPrimeNormalVel1 + vPrimeTanVel1;
+	that->vel = vPrimeNormalVel2 + vPrimeTanVel2;
 
 	// Calculate the restitution coefficient (bounciness) of the collision
-    float restitution = 0.5f;
-    glm::vec3 relativeVelocity = that->vel - this->vel;
-    float velocityAlongNormal = glm::dot(relativeVelocity, normal);
-    // Calculate the impulse magnitude
-    float impulseMagnitude = -(1 + restitution) * velocityAlongNormal /
-        (1 / this->mass + 1 / that->mass);
+	float restitution = 0.5f;
+	glm::vec3 relativeVelocity = that->vel - this->vel;
+	float velocityAlongNormal = glm::dot(relativeVelocity, normal);
+	// Calculate the impulse magnitude
+	float impulseMagnitude = -(1 + restitution) * velocityAlongNormal /
+		(1 / this->mass + 1 / that->mass);
 
-    // Apply the impulse to the objects
-    glm::vec3 impulse = impulseMagnitude * normal;
-    this->vel -= impulse / this->mass;
-    that->vel += impulse / that->mass;
+
+	// Apply the impulse to the objects
+	glm::vec3 impulse = impulseMagnitude * normal;
+	this->vel -= impulse / this->mass;
+	that->vel += impulse / that->mass;
+
+	this->force = -normal;
+	that->force = normal;
+
+
+	//// Apply the impulse to the objects
+	//glm::vec3 impulse = impulseMagnitude * normal;
+	//this->vel -= impulse / this->mass;
+	//that->vel += impulse / that->mass;
+
 }
