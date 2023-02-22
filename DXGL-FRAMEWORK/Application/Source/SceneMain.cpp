@@ -16,6 +16,7 @@
 #include "MeshBuilder.h"
 #include "KeyboardController.h"
 #include "LoadTGA.h"
+#include "SceneManager.h"
 
 #define time_scale 5
 
@@ -678,7 +679,10 @@ void SceneMain::Update(double dt)
 
 	mainFPSCam.Update(dt);
 	m_player->fixedUpdate(static_cast<float>(dt));
-	
+	if (nearHitMan && KeyboardController::GetInstance()->IsKeyPressed('F')) {
+		SceneManager::GetInstance()->LoadScene(SceneManager::SCENE_NUM::SCENE_HITMEN);
+	}
+
 }
 
 void SceneMain::Render()
@@ -1742,5 +1746,4 @@ void SceneMain::HandleKeyPress()
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //wireframe mode
 	}
 
-	
 }

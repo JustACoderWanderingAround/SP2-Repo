@@ -9,7 +9,10 @@ class Application
 public:
 	enum class SCENE_NUM {
 		SCENE_TEST = 0,
+		SCENE_MAIN,
 		SCENE_HITMEN,
+		SCENE_CANTOPPLE,
+		SCENE_PINBALL,
 		TOTAL_SCENE
 	};
 	Application();

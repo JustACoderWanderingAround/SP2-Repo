@@ -159,7 +159,7 @@ void SceneHitMen::Init()
 		for (int i = -2; i < 3; i++) {
 			for (int j = -2; j < 3; j++) {
 				doorMen.emplace_back(new GameObject);
-				doorMen[counter]->pos = (glm::vec3(- 1 * j * 3.f + offSet, 7.5f + offSet, -1 * i * 1.1f));
+				doorMen[counter]->pos = (glm::vec3(- 1 * j * 3.f + offSet, 9.5f + offSet, -1 * i * 1.1f));
 				doorMenInitPos.emplace_back(doorMen[counter]->pos);
 				doorMen[counter]->scale = glm::vec3(0.5f, 3.5f, 0.5f);
 				doorMen[counter]->vel = glm::vec3(0, 0, 0);
@@ -449,17 +449,6 @@ void SceneHitMen::Update(double dt)
 		vertiView = -1 * glm::degrees(atan2(view.y, view.z));
 		gunHori = horiView;
 		gunVerti = vertiView;
-		//if (m_bullet.CheckCSCollision(&m_table1) || m_bullet.pos.y < 0.0001f) {
-		//	//m_bullet.CollisionResponse(&m_table1);
-		//	m_bullet.force.y = 0;
-		//	m_bullet.vel.y = 0;
-		//}
-		//else {
-		//	m_bullet.force += gravity;
-		//}
-		//if (m_bullet.pos.z < -5) {
-		//	m_bullet.active = false;
-		//}
 		for (int i = 0; i < NUM_SHELLS; i++) {
 			m_grapeShot[i]->fixedUpdate(static_cast<float>(dt));
 		}
@@ -525,10 +514,10 @@ void SceneHitMen::Update(double dt)
 	else
 		{
 		if (KeyboardController::GetInstance()->IsKeyPressed('Z')) {
-			SceneManager::GetInstance()->LoadScene(SceneManager::SCENE_NUM::SCENE_TEST);
+			SceneManager::GetInstance()->LoadScene(SceneManager::SCENE_NUM::SCENE_MAIN);
 		}
 	 }
-	//m_bullet.fixedUpdate(static_cast<float>(dt));
+	 std::cout << doorMen[0]->pos.y << std::endl;
 }
 
 void SceneHitMen::Render()
@@ -656,18 +645,19 @@ void SceneHitMen::Render()
 
 	}
 	RenderSkybox();
-	RenderTextOnScreen(meshList[GEO_TEXT], std::string("Score: " + std::to_string(score)), Color(0.f, 0.f, 0.f), 40, 0, 550);
-	RenderTextOnScreen(meshList[GEO_TEXT], std::string("Time: " + std::to_string(gameTimer)), Color(0.f, 0.f, 0.f), 40, 400, 550);
+	RenderTextOnScreen(meshList[GEO_TEXT], std::string("Score: " + std::to_string(score)), Color(255.f / 255.f, 165 / 255.f, 0.f ), 40, 0, 550);
+	RenderTextOnScreen(meshList[GEO_TEXT], std::string("Time: " + std::to_string(gameTimer)), Color(255.f / 255.f, 165 / 255.f, 0.f), 40, 400, 550);
 	if (reloading)
-		RenderTextOnScreen(meshList[GEO_TEXT], std::string("Reloading: " + std::to_string(reloadTimer)), Color(0.f, 0.f, 0.f), 40, 250, 30);
+		RenderTextOnScreen(meshList[GEO_TEXT], std::string("Reloading: " + std::to_string(reloadTimer)), Color(255.f / 255.f, 165 / 255.f, 0.f), 40, 250, 30);
 	else{
 		if (totalAmmo > 0 || ammo > 0)
-			RenderTextOnScreen(meshList[GEO_TEXT], std::string("Ammo:" + std::to_string(ammo) + "/" + std::to_string(totalAmmo)), Color(0.f, 0.f, 0.f), 40, 400, 30);
+			RenderTextOnScreen(meshList[GEO_TEXT], std::string("Ammo:" + std::to_string(ammo) + "/" + std::to_string(totalAmmo)), Color(255.f / 255.f, 165 / 255.f, 0.f), 40, 400, 30);
 		else
 			RenderTextOnScreen(meshList[GEO_TEXT], "No ammo!", Color(0.f, 0.f, 0.f), 40, 400, 30);
 	}
 	if (gameOver) {
 		RenderTextOnScreen(meshList[GEO_TEXT], "Time's up, game over!", Color(1.f, 0.f, 0.f), 40, 0, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Press Z to exit", Color(1.f, 0.f, 0.f), 40, 0, 240);
 	}
 }
 
@@ -960,7 +950,7 @@ void SceneHitMen::HandleKeyPress()
 	}
 	switch (bulletType) {
 	case BULLET_TYPE::BULLET_SINGLE:
-		if (KeyboardController::GetInstance()->IsKeyPressed(0x20) && ammo > 0) {
+		if (KeyboardController::GetInstance()->IsKeyPressed(0x20) && ammo > 0 && !reloading) {
 			/*m_bullet.active = true;
 			m_bullet.vel = glm::vec3(0, 0, 0);
 			m_bullet.pos = gunCam.position;
@@ -978,7 +968,7 @@ void SceneHitMen::HandleKeyPress()
 		}
 		break;
 	case BULLET_TYPE::BULLET_SHOTGUN:
-		if (KeyboardController::GetInstance()->IsKeyPressed(0x20) && ammo > 2) {
+		if (KeyboardController::GetInstance()->IsKeyPressed(0x20) && ammo > 2 && !reloading) {
 			glm::vec3 view = glm::normalize(glm::vec3(gunCam.position - gunCam.target));
 			for (int i = 0; i < NUM_SHELLS; i++) {
 				m_grapeShot[i]->pos = gunCam.position;

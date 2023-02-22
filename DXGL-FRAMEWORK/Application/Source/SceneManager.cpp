@@ -1,14 +1,15 @@
 #include "SceneManager.h"
 #include "SceneHitMen.h"
 #include "SceneAssignment.h"
+#include "SceneMain.h"
 // todo: import all necessary .h files (main, canTopple, pinball)
 #include <iostream>
 SceneManager* SceneManager::m_instance = nullptr;
 
 SceneManager::SceneManager()
 {
-	sceneNum = SCENE_NUM::SCENE_HITMEN;
-	currScene = new SceneAssignment();
+	sceneNum = SCENE_NUM::SCENE_MAIN;
+	currScene = new SceneMain();
 }
 
 SceneManager::~SceneManager()
@@ -28,9 +29,16 @@ SceneManager* SceneManager::GetInstance()
 	return m_instance;
 }
 void SceneManager::SwapScene(Scene* scene) {
-	ExitScene();
+	//if (tempSNum != SCENE_NUM::SCENE_MAIN)
+		ExitScene();
+	//else {
+	//	sceneToLoad = currScene;
+	//}
 	currScene = scene;
-	InitScene();
+	//if (sceneNum != SCENE_NUM::SCENE_MAIN)
+		InitScene();
+	//else
+	//	currScene = sceneToLoad;
 }
 
 void SceneManager::InitScene()
@@ -41,10 +49,12 @@ void SceneManager::InitScene()
 void SceneManager::LoadScene(SCENE_NUM newSceneNum)
 {
 	Scene* temp;
-	switch (newSceneNum) {
+	tempSNum = SCENE_NUM(sceneNum);
+	sceneNum = newSceneNum;
+	switch (sceneNum) {
 	case SCENE_NUM::SCENE_MAIN:
-		/*temp = new SceneMain();
-		SwapScene(temp);*/
+		temp = new SceneMain();
+		SwapScene(temp);
 		break;
 	case SCENE_NUM::SCENE_TEST:
 		temp = new SceneAssignment();
@@ -65,7 +75,6 @@ void SceneManager::LoadScene(SCENE_NUM newSceneNum)
 	default:
 		std::cout << "Error!" << std::endl;
 	}
-	
 }
 
 void SceneManager::RunScene(double dt)

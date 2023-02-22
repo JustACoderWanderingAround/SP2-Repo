@@ -149,7 +149,7 @@ void Application::Init()
 		fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
 		//return -1;
 	}
-	sceneNum = SCENE_NUM::SCENE_HITMEN;
+	sceneNum = SCENE_NUM::SCENE_MAIN;
 }
 void Application::Run()
 {
