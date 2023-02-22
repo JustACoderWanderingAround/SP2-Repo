@@ -17,9 +17,11 @@ public:
 	{
 		GEO_AXES,
 		GEO_TEXT,
+		GEO_FLOOR,
 		GEO_BALL,
 		GEO_CUBE,
 		GEO_BULLET,
+		GEO_BALLER,
 		GEO_ALIEN, // to create alien mesh
 		NUM_GEOMETRY,
 	};

@@ -7,6 +7,14 @@
 class Application
 {
 public:
+	enum class SCENE_NUM {
+		SCENE_TEST = 0,
+		SCENE_MAIN,
+		SCENE_HITMEN,
+		SCENE_CANTOPPLE,
+		SCENE_PINBALL,
+		TOTAL_SCENE
+	};
 	Application();
 	~Application();
 	void Init();
@@ -19,9 +27,10 @@ public:
 	static int GetWindowWidth();
 	static int GetWindowHeight();
 private:
+	SCENE_NUM sceneNum;
 	bool enablePointer = false;
 	bool showPointer = false;
-
+	bool isEnterUp;
 	//Declare a window object
 	StopWatch m_timer;
 };

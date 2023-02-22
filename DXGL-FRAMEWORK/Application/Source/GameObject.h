@@ -4,7 +4,7 @@
 #include "Vector3.h"
 #include <glm\glm.hpp>
 
-#define x_resistant 3
+#define x_resistant 1
 
 struct GameObject
 {
@@ -18,6 +18,12 @@ struct GameObject
         GO_WALL,
         GO_ALIEN,
         GO_FLIPPER,
+        GO_CAN,
+        GO_TABLE,
+        GO_FLOOR,
+        GO_BULLET,
+        GO_WALL,
+        GO_ALIEN,  // aliens
         GO_TOTAL, //must be last
     };
     GAMEOBJECT_TYPE type;
@@ -43,8 +49,11 @@ struct GameObject
     float momentOfInertia;
     float anglularVelocity;
     float multiplier;
+    bool collidingWithTable;
+    bool touched;
+    double despawnTimer;
+    
 
     GameObject(GAMEOBJECT_TYPE typeValue = GO_BALL);
     ~GameObject();
 };
-#endif
