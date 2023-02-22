@@ -647,8 +647,12 @@ void SceneHitMen::Render()
 	if (reloading)
 		RenderTextOnScreen(meshList[GEO_TEXT], std::string("Reloading: " + std::to_string(reloadTimer)), Color(255.f / 255.f, 165 / 255.f, 0.f), 40, 250, 30);
 	else{
-		if (totalAmmo > 0 || ammo > 0)
+		if (totalAmmo > 0 || ammo > 0) {
+			if (ammo < 0) {
+				ammo = 0;
+			}
 			RenderTextOnScreen(meshList[GEO_TEXT], std::string("Ammo:" + std::to_string(ammo) + "/" + std::to_string(totalAmmo)), Color(255.f / 255.f, 165 / 255.f, 0.f), 40, 400, 30);
+		}
 		else
 			RenderTextOnScreen(meshList[GEO_TEXT], "No ammo!", Color(0.f, 0.f, 0.f), 40, 400, 30);
 	}
