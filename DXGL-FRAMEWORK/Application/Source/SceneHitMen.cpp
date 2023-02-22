@@ -557,9 +557,6 @@ void SceneHitMen::Render()
 			RenderMesh(meshList[GEO_SPHERE], false);
 		} modelStack.PopMatrix();
 	}
-	modelStack.PushMatrix(); {
-		RenderMesh(meshList[GEO_AXES], false);
-	} modelStack.PopMatrix();
 	for (int i = 0; i < NUM_DOORMEN; i++) {
 		
 			modelStack.PushMatrix(); {

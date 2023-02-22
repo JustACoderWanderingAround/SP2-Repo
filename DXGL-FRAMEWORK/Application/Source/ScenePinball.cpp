@@ -257,7 +257,7 @@ void ScenePinball::Init()
 		m_player->active = true;
 		m_player->mass = 1;
 		m_player->dir = glm::vec3(0.f, 1.f, 0.f); 
-		m_player->force = glm::vec3(0.f,0.f,-9.81f);
+		m_player->force = glm::vec3(0.f,0.f,-0.f);
 		score = 0;
 		m_player->normal = glm::vec3(0, 0, 1);
 		}
