@@ -161,10 +161,7 @@ void ScenePinball::Init()
 		{
 			meshList[GEO_AXES] = MeshBuilder::GenerateAxes("Axes", 10000.f, 10000.f, 10000.f);
 			meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sun", Color(1.f, 1.f, 1.f), 1.f, 16, 16);
-			meshList[GEO_SILVER_SPHERE] = MeshBuilder::GenerateSphere("Player", Color(168 / 255, 169 / 255, 173 / 255), 1, 32, 32);
-			//meshList[GEO_SILVER_SPHERE]->textureID = LoadTGA("Image//ball.tga");
-			//meshList[GEO_SILVER_SPHERE] = MeshBuilder::GenerateOBJMTL("Player", "OBJ//Ball3.obj", "OBJ//Ball3.mtl");
-
+			meshList[GEO_SILVER_SPHERE] = MeshBuilder::GenerateSphere("Player", Color(1.f,1.f,1.f), 1, 32, 32);
 
 			meshList[GEO_TENT] = MeshBuilder::GenerateOBJ("Tent", "OBJ//tent.obj");
 			meshList[GEO_TENT]->textureID = LoadTGA("Image//tent.tga");
@@ -257,7 +254,7 @@ void ScenePinball::Init()
 		m_player->active = true;
 		m_player->mass = 1;
 		m_player->dir = glm::vec3(0.f, 1.f, 0.f); 
-		m_player->force = glm::vec3(0.f,0.f,-9.81f);
+		m_player->force = glm::vec3(0.f,0.f,0.f);
 		score = 0;
 		m_player->normal = glm::vec3(0, 0, 1);
 		}
@@ -317,7 +314,7 @@ void ScenePinball::Init()
 			// 4 = back
 			PinballMachine[4]->pos = glm::vec3(2.5f, 2.f, 11.f);
 			PinballMachine[4]->scale = glm::vec3(8.3f, 3.6f, 1.f);
-			PinballMachine[4]->normal = glm::vec3(0, 0, 1);
+			PinballMachine[4]->normal = glm::vec3(0, 0, -1);
 			// 5 = launcher wall
 			PinballMachine[5]->pos = glm::vec3(-0.16f, 2.f, 3.f);
 			PinballMachine[5]->scale = glm::vec3(0.4f, 1.f, 8.f);
@@ -335,25 +332,25 @@ void ScenePinball::Init()
 			PinballMachine[8]->scale = glm::vec3(1.f, 0.5f, 2.5f);
 			PinballMachine[8]->normal = glm::vec3(0, 0, 1);
 			// 9 = laucher slot blocker
-			PinballMachine[9]->pos = glm::vec3(-0.6f, 1.5f, 7.35f);
-			PinballMachine[9]->scale = glm::vec3(1.5f, 0.7f, 0.2f);
-			PinballMachine[9]->normal = glm::vec3(1, 0, 1);
+			PinballMachine[9]->pos = glm::vec3(-0.6f, 1.5f, 7.32f);
+			PinballMachine[9]->scale = glm::vec3(1.3f, 0.7f, 0.2f);
+			PinballMachine[9]->normal = glm::vec3(0, 0, 1);
 			// 10 = top left ball obstacle
 			PinballMachine[10]->pos = glm::vec3(3.f, 2.3f, 9.f);
 			PinballMachine[10]->scale = glm::vec3(0.3f, 0.3f, 0.3f);
-			PinballMachine[10]->normal = glm::vec3(0, 0, 1);
+			PinballMachine[10]->normal = glm::vec3(1, 0, 1);
 			// 11 = top right ball obstacle
 			PinballMachine[11]->pos = glm::vec3(1.f, 2.3f, 7.8f);
 			PinballMachine[11]->scale = glm::vec3(0.3f, 0.3f, 0.3f);
-			PinballMachine[11]->normal = glm::vec3(0, 0, 1);
+			PinballMachine[11]->normal = glm::vec3(-1, 0, 1);
 			// 12 = bottom left ball obstacle
 			PinballMachine[12]->pos = glm::vec3(4.f, 2.3f, 6.f);
 			PinballMachine[12]->scale = glm::vec3(0.3f, 0.3f, 0.3f);
-			PinballMachine[12]->normal = glm::vec3(0, 0, 1);
+			PinballMachine[12]->normal = glm::vec3(1, 0, 1);
 			// 13 = bottom right ball obstacle
-			PinballMachine[13]->pos = glm::vec3(1.8f, 2.3f, 6.3f);
+			PinballMachine[13]->pos = glm::vec3(1.8f, 2.3f, 5.4f);
 			PinballMachine[13]->scale = glm::vec3(0.3f, 0.3f, 0.3f);
-			PinballMachine[13]->normal = glm::vec3(0, 0, 1);
+			PinballMachine[13]->normal = glm::vec3(-1, 0, -1);
 			// 14 = right flipper wall part 3
 			PinballMachine[14]->pos = glm::vec3(2.21f, 2.3f, 1.6f);
 			PinballMachine[14]->scale = glm::vec3(0.4f, 0.4f, 0.2f);
@@ -375,12 +372,12 @@ void ScenePinball::Init()
 			PinballMachine[18]->scale = glm::vec3(1.f, 0.4f, 0.4f);
 			PinballMachine[18]->normal = glm::vec3(0, 0, 1);
 			// 19 = right corner
-			PinballMachine[19]->pos = glm::vec3(-0.8f, 2.1f, 10.5f);
+			PinballMachine[19]->pos = glm::vec3(-0.8f, 2.1f, 10.6f);
 			PinballMachine[19]->scale = glm::vec3(1.5f, 1.5f, 1.f);
-			PinballMachine[19]->normal = glm::vec3(0.7, 0, -1);
+			PinballMachine[19]->normal = glm::vec3(1, 0, -1);
 			yaw = glm::degrees(atan2(PinballMachine[19]->pos.x + PinballMachine[19]->scale.x, PinballMachine[19]->pos.z + PinballMachine[19]->scale.z));
 			// 20 = left corner
-			PinballMachine[20]->pos = glm::vec3(5.9f, 2.1f, 10.5f);
+			PinballMachine[20]->pos = glm::vec3(5.8f, 2.1f, 10.6f);
 			PinballMachine[20]->scale = glm::vec3(1.5f, 1.5f, 1.f);
 			PinballMachine[20]->normal = glm::vec3(-1, 0, -1);
 			// 21 = left wall slope down
@@ -420,8 +417,8 @@ void ScenePinball::Init()
 			// main Hangar light 
 			light[1].position = glm::vec3(0, 20, 0);
 			light[1].type = Light::LIGHT_SPOT;
-			//light[1].color.Set(1, 1, 1);
-			light[1].color.Set(247 / 255.f, 181 / 255.f, 0);
+			light[1].color.Set(1, 1, 1);
+			//light[1].color.Set(247 / 255.f, 181 / 255.f, 0);
 			light[1].spotDirection = glm::normalize(light[1].position - glm::vec3(0, 0, 0));
 			light[1].power = 7.5f;
 			light[1].kC = 1.f;
@@ -431,32 +428,15 @@ void ScenePinball::Init()
 			light[1].cosInner = 30.f;
 			light[1].exponent = 3.f;
 
-			// room light 1
-			light[2].position = glm::vec3(15, 10.f, 0);
-			light[2].power = 3.f;
-			light[2].type = Light::LIGHT_POINT;
+			light[2].position = glm::vec3(5, 9.f, -1.5f);
+			light[2].color.Set(1, 1, 1);
+			//light[2].color.Set(251 / 255.f, 139 / 255.f, 35/255.f);
+			light[2].power = 0.f;
+			light[2].type = Light::LIGHT_DIRECTIONAL;
 			light[2].spotDirection = glm::vec3(0.f, -1.f, 0.f);
 			light[2].cosCutoff = 65.f;
 			light[2].cosInner = 10.f;
 			light[2].exponent = 3.f;
-
-			// room light 2
-			light[3].position = glm::vec3(21, 10.f, 0);
-			light[3].power = 3.f;
-			light[3].type = Light::LIGHT_POINT;
-			light[3].spotDirection = glm::vec3(0.f, -1.f, 0.f);
-			light[3].cosCutoff = 65.f;
-			light[3].cosInner = 10.f;
-			light[3].exponent = 3.f;
-
-			light[4].position = glm::vec3(5, 9.f, -1.5f);
-			light[4].color.Set(251 / 255.f, 139 / 255.f, 35/255.f);
-			light[4].power = 0.f;
-			light[4].type = Light::LIGHT_DIRECTIONAL;
-			light[4].spotDirection = glm::vec3(0.f, -1.f, 0.f);
-			light[4].cosCutoff = 65.f;
-			light[4].cosInner = 10.f;
-			light[4].exponent = 3.f;
 		}
 		for (int i = 0; i < NUM_LIGHTS; i++) {
 			glUniform3fv(m_parameters[U_LIGHT0_COLOR + (i * 11)], 1, &light[i].color.r);
@@ -493,7 +473,25 @@ void ScenePinball::Update(double dt)
 
 	if (m_player->active)
 	{
+		//speed limit
 		m_player->pos.y = 2.42f;
+		if (m_player->vel.x > 25)
+		{
+			m_player->vel.x = 25;
+		}
+		if (m_player->vel.x < -25)
+		{
+			m_player->vel.x = -25;
+		}
+		if (m_player->vel.z > 25)
+		{
+			m_player->vel.z = 25;
+		}
+		if (m_player->vel.z < -25)
+		{
+			m_player->vel.z = -25;
+		}
+
 		CollisionCheck();
 		m_player->fixedUpdate(dt);
 		ScoreAndCoin();
@@ -506,8 +504,7 @@ void ScenePinball::Update(double dt)
 
 	//std::cout << "X: " << light[0].position.x << " Y: " << light[0].position.y << " Z: " << light[0].position.z << std::endl;
 	//std::cout << "X: " << m_player->pos.x << " Y: " << m_player->pos.y << " Z: " << m_player->pos.z << std::endl;
-	//std::cout << "X: " << cameraArray[0].position.x << " Y: " << cameraArray[0].position.y << " Z: " << cameraArray[0].position.z << std::endl;
-	//std::cout << "X: " << cameraArray[0].target.x << " Y: " << cameraArray[0].target.y << " Z: " << cameraArray[0].target.z << std::endl;
+	//std::cout << "X: " << m_player->vel.x << " Y: " << m_player->vel.y << " Z: " << m_player->vel.z << std::endl;
 }
 
 void ScenePinball::Render()
@@ -535,9 +532,6 @@ void ScenePinball::Render()
 			RenderMesh(meshList[GEO_SPHERE], false);
 		} modelStack.PopMatrix();
 	}
-	modelStack.PushMatrix(); {
-		RenderMesh(meshList[GEO_AXES], false);
-	} modelStack.PopMatrix();
 
 	// render pinball Machine
 	modelStack.PushMatrix(); {
@@ -552,14 +546,14 @@ void ScenePinball::Render()
 		modelStack.PushMatrix();
 		modelStack.Translate(m_player->pos.x, m_player->pos.y, m_player->pos.z);
 		modelStack.Scale(m_player->scale.x, m_player->scale.y, m_player->scale.z);
-		RenderMesh(meshList[GEO_SILVER_SPHERE], true);
+		RenderMesh(meshList[GEO_SPHERE_WHITE], true);
 		modelStack.PopMatrix();
 	}
 
 	modelStack.PushMatrix();
 	modelStack.Translate(3.f, 0.f, 6.f);
 	modelStack.Rotate(180, 0.f, 1.f, 0.f);
-	modelStack.Scale(1.f, 1.f, 1.f);
+	modelStack.Scale(1.5f, 1.5f, 1.5f);
 	RenderMesh(meshList[GEO_TENT], true);
 	modelStack.PopMatrix();
 
@@ -864,26 +858,6 @@ void ScenePinball::RenderPinballMachine()
 		//launcher area
 		modelStack.PushMatrix(); {
 			modelStack.PushMatrix();
-				//ball launcher box
-				/*
-				{
-				modelStack.PushMatrix();
-				modelStack.Translate(-0.5f, 1.7f, -0.8f);
-				modelStack.Scale(0.3f,0.7f,0.5f);
-				RenderMesh(meshList[GEO_SIDE], true);
-				modelStack.PopMatrix();
-				modelStack.PushMatrix();
-				modelStack.Translate(-1.1f, 1.7f, -0.8f);
-				modelStack.Scale(0.3f, 0.7f, 0.5f);
-				RenderMesh(meshList[GEO_SIDE], true);
-				modelStack.PopMatrix();
-				modelStack.PushMatrix();
-				modelStack.Translate(-0.8f, 1.74f, -0.5f);
-
-				modelStack.Scale(0.7f, 0.7f, 0.2f);
-				RenderMesh(meshList[GEO_SIDE], true);
-				modelStack.PopMatrix();
-				}*/
 			modelStack.Translate(PinballMachine[5]->pos.x, PinballMachine[5]->pos.y, PinballMachine[5]->pos.z);
 			modelStack.Scale(PinballMachine[5]->scale.x, PinballMachine[5]->scale.y, PinballMachine[5]->scale.z);
 			RenderMesh(meshList[GEO_SIDE], true);
@@ -891,7 +865,7 @@ void ScenePinball::RenderPinballMachine()
 			//Launcher blocker
 			modelStack.PushMatrix();
 			modelStack.Translate(PinballMachine[9]->pos.x,PinballMachine[9]->pos.y,PinballMachine[9]->pos.z);
-			modelStack.Rotate(40, 0.f, 1.f, 0.f);
+
 			modelStack.Scale(PinballMachine[9]->scale.x, PinballMachine[9]->scale.y, PinballMachine[9]->scale.z);
 			RenderMesh(meshList[GEO_SIDE], true);
 			modelStack.PopMatrix();
@@ -937,16 +911,6 @@ void ScenePinball::RenderPinballMachine()
 			modelStack.Scale(PinballMachine[21]->scale.x, PinballMachine[21]->scale.y, PinballMachine[21]->scale.z);
 			RenderMesh(meshList[GEO_SIDE], true);
 			modelStack.PopMatrix();
-
-
-			//right side triangle
-			/*
-			modelStack.PushMatrix();
-			modelStack.Translate(2.6f, 2.4f, 3.5f);
-			modelStack.Rotate(90.f, 0.f, 0.f, 1.f);
-			modelStack.Scale(1.f, 1.8f, 1.8f);
-			RenderMesh(meshList[GEO_SLOPE], true);
-			modelStack.PopMatrix();*/
 		
 			//left side flipper area
 			modelStack.PushMatrix();
@@ -1113,9 +1077,6 @@ void ScenePinball::ScoreAndCoin() {
 
 void ScenePinball::CollisionCheck()
 {
-	if (PinballMachine[0]->CheckCSCollision(m_player))
-	{
-	}
 	//machine and launcher wall
 		for (int i = 1; i < 6; i++)
 		{
@@ -1131,9 +1092,6 @@ void ScenePinball::CollisionCheck()
 		if (PinballMachine[9]->CheckCSCollision(m_player))
 		{
 			m_player->vel = m_player->vel - (2.0f * dot(m_player->vel, PinballMachine[9]->normal)) * PinballMachine[9]->normal;
-			//m_player->CollisionResponse(PinballMachine[4]);
-			//m_player->WallCollisionResponse(PinballMachine[i]);
-			//m_player->vel = glm::vec3(1, 0, 0);
 			std::cout << "Collision launch blocker Hit" << std::endl;
 		}
 
@@ -1153,8 +1111,8 @@ void ScenePinball::CollisionCheck()
 		{
 			if (PinballMachine[i]->CheckCSCollision(m_player))
 			{
-				m_player->vel = m_player->vel.x - (2.0f * dot(m_player->vel, PinballMachine[i]->normal)) * PinballMachine[i]->normal;
-				PinballMachine[9]->pos = glm::vec3(-0.6f, 2.15f, 7.37f);
+				m_player->vel = m_player->vel - (2.0f * dot(m_player->vel, PinballMachine[i]->normal)) * PinballMachine[i]->normal;
+				PinballMachine[9]->pos = glm::vec3(-0.59f, 2.15f, 7.05f);
 				std::cout << "Collision slope Hit" << std::endl;
 			}
 		}
@@ -1194,7 +1152,7 @@ void ScenePinball::CollisionCheck()
 		{
 			if (PinballMachine[i]->CheckCSCollision(m_player))
 			{
-				m_player->vel = m_player->vel.x - (2.0f * dot(m_player->vel, PinballMachine[i]->normal)) * PinballMachine[i]->normal;
+				m_player->vel = m_player->vel - (2.0f * dot(m_player->vel, PinballMachine[i]->normal)) * PinballMachine[i]->normal;
 				std::cout << "Collision wall slope Hit" << std::endl;
 			}
 		}
@@ -1258,15 +1216,6 @@ void ScenePinball::HandleKeyPress()
 				cameraNum = 0;
 		}
 
-		if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_F1))
-		{
-			posAdd += 1.2;
-		}
-		else if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_F2))
-		{
-			posAdd -= 0.2;
-		}
-
 		// Power Control
 		if (Application::IsKeyPressed(GLFW_KEY_K))
 		{
@@ -1299,6 +1248,7 @@ void ScenePinball::HandleKeyPress()
 			bRKeyStateSpace = false;
 			ballLaunch = true;
 			m_player->vel = glm::vec3(0.f, 0.f, power);
+			m_player->force = glm::vec3(0, 0, -5.f);
 			std::cout << m_player->vel.x << std::endl;
 			BallLeft--;
 			//PinballMachine[9]->pos = glm::vec3(-0.6f, 2.15f, 7.35f);
@@ -1333,6 +1283,7 @@ void ScenePinball::HandleKeyPress()
 		}
 
 		//Test score
+		/*
 		if (!bRKeyState && Application::IsKeyPressed(GLFW_KEY_O))
 		{
 			bRKeyState = true;
@@ -1341,8 +1292,9 @@ void ScenePinball::HandleKeyPress()
 		else if (bRKeyState && !Application::IsKeyPressed(GLFW_KEY_O))
 		{
 			bRKeyState = false;
-		}
+		}*/
 	}
+
 	if (!bRKeyStateR && Application::IsKeyPressed(GLFW_KEY_R))
 	{
 		bRKeyStateR = true;
@@ -1350,11 +1302,14 @@ void ScenePinball::HandleKeyPress()
 	else if (bRKeyStateR && !Application::IsKeyPressed(GLFW_KEY_R))
 	{
 		bRKeyStateR = false;
+		bRKeyStateSpace = false;
 		m_player->pos = glm::vec3(-0.6f, 2.42f, 0.f);
 		m_player->vel = glm::vec3(0, 0, 0);
 		PinballMachine[9]->pos = glm::vec3(-0.6f, 1.5f, 7.35f);
 		m_player->active = true;
-		score = 0;
+		ballLaunch = false;
+		score = 0;	
 		BallLeft = 5;
+		power = 0;
 	}
 }

@@ -36,18 +36,12 @@ bool GameObject::CheckLineCollision(GameObject* that)
 
 	glm::vec3 axisY = glm::vec3(-that->normal.y, that->normal.x, 0);
 
-
 	float projectedDist = dot(diff, axisX);
 
 	if (projectedDist > 0) axisX = -axisX;
 
 	return dot(this->vel, axisX) >= 0 && //Check 1: Travelling towards the wall ?
-
 		that->scale.x * 0.5 + this->scale.x > -dot(diff, axisX) && //Check 2: Radius + Thickness vs Distance
-
-
-
-
 		that->scale.y * 0.5 > fabs(dot(diff, axisY)); //Check 3: Length check
 }
 
@@ -95,11 +89,7 @@ void GameObject::fixedUpdate(double dt)
 			force.z = -x_resistant;
 		}
 		else
-
-
 			force.z = x_resistant;*/
-
-
 	}
 
 	//Calculate the resulting acceleration

@@ -11,7 +11,7 @@
 #include "GameObject.h"
 #define NUM_INTERACTABLES 1
 #define MAX_PARTS 24
-#define MAX_SPEED 20
+#define MAX_SPEED 25
 class ScenePinball : public Scene
 {
 public:
@@ -169,16 +169,13 @@ private:
 	//AltAzCamera zakuCam;
 	int projType = 1; // fix to 0 for orthographic, 1 for projection
 	MatrixStack modelStack, viewStack, projectionStack;
-	static const int NUM_LIGHTS = 5;
+	static const int NUM_LIGHTS = 3;
 	Light light[NUM_LIGHTS];
 	bool enableLight;
 	int cameraNum;
-	int currInteractable;
-	bool showUI;
 	bool bRKeyStateZ, bRKeyStateX, bRKeyStateSpace, bRKeyStateR, bRKeyState,  ballLaunch;
 	float rotation1, rotation2, power;
 	int BallLeft,coins, score;
-	float posAdd = 0;
 	float yaw;
 	glm::vec3 gravity;
 };
