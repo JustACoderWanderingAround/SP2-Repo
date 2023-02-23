@@ -1802,7 +1802,8 @@ void SceneMain::Render()
 		RenderMeshOnScreen(meshList[GEO_BLACK_BG], 400, 300, 1000, 800);
 		RenderTextOnScreen(meshList[GEO_TEXT], "You have turn back to a human!", Color(1, 1, 1), 25, 0, 300);
 	}
-	
+	RenderMeshOnScreen(meshList[GEO_BLACK_BG], 0, 60, 1200, 35);
+	RenderTextOnScreen(meshList[GEO_TEXT], "Press I for inventory", Color(1, 1, 1), 25, 0, 50);
 	if (Application::getCutScene() == false)
 	{
 		RenderCutscene();
@@ -1813,7 +1814,7 @@ void SceneMain::Render()
 		RenderMeshOnScreen(meshList[GEO_MENU], 400, 300, 160, 120);
 	}
 
-	
+
 }
 
 
