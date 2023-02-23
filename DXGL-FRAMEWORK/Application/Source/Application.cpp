@@ -25,6 +25,7 @@ GLFWwindow* m_window;
 const unsigned char FPS = 60; // FPS of this game
 const unsigned int frameTime = 1000 / FPS; // time for each frame
 int m_width, m_height;
+bool gameStart;
 
 //Define an error callback
 static void error_callback(int error, const char* description)
@@ -153,6 +154,8 @@ void Application::Init()
 		//return -1;
 	}
 	sceneNum = SCENE_NUM::SCENE_MAIN;
+
+	gameStart = false;
 }
 void Application::Run()
 {
@@ -196,6 +199,16 @@ int Application::GetWindowWidth()
 int Application::GetWindowHeight()
 {
 	return m_height;
+}
+
+bool Application::getGameStart()
+{
+	return gameStart;
+}
+
+void Application::setGameStart(bool Value)
+{
+	gameStart = Value;
 }
 
 void Application::Exit()

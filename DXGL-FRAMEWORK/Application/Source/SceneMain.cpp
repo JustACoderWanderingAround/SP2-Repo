@@ -160,8 +160,6 @@ void SceneMain::Init()
 			meshList[GEO_TEXT_BG] = MeshBuilder::GenerateQuad("left", Color(1, 1, 1), 5);
 			meshList[GEO_TEXT_BG]->textureID = LoadTGA("Image//scroll.tga");
 
-
-
 			meshList[GEO_LEFT] = MeshBuilder::GenerateQuad("left", Color(1 ,1 ,1), 100);
 			meshList[GEO_LEFT]->textureID = LoadTGA("Image//skyboxleft.tga");
 			meshList[GEO_RIGHT] = MeshBuilder::GenerateQuad("right", Color(1, 1, 1), 100);
@@ -229,8 +227,9 @@ void SceneMain::Init()
 			meshList[GEO_CAROUSEL] = MeshBuilder::GenerateOBJMTL("ferris wheel", "OBJ//carousel.obj",
 				"OBJ//carousel.mtl");
 			meshList[GEO_CAROUSEL]->textureID = LoadTGA("Image//carousel.tga");
-
-
+			meshList[GEO_MENU] = MeshBuilder::GenerateQuad("Menu", Color(1, 1, 1), 5);
+			meshList[GEO_MENU]->textureID = LoadTGA("Image//MainMenu.tga");
+			
 		}
 		glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
 		projectionStack.LoadMatrix(projection);
@@ -677,8 +676,16 @@ void SceneMain::Update(double dt)
 		mainFPSCam.position.z = -48.99;
 	}
 
-	mainFPSCam.Update(dt);
-	m_player->fixedUpdate(static_cast<float>(dt));
+	if (Application::getGameStart())
+	{
+		mainFPSCam.Update(dt);
+		m_player->fixedUpdate(static_cast<float>(dt));
+	}
+	
+	if (Application::getGameStart() == false && KeyboardController::GetInstance()->IsKeyPressed('F'))
+	{
+		Application::setGameStart(true);
+	}
 	if (nearHitMan && KeyboardController::GetInstance()->IsKeyPressed('F')) {
 		SceneManager::GetInstance()->LoadScene(SceneManager::SCENE_NUM::SCENE_HITMEN);
 	}
@@ -1422,6 +1429,11 @@ void SceneMain::Render()
 
 	//render text
 	{
+		if (Application::getGameStart() == false)
+		{
+			RenderMeshOnScreen(meshList[GEO_MENU], 400, 300, 160, 120);
+		}
+
 		if (nearToppled == true)
 		{
 			RenderMeshOnScreen(meshList[GEO_TEXT_BG], 400, 100, 200, 15);
