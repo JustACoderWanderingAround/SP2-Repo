@@ -1081,7 +1081,7 @@ void ScenePinball::ScoreAndCoin() {
 		}
 	}
 
-	if (BallLeft == 0)
+	if (BallLeft == 0 && !m_player->active)
 	{
 		float coin_convert;
 		coin_convert = score / 3000;
