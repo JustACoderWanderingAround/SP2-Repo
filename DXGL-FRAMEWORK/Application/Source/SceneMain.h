@@ -81,6 +81,9 @@ public:
 		GEO_AXE_CUBE,
 		GEO_FIRE_CUBE,
 
+		GEO_MENU,
+
+
 		GEO_TEXT_BG,
 		GEO_TEXT,
 		NUM_GEOMETRY,

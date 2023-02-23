@@ -658,6 +658,19 @@ void SceneHitMen::Render()
 		else
 			RenderTextOnScreen(meshList[GEO_TEXT], "No ammo!", Color(0.f, 0.f, 0.f), 40, 400, 30);
 	}
+	std::string shotGunString;
+	std::string singleString;
+	if (bulletType == BULLET_TYPE::BULLET_SINGLE) {
+		singleString = "> SingleShot";
+		shotGunString = "BuckShot";
+	}
+	else
+	{
+		singleString = "SingleShot";
+		shotGunString = "> BuckShot";
+	}
+	RenderTextOnScreen(meshList[GEO_TEXT], singleString, Color(255.f / 255.f, 165 / 255.f, 0.f), 20, 550, 400);
+	RenderTextOnScreen(meshList[GEO_TEXT], shotGunString, Color(255.f / 255.f, 165 / 255.f, 0.f), 20, 550, 360);
 	if (gameOver) {
 		RenderTextOnScreen(meshList[GEO_TEXT], "Time's up, game over!", Color(1.f, 0.f, 0.f), 40, 0, 300);
 		RenderTextOnScreen(meshList[GEO_TEXT], "Press Z to exit", Color(1.f, 0.f, 0.f), 40, 0, 240);

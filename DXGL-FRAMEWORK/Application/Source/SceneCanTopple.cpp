@@ -150,7 +150,7 @@ void SceneCanTopple::Init()
 
 	}
 		// Initialise camera properties
-		camera.Init(glm::vec3(0, 10, 11), glm::vec3(0, 0, 0), glm::vec3(0.f, 1, 0.f));
+		camera.Init(glm::vec3(0, 10, 11), glm::vec3(0, 0, 0), glm::vec3(0.f, 1, 0.f), false, false);
 
 		// Init VBO here
 		for (int i = 0; i < NUM_GEOMETRY; ++i)
@@ -427,7 +427,11 @@ void SceneCanTopple::Update(double dt)
 			}
 		}
 	else {
-		Player::GetInstance()->coins += score;
+
+		if (KeyboardController::GetInstance()->IsKeyPressed('Z')) {
+      		Player::GetInstance()->coins += score;
+			    SceneManager::GetInstance()->LoadScene(SceneManager::SCENE_NUM::SCENE_MAIN);
+    }
 	}
 
 		std::cout << camera.target.x << "," << camera.target.y << "," << camera.target.z << std::endl;
@@ -568,6 +572,8 @@ void SceneCanTopple::Render()
 	{
 	std::string temp5("Time's up!"); // loading in current time
 	RenderTextOnScreen(meshList[GEO_TEXT], temp5.substr(0, 10), Color(1, 1, 0), 40, 0, 280);
+	std::string temp6("Press Z to exit"); // loading in current time
+	RenderTextOnScreen(meshList[GEO_TEXT], temp6.substr(0, 15), Color(1, 1, 0), 40, 0, 240);
 	}
 }
 

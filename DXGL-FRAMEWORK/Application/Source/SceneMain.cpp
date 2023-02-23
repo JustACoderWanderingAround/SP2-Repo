@@ -809,9 +809,16 @@ void SceneMain::Update(double dt)
 		mainFPSCam.position.z = -48.99;
 	}
 
-	mainFPSCam.Update(dt);
-	m_player->fixedUpdate(static_cast<float>(dt));
+	if (Application::getGameStart())
+	{
+		mainFPSCam.Update(dt);
+		m_player->fixedUpdate(static_cast<float>(dt));
+	}
 	
+	if (Application::getGameStart() == false && KeyboardController::GetInstance()->IsKeyPressed('F'))
+	{
+		Application::setGameStart(true);
+	}
 	if (nearHitMan && KeyboardController::GetInstance()->IsKeyPressed('F')) {
 		SceneManager::GetInstance()->LoadScene(SceneManager::SCENE_NUM::SCENE_HITMEN);
 	}
@@ -1583,7 +1590,11 @@ void SceneMain::Render()
 
 	//render text
 	{
-		
+
+		if (Application::getGameStart() == false)
+		{
+			RenderMeshOnScreen(meshList[GEO_MENU], 400, 300, 160, 120);
+		}
 
 		if (nearToppled == true)
 		{
