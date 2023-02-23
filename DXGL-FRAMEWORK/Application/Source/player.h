@@ -2,10 +2,10 @@
 #define PLAYER_H
 
 #include "GameObject.h"
-class player
+class Player
 {
 public:
-	static player* GetInstance(void);
+	static Player* GetInstance(void);
 	void DestroyInstance(void);
 	int getCoins();
 	void setCoins(int newCoins);
@@ -17,9 +17,9 @@ public:
 
 private:
 
-	player(void);
-	~player(void);
-	static player* instance;
+	Player(void);
+	~Player(void);
+	static Player* instance;
 
 };
 #endif

@@ -170,7 +170,6 @@
     <ClCompile Include="Source\SceneHitMen.cpp" />
     <ClCompile Include="Source\SceneManager.cpp" />
     <ClCompile Include="Source\shader.cpp" />
-    <ClCompile Include="Source\stall.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\AltAzCamera.h" />
@@ -198,7 +197,6 @@
     <ClInclude Include="Source\SceneHitMen.h" />
     <ClInclude Include="Source\SceneManager.h" />
     <ClInclude Include="Source\shader.hpp" />
-    <ClInclude Include="Source\stall.h" />
     <ClInclude Include="Source\Vertex.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

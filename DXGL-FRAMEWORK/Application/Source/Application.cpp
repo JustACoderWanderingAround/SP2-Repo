@@ -20,6 +20,7 @@
 #include "SceneMain.h"
 #include "SceneHitMen.h"
 #include "SceneManager.h"
+#include "Player.h"
 
 GLFWwindow* m_window;
 const unsigned char FPS = 60; // FPS of this game
@@ -175,6 +176,7 @@ void Application::Run()
 		KeyboardController::GetInstance()->PostUpdate();
 
 		MouseController::GetInstance()->PostUpdate();
+		Player::GetInstance();
 
 
 		double mouse_x, mouse_y;

@@ -10,6 +10,10 @@
 #include <vector>
 #include "GameObject.h"
 #include "Inventory.h"
+#include "Player.h"
+#include "SceneHitMen.h"
+#include "SceneCanTopple.h"
+#include "ScenePinball.h"
 #define MAX_FENCE 33
 #define MAX_OBJ 5
 class SceneMain : public Scene
@@ -61,6 +65,7 @@ public:
 		GEO_RUBIK_PNG,
 		GEO_POTION_PNG,
 		GEO_COTTON_CANDY,
+		GEO_BLACK_BG,
 
 		GEO_SPHERE_BLACK,
 		GEO_ZAKU_HEAD,
@@ -211,7 +216,10 @@ private:
 	bool shopUI;
 	int shopItems;
 	bool ivt;
-
+	
+	int costOfZaku, costOfBall, costOfRubik, costOfPotion;
+	int coins;
+	bool notEnoughCoins;
 
 };
 

@@ -17,6 +17,7 @@
 #include "KeyboardController.h"
 #include "LoadTGA.h"
 #include "SceneManager.h"
+#include "Player.h"
 
 SceneHitMen::SceneHitMen()
 {
@@ -514,6 +515,7 @@ void SceneHitMen::Update(double dt)
 	else
 		{
 		if (KeyboardController::GetInstance()->IsKeyPressed('Z')) {
+			Player::GetInstance()->coins += score;
 			SceneManager::GetInstance()->LoadScene(SceneManager::SCENE_NUM::SCENE_MAIN);
 		}
 	 }

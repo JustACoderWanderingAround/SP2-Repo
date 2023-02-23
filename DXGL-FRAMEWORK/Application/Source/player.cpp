@@ -1,26 +1,28 @@
 #include "player.h"
 
-player* player::instance = nullptr;
+Player* Player::instance = nullptr;
 
-player::player(void)
+Player::Player(void)
 {
 	coins = 0;
+	playerPos = glm::vec3(0, -7, -40);
 }
 
-player::~player(void)
+Player::~Player(void)
 {
+
 }
 
-player* player::GetInstance(void)
+Player* Player::GetInstance(void)
 {
 	if (instance == nullptr)
 	{
-		instance = new player();
+		instance = new Player();
 	}
 	return instance;
 }
 
-void player::DestroyInstance(void)
+void Player::DestroyInstance(void)
 {
 	if (instance)
 	{
@@ -29,22 +31,22 @@ void player::DestroyInstance(void)
 	}
 }
 
-int player::getCoins()
+int Player::getCoins()
 {
 	return coins;
 }
 
-void player::setCoins(int newCoins)
+void Player::setCoins(int newCoins)
 {
 	coins = newCoins;
 }
 
-glm::vec3 player::getPos()
+glm::vec3 Player::getPos()
 {
 	return glm::vec3(playerPos);
 }
 
-void player::setPos(glm::vec3 currentPos)
+void Player::setPos(glm::vec3 currentPos)
 {
 	playerPos = currentPos;
 }

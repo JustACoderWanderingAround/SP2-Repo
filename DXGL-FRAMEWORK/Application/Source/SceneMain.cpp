@@ -162,6 +162,7 @@ void SceneMain::Init()
 		meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("shop UI", Color(85 / 255, 85 / 255, 85 / 255), 1);
 		meshList[GEO_INVENTORY] = MeshBuilder::GenerateQuad("left", Color(1, 1, 1), 1);
 		meshList[GEO_INVENTORY]->textureID = LoadTGA("Image//inventory.tga");
+		meshList[GEO_BLACK_BG] = MeshBuilder::GenerateQuad("shop UI", Color(0, 0, 0), 1);
 
 
 
@@ -259,6 +260,7 @@ void SceneMain::Init()
 
 		meshList[GEO_COTTON_CANDY] = MeshBuilder::GenerateQuad("cotton candy pic", Color(1, 1, 1), 1);
 		meshList[GEO_COTTON_CANDY]->textureID = LoadTGA("Image//cottoncandy.tga");
+
 
 	}
 
@@ -370,6 +372,7 @@ void SceneMain::Init()
 	shopUI = false;
 	shopItems = 0;
 	ivt = false;
+	notEnoughCoins = false;
 
 	mainFPSCam.Init(glm::vec3(0, -7, -40), glm::vec3(0, -12, 0), glm::vec3(0.f, 1, 0.f));
 
@@ -488,6 +491,12 @@ void SceneMain::Init()
 
 	inventory = new Inventory();
 
+	costOfZaku = 10;
+	costOfBall = 5;
+	costOfRubik = 15;
+	costOfPotion = 30;
+
+	Player::GetInstance()->coins = 100;
 }
 
 
@@ -500,14 +509,12 @@ void SceneMain::Update(double dt)
 
 
 	m_player->pos = glm::vec3(mainFPSCam.position.x, mainFPSCam.position.y, mainFPSCam.position.z);
-	//std::cout << mainFPSCam.position.x << "," << mainFPSCam.position.y << "," << mainFPSCam.position.z << std::endl;
-	//std::cout << m_player->pos.x << "," << m_player->pos.y << "," << m_player->pos.z << std::endl;
-	//oldPlayerPos = glm::vec3(m_player->pos.x, m_player->pos.y, m_player->pos.z);
-	//m_player->vel = oldPlayerPos - m_player->pos;
-	//cameraArray[cameraNum].Update(dt);
+	
+	coins = Player::GetInstance()->coins;
+	Player::GetInstance()->setPos(m_player->pos);
 
 	// check for collision btween player and stalls
-	//canbetoppledd
+	//canbetoppled
 	if (stallCanBeToppled->CheckCSCollision(m_player))
 	{
 		nearToppled = true;
@@ -800,6 +807,7 @@ void SceneMain::Update(double dt)
 
 	mainFPSCam.Update(dt);
 	m_player->fixedUpdate(static_cast<float>(dt));
+	
 	if (nearHitMan && KeyboardController::GetInstance()->IsKeyPressed('F')) {
 		SceneManager::GetInstance()->LoadScene(SceneManager::SCENE_NUM::SCENE_HITMEN);
 	}
@@ -1567,6 +1575,8 @@ void SceneMain::Render()
 
 	//render text
 	{
+		
+
 		if (nearToppled == true)
 		{
 			RenderMeshOnScreen(meshList[GEO_TEXT_BG], 400, 100, 200, 15);
@@ -1642,13 +1652,23 @@ void SceneMain::Render()
 		}
 		else if (shopItems == 3)
 		{
+
 			RenderMeshOnScreen(meshList[GEO_POTION_PNG], 400, 300, 150, 150);
 			RenderTextOnScreen(meshList[GEO_TEXT], "Purchase 'Potion of Change'?", Color(0, 0, 0), 25, 25, 150);
 			RenderTextOnScreen(meshList[GEO_TEXT], "- [B] ", Color(0, 0, 0), 25, 350, 100);
 			RenderTextOnScreen(meshList[GEO_TEXT], "Press Left to see previous item", Color(0, 0, 0), 25, 20, 500);
 			RenderTextOnScreen(meshList[GEO_TEXT], "Press Right to see next item", Color(0, 0, 0), 25, 50, 450);
 		}
+		else
+		{
+			// skip
+		}
 
+		if (notEnoughCoins == true)
+		{
+			RenderMeshOnScreen(meshList[GEO_TEXT_BG], 400, 100, 200, 15);
+			RenderTextOnScreen(meshList[GEO_TEXT], "Not Enough Coins.", Color(0, 0, 0), 25, 0, 100);
+		}
 	}
 
 	// render inventory 
@@ -1656,15 +1676,6 @@ void SceneMain::Render()
 	{
 		// x & y = 120 difference
 		RenderMeshOnScreen(meshList[GEO_INVENTORY], 400, 300, 600, 600);
-		/*for (int i = 0; i < 4 ;i++)
-		{
-			for (int j = 0; j < 4; j++)
-			{
-				RenderMeshOnScreen(meshList[GEO_CUBE], 400 + i * 120, 180 + j * 120, 50, 50);
-			}
-			
-		}*/
-		
 		// starting 160, 540
 		Item* print;
 		int x, y;
@@ -1675,43 +1686,58 @@ void SceneMain::Render()
 		{
 			if (print->getName() == "Zaku Toy")
 			{
-				RenderMeshOnScreen(meshList[GEO_ZAKU], 160 + x, 540 + y, 100, 100);
+				RenderMeshOnScreen(meshList[GEO_ZAKU], 160 + x, 540 - y, 100, 100);
+				
 			}
 			else if (print->getName() == "Ball")
 			{
-				RenderMeshOnScreen(meshList[GEO_BALL], 160 + x, 540 + y, 100, 100);
+				RenderMeshOnScreen(meshList[GEO_BALL], 160 + x, 540 - y, 100, 100);
 			}
 			else if (print->getName() == "Rubik's Cube")
 			{
-				RenderMeshOnScreen(meshList[GEO_RUBIK_PNG], 160 + x, 540 + y, 100, 100);
+				RenderMeshOnScreen(meshList[GEO_RUBIK_PNG], 160 + x, 540 - y, 100, 100);
 			}
 			else if (print->getName() == "Potion of Change")
 			{
-				RenderMeshOnScreen(meshList[GEO_POTION_PNG], 160 + x, 540 + y, 100, 100);
+				RenderMeshOnScreen(meshList[GEO_POTION_PNG], 160 + x, 540 - y, 100, 100);
 			}
 			else if (print->getName() == "Cotton Candy")
 			{
-				RenderMeshOnScreen(meshList[GEO_COTTON_CANDY], 160 + x, 540 + y, 100, 100);
+				RenderMeshOnScreen(meshList[GEO_COTTON_CANDY], 160 + x, 540 - y, 100, 100);
 			}
 			else if (print->getName() == "Apple")
 			{
-				RenderMeshOnScreen(meshList[GEO_APPLE], 160 + x, 540 + y, 100, 100);
+				RenderMeshOnScreen(meshList[GEO_APPLE], 160 + x, 490 - y, 100, 100);
 			}
-			if (x < 480)
+			RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(print->getAmt()), Color(1, 1, 1), 20, 160 + x, 470 - y);
+			if (x < 480 && y < 540)
 			{
 				x += 120;
 			}
 			else
 			{
 				y += 120;
+				if (x >= 480)
+				{
+					x = 0;
+				}
+				else
+				{
+					x += 120;
+				}
 			}
 			//std::cout << print->getName() << print->getAmt() << std::endl;
+			
 			print = print->getNextItem();
 		}
 		print = nullptr;
 		
 		RenderTextOnScreen(meshList[GEO_TEXT], "Press [I] to exit.", Color(1, 1, 1), 25, 10, 100);
 	}
+
+	RenderMeshOnScreen(meshList[GEO_BLACK_BG], 0, 550 , 100, 100);
+	RenderTextOnScreen(meshList[GEO_TEXT], " Coins: ", Color(1, 1, 1), 25, 0, 550);
+	RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(coins), Color(1, 1, 1), 25, 200, 550);
 
 }
 
@@ -2482,25 +2508,40 @@ void SceneMain::HandleKeyPress()
 
 	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_B))
 	{
-		if (nearShop == true && shopUI == true)
+		if (nearShop == true && shopUI == true )
 		{
-			if (shopItems == 0)
+			if (Player::GetInstance()->getCoins() > costOfZaku && shopItems == 0)
 			{
+				//notEnoughCoins = false;
 				inventory->addItem("Zaku Toy");
+				Player::GetInstance()->coins -= costOfZaku;
 			}
-			else if (shopItems == 1)
+			else if (Player::GetInstance()->getCoins() > costOfBall && shopItems == 1)
 			{
+				notEnoughCoins = false;
 				inventory->addItem("Ball");
+				Player::GetInstance()->coins -= costOfBall;
 			}
-			else if (shopItems == 2)
+			else if (Player::GetInstance()->getCoins() > costOfRubik && shopItems == 2)
 			{
+				//notEnoughCoins = false;
 				inventory->addItem("Rubik's Cube");
+				Player::GetInstance()->coins -= costOfRubik;
 			}
-			else if (shopItems == 3)
+			else if (Player::GetInstance()->getCoins() > costOfPotion && shopItems == 3)
 			{
+				//notEnoughCoins = false;
 				inventory->addItem("Potion of Change");
+				Player::GetInstance()->coins -= costOfPotion;
 			}
+			else
+			{
+				notEnoughCoins = true;
+			}
+
+
 		}
+
 	}
 
 	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_I))
@@ -2518,6 +2559,7 @@ void SceneMain::HandleKeyPress()
 
 	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_RIGHT))
 	{
+		notEnoughCoins = false;
 		if (shopItems == 0)
 		{
 			shopItems = 1;
@@ -2534,6 +2576,7 @@ void SceneMain::HandleKeyPress()
 
 	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_LEFT))
 	{
+		notEnoughCoins = false;
 		if (shopItems == 1)
 		{
 			shopItems = 0;

@@ -14,7 +14,7 @@ public:
 
 	Item*findName(std::string NAME);
 	void addItem(std::string NAME);
-	void deleteUsedItem(std::string NAME);
+
 
 
 };

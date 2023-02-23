@@ -17,6 +17,7 @@
 #include "KeyboardController.h"
 #include "LoadTGA.h"
 #include "SceneManager.h"
+#include "Player.h"
 SceneCanTopple::SceneCanTopple()
 {
 	srand(rand());
@@ -426,7 +427,7 @@ void SceneCanTopple::Update(double dt)
 			}
 		}
 	else {
-
+		Player::GetInstance()->coins += score;
 	}
 
 		std::cout << camera.target.x << "," << camera.target.y << "," << camera.target.z << std::endl;

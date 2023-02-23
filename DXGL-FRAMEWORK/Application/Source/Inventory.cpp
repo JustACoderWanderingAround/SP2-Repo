@@ -136,16 +136,3 @@ void Inventory::addItem(std::string NAME)
 	print = nullptr;
 }
 
-void Inventory::deleteUsedItem(std::string NAME)
-{
-	
-	if (findName(NAME)->getName() == NAME)
-	{
-		findName(NAME)->delAmt();
-	}
-	else
-	{
-		// it does not exist 
-		std::cout << "does not exist" << std::endl;
-	}
-}

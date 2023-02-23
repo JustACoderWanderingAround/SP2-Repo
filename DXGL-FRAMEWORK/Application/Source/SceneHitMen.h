@@ -145,6 +145,7 @@ public:
 	virtual void Render();
 	void RenderSkybox();
 	virtual void Exit();
+	int score;
 
 private:
 	void HandleKeyPress();
@@ -187,7 +188,6 @@ private:
 	float initCamY;
 	glm::vec3 zakuPos;
 	int cameraNum;
-	int score;
 	int ammo;
 	int time;
 	double ballTimer;
