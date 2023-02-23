@@ -474,9 +474,9 @@ void SceneCanTopple::Render()
 				//RenderMesh(meshList[GEO_SPHERE], false);
 			} modelStack.PopMatrix();
 		}
-		modelStack.PushMatrix(); {
+		/*modelStack.PushMatrix(); {
 			RenderMesh(meshList[GEO_AXES], false);
-		} modelStack.PopMatrix();
+		} modelStack.PopMatrix();*/
 
 		modelStack.PushMatrix();
 		// Render Sun
@@ -513,7 +513,7 @@ void SceneCanTopple::Render()
 
 		modelStack.PushMatrix();  // Render Player / Steve
 		modelStack.Translate(-1.5f, 0, -10);
-		modelStack.Scale(0.5f, 0.5f, 0.5f);
+		modelStack.Scale(10.f, 5.f, 5.f);
 		modelStack.Rotate(0, 0, 1, 0);
 		meshList[GEO_TABLE]->material.kAmbient.Set(0.3f, 0.3f, 0.3f);
 		meshList[GEO_TABLE]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
