@@ -426,7 +426,8 @@ void SceneCanTopple::Update(double dt)
 			}
 		}
 	else {
-
+		if (KeyboardController::GetInstance()->IsKeyPressed('Z'))
+			SceneManager::GetInstance()->LoadScene(SceneManager::SCENE_NUM::SCENE_MAIN);
 	}
 
 		std::cout << camera.target.x << "," << camera.target.y << "," << camera.target.z << std::endl;
@@ -567,6 +568,8 @@ void SceneCanTopple::Render()
 	{
 	std::string temp5("Time's up!"); // loading in current time
 	RenderTextOnScreen(meshList[GEO_TEXT], temp5.substr(0, 10), Color(1, 1, 0), 40, 0, 280);
+	std::string temp6("Press Z to exit"); // loading in current time
+	RenderTextOnScreen(meshList[GEO_TEXT], temp6.substr(0, 15), Color(1, 1, 0), 40, 0, 240);
 	}
 }
 
