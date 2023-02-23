@@ -27,6 +27,7 @@ const unsigned char FPS = 60; // FPS of this game
 const unsigned int frameTime = 1000 / FPS; // time for each frame
 int m_width, m_height;
 bool gameStart;
+bool cutSceneStart;
 
 //Define an error callback
 static void error_callback(int error, const char* description)
@@ -94,6 +95,16 @@ bool Application::getGameStart()
 void Application::setGameStart(bool Value)
 {
 	gameStart = Value;
+}
+
+bool Application::getCutScene()
+{
+	return cutSceneStart;
+}
+
+void Application::setCutScene(bool Value)
+{
+	cutSceneStart = Value;
 }
 
 void Application::Init()

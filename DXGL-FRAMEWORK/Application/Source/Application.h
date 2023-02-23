@@ -25,6 +25,8 @@ public:
 	static void GetCursorPos(double* xpos, double* ypos);
 	static bool getGameStart();
 	static void setGameStart(bool Value);
+	static bool getCutScene();
+	static void setCutScene(bool Value);
 
 
 	static int GetWindowWidth();
