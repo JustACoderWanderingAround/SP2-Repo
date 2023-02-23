@@ -150,7 +150,6 @@ void SceneMain::Init()
 		meshList[i] = nullptr;
 	}
 
-
 	{
 		meshList[GEO_AXES] = MeshBuilder::GenerateAxes("Axes", 10000.f, 10000.f, 10000.f);
 		meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("ball", Color(1.f, 0.f, 0.f), 1.f, 16, 16);
@@ -159,12 +158,10 @@ void SceneMain::Init()
 		meshList[GEO_TEXT]->textureID = LoadTGA("Image//ComicSans.tga");
 		meshList[GEO_TEXT_BG] = MeshBuilder::GenerateQuad("left", Color(1, 1, 1), 5);
 		meshList[GEO_TEXT_BG]->textureID = LoadTGA("Image//scroll.tga");
-		meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("shop UI", Color( 0.5, 0.5, 0.5), 1);
+		meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("shop UI", Color(0.5, 0.5, 0.5), 1);
 		meshList[GEO_INVENTORY] = MeshBuilder::GenerateQuad("left", Color(1, 1, 1), 1);
 		meshList[GEO_INVENTORY]->textureID = LoadTGA("Image//inventory.tga");
 		meshList[GEO_BLACK_BG] = MeshBuilder::GenerateQuad("shop UI", Color(0, 0, 0), 1);
-
-
 
 		meshList[GEO_LEFT] = MeshBuilder::GenerateQuad("left", Color(1, 1, 1), 100);
 		meshList[GEO_LEFT]->textureID = LoadTGA("Image//skyboxleft.tga");
@@ -267,7 +264,8 @@ void SceneMain::Init()
 		meshList[GEO_HM_RULES] = MeshBuilder::GenerateQuad("rules", Color(1, 1, 1), 1);
 		meshList[GEO_HM_RULES]->textureID = LoadTGA("Image//hmrules.tga");
 
-
+		meshList[GEO_PB_RULES] = MeshBuilder::GenerateQuad("PBrules", Color(1, 1, 1), 1);
+		meshList[GEO_PB_RULES]->textureID = LoadTGA("Image//PinballRules.tga");
 	}
 
 	// for zaku 
@@ -333,7 +331,6 @@ void SceneMain::Init()
 		}
 	}
 
-
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
 
@@ -380,7 +377,8 @@ void SceneMain::Init()
 	ivt = false;
 	notEnoughCoins = false;
 	endScreen = false;
-	sign = false;
+	HMsign = false;
+	PBsign = false;
 
 	mainFPSCam.Init(glm::vec3(0, -7, -40), glm::vec3(0, -12, 0), glm::vec3(0.f, 1, 0.f));
 
@@ -404,7 +402,6 @@ void SceneMain::Init()
 	stallPinball->pos = glm::vec3(-10.5, -7, -22.5);
 	stallPinball->scale = glm::vec3(8.6, 7, 9);
 	stallPinball->active = false;
-
 
 	stallHitMan = new GameObject(GameObject::GO_CUBE);
 	stallHitMan->pos = glm::vec3(-10.5, -7, 0);
@@ -496,6 +493,11 @@ void SceneMain::Init()
 	objs[4] = new GameObject(GameObject::GO_CUBE);
 	objs[4]->pos = glm::vec3(-4.5, -8.5, -5);
 	objs[4]->scale = glm::vec3(3, 10, 4);
+
+	// game object for Pinball sign
+	objs[5] = new GameObject(GameObject::GO_CUBE);
+	objs[5]->pos = glm::vec3(-4.5, -8.5, -17);
+	objs[5]->scale = glm::vec3(3, 10, 4);
 
 	inventory = new Inventory();
 
@@ -676,6 +678,7 @@ void SceneMain::Update(double dt)
 		}
 	}
 
+	// checking collision for FerrisWheel
 	if (objs[0]->CheckCSCollision(m_player))
 	{
 		nearFerrisWheel = true;
@@ -700,7 +703,7 @@ void SceneMain::Update(double dt)
 			mainFPSCam.position.z = 34.599;
 		}
 	}
-	else if (objs[1]->CheckCSCollision(m_player))
+	else if (objs[1]->CheckCSCollision(m_player)) // checking collision for Marketplace
 	{
 		nearMarket = true;
 		if (mainFPSCam.position.x > 11 && mainFPSCam.position.x <= 12.5
@@ -724,7 +727,7 @@ void SceneMain::Update(double dt)
 			mainFPSCam.position.z = 44.99;
 		}
 	}
-	else if (objs[2]->CheckCSCollision(m_player))
+	else if (objs[2]->CheckCSCollision(m_player)) // checking collision for CottonCandy Store
 	{
 		nearCottonStore = true;
 		if (mainFPSCam.position.x > 7.5 && mainFPSCam.position.x <= 8.25
@@ -748,7 +751,7 @@ void SceneMain::Update(double dt)
 			mainFPSCam.position.z = 9.099;
 		}
 	}
-	else if (objs[3]->CheckCSCollision(m_player))
+	else if (objs[3]->CheckCSCollision(m_player)) // checking collision for Grocery Stall
 	{
 		nearGrocery = true;
 		if (mainFPSCam.position.x > 29 && mainFPSCam.position.x <= 30
@@ -772,7 +775,7 @@ void SceneMain::Update(double dt)
 			mainFPSCam.position.z = 42.501;
 		}
 	}
-	else if (objs[4]->CheckCSCollision(m_player))
+	else if (objs[4]->CheckCSCollision(m_player)) // checking collision for Hitman Help Sign
 	{
 		nearHitMenSign = true;
 		if (mainFPSCam.position.x <= -4 && mainFPSCam.position.x > -4.5
@@ -786,6 +789,20 @@ void SceneMain::Update(double dt)
 			mainFPSCam.position.x = -6.01;
 		}
 	}
+	else if (objs[5]->CheckCSCollision(m_player)) // checking collision for Pinball Help Sign
+	{
+		nearPinballSign = true;
+		if (mainFPSCam.position.x <= -4 && mainFPSCam.position.x > -4.5
+			&& mainFPSCam.position.z > -19 && mainFPSCam.position.z < -11)
+		{
+			mainFPSCam.position.x = -3.999;
+		}
+		else if (mainFPSCam.position.x >= -6 && mainFPSCam.position.x < -5
+			&& mainFPSCam.position.z > -19 && mainFPSCam.position.z < -11)
+		{
+			mainFPSCam.position.x = -6.01;
+		}
+	}
 	else
 	{
 		nearFerrisWheel = false;
@@ -793,6 +810,7 @@ void SceneMain::Update(double dt)
 		nearCottonStore = false;
 		nearGrocery = false;
 		nearHitMenSign = false;
+		nearPinballSign = false;
 	}
 
 	if (mainFPSCam.position.x >= 49)
@@ -832,24 +850,13 @@ void SceneMain::Update(double dt)
 		SceneManager::GetInstance()->LoadScene(SceneManager::SCENE_NUM::SCENE_PINBALL);
 	}
 
-	if (Application::getGameStart())
-	{
-		mainFPSCam.Update(dt);
-		m_player->fixedUpdate(static_cast<float>(dt));
-	}
-
-	if (Application::getGameStart() == false && KeyboardController::GetInstance()->IsKeyPressed('F'))
-	{
-		Application::setGameStart(true);
-	}
-
 	if (Application::getCutScene())
 	{
 		mainFPSCam.Update(dt);
 		m_player->fixedUpdate(static_cast<float>(dt));
 	}
 
-	if (Application::getCutScene() == false && KeyboardController::GetInstance()->IsKeyPressed('C'))
+	if (Application::getGameStart() && Application::getCutScene() == false && KeyboardController::GetInstance()->IsKeyPressed('C'))
 	{
 		Application::setCutScene(true);
 	}
@@ -1560,6 +1567,20 @@ void SceneMain::Render()
 		RenderMesh(meshList[GEO_WOODEN_SIGN], enableLight);
 	}
 	modelStack.PopMatrix();
+
+	//pinball
+	modelStack.PushMatrix();
+	{
+		modelStack.Translate(-6, -12, -17);
+		modelStack.Rotate(90, 0, 1, 0);
+		modelStack.Scale(2, 3, 2);
+		meshList[GEO_WOODEN_SIGN]->material.kAmbient.Set(0.5f, 0.5f, 0.5f);
+		meshList[GEO_WOODEN_SIGN]->material.kDiffuse.Set(0.5f, 0.5f, 0.5f);
+		meshList[GEO_WOODEN_SIGN]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
+		meshList[GEO_WOODEN_SIGN]->material.kShininess = 1.f;
+		RenderMesh(meshList[GEO_WOODEN_SIGN], enableLight);
+	}
+	modelStack.PopMatrix();
 	//modelStack.PushMatrix();
 	//{
 	//	modelStack.Translate(objs[4]->pos.x, objs[4]->pos.y, objs[4]->pos.z);
@@ -1610,14 +1631,20 @@ void SceneMain::Render()
 	}
 	modelStack.PopMatrix();
 
+	modelStack.PushMatrix();
+	{
+		modelStack.Translate(-5.73, -5.8, -17);
+		modelStack.Rotate(90, 0, 1, 0);
+		modelStack.Scale(2.5, 2.5, 2.5);
+		RenderMesh(meshList[GEO_PB_RULES], enableLight);
+	}
+	modelStack.PopMatrix();
+
 
 	//render text
 	{
 
-		if (Application::getGameStart() == false)
-		{
-			RenderMeshOnScreen(meshList[GEO_MENU], 400, 300, 160, 120);
-		}
+		
 
 		if (nearToppled == true)
 		{
@@ -1663,6 +1690,11 @@ void SceneMain::Render()
 		{
 			RenderMeshOnScreen(meshList[GEO_TEXT_BG], 400, 100, 200, 15);
 			RenderTextOnScreen(meshList[GEO_TEXT], "Read 'HitMen' rules - [F]", Color(0, 0, 0), 25, 0, 100);
+		}
+		else if (nearPinballSign == true)
+		{
+			RenderMeshOnScreen(meshList[GEO_TEXT_BG], 400, 100, 200, 15);
+			RenderTextOnScreen(meshList[GEO_TEXT], "Read 'Pinball' rules - [F]", Color(0, 0, 0), 25, 0, 100);
 		}
 
 	}
@@ -1792,9 +1824,16 @@ void SceneMain::Render()
 	RenderTextOnScreen(meshList[GEO_TEXT], " Coins: ", Color(1, 1, 1), 25, 0, 550);
 	RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(coins), Color(1, 1, 1), 25, 200, 550);
 
-	if (sign == true)
+	if (HMsign == true)
 	{
 		RenderMeshOnScreen(meshList[GEO_HM_RULES], 400, 300, 600, 600);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Press [X] to exit.", Color(0, 0, 0), 25, 20, 50);
+	}
+
+	if (PBsign == true)
+	{
+		RenderMeshOnScreen(meshList[GEO_PB_RULES], 400, 300, 650, 600);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Press [X] to exit.", Color(0, 0, 0), 25, 20, 50);
 	}
 
 	if (endScreen == true)
@@ -1803,17 +1842,15 @@ void SceneMain::Render()
 		RenderTextOnScreen(meshList[GEO_TEXT], "You have turn back to a human!", Color(1, 1, 1), 25, 0, 300);
 	}
 	
-	if (Application::getCutScene() == false)
+	if (Application::getCutScene() == false && Application::getGameStart())
 	{
 		RenderCutscene();
 	}
-
+	
 	if (Application::getGameStart() == false)
 	{
 		RenderMeshOnScreen(meshList[GEO_MENU], 400, 300, 160, 120);
 	}
-
-	
 }
 
 
@@ -2597,11 +2634,20 @@ void SceneMain::HandleKeyPress()
 		
 		if (nearHitMenSign == true)
 		{
-			sign = true;
+			HMsign = true;
 		}
 		else
 		{
-			sign = false;
+			HMsign = false;
+		}
+
+		if (nearPinballSign == true)
+		{
+			PBsign = true;
+		}
+		else
+		{
+			PBsign = false;
 		}
 	}
 
@@ -2698,5 +2744,14 @@ void SceneMain::HandleKeyPress()
 		{
 			shopUI = false;
 		}
+		if (HMsign == true)
+		{
+			HMsign = false;
+		}
+		if (PBsign == true)
+		{
+			PBsign = false;
+		}
+
 	}
 }

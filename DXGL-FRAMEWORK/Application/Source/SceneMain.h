@@ -15,7 +15,7 @@
 #include "SceneCanTopple.h"
 #include "ScenePinball.h"
 #define MAX_FENCE 33
-#define MAX_OBJ 5
+#define MAX_OBJ 6
 class SceneMain : public Scene
 {
 public:
@@ -68,6 +68,7 @@ public:
 		GEO_BLACK_BG,
 		GEO_MENU,
 		GEO_HM_RULES,
+		GEO_PB_RULES,
 
 		GEO_SPHERE_BLACK,
 		GEO_ZAKU_HEAD,
@@ -217,15 +218,14 @@ private:
 	bool nearCottonStore;
 	bool nearGrocery;
 	bool nearHitMenSign;
+	bool nearPinballSign;
 	bool shopUI;
 	int shopItems;
 	bool ivt;
 	
 	int costOfZaku, costOfBall, costOfRubik, costOfPotion;
 	int coins;
-	bool notEnoughCoins;
-	bool endScreen;
-	bool sign;
+	bool notEnoughCoins, endScreen, HMsign, PBsign;
 
 };
 

@@ -367,7 +367,7 @@ void ScenePinball::Init()
 			// 17 = right flipper wall part 1
 			PinballMachine[17]->pos = glm::vec3(1.3f, 2.3f, 2.2f);
 			PinballMachine[17]->scale = glm::vec3(0.2f, 0.4f, 1.5f);
-			PinballMachine[17]->normal = glm::vec3(1, 0, 0);
+			PinballMachine[17]->normal = glm::vec3(-1, 0, 0);
 			// 18 = right flipper wall part 2
 			PinballMachine[18]->pos = glm::vec3(1.8f, 2.3f, 1.6f);
 			PinballMachine[18]->scale = glm::vec3(1.f, 0.4f, 0.4f);
@@ -401,8 +401,8 @@ void ScenePinball::Init()
 		glUniform1i(m_parameters[U_NUMLIGHTS], NUM_LIGHTS);
 		// light params
 		{
-			// light that follows primary zakuCam
-			light[0].position = glm::vec3(0, 25, -10);
+			// light that follows Secondary Cam
+			light[0].position = glm::vec3(-1, 25, -10);
 			light[0].color.Set(1, 1, 1);
 			light[0].type = Light::LIGHT_SPOT;
 			light[0].power = 5.f;
@@ -412,12 +412,12 @@ void ScenePinball::Init()
 			light[0].cosCutoff = 5.f;
 			light[0].cosInner = 1.f;
 			light[0].exponent = 3.f;
+			
 
-
-
-			// main Hangar light 
-			light[1].position = glm::vec3(0, 20, 0);
-			light[1].type = Light::LIGHT_SPOT;
+			
+			// main light 
+			light[1].position = glm::vec3(43, 40, 45);
+			light[1].type = Light::LIGHT_DIRECTIONAL;
 			light[1].color.Set(1, 1, 1);
 			//light[1].color.Set(247 / 255.f, 181 / 255.f, 0);
 			light[1].spotDirection = glm::normalize(light[1].position - glm::vec3(0, 0, 0));
@@ -433,8 +433,8 @@ void ScenePinball::Init()
 			light[2].color.Set(1, 1, 1);
 			//light[2].color.Set(251 / 255.f, 139 / 255.f, 35/255.f);
 			light[2].power = 0.f;
-			light[2].type = Light::LIGHT_DIRECTIONAL;
-			light[2].spotDirection = glm::vec3(0.f, -1.f, 0.f);
+			light[2].type = Light::LIGHT_SPOT;
+			light[2].spotDirection = glm::vec3(3.f, -1.f, 6.f);
 			light[2].cosCutoff = 65.f;
 			light[2].cosInner = 10.f;
 			light[2].exponent = 3.f;
@@ -454,8 +454,6 @@ void ScenePinball::Init()
 		cameraNum = 0;
 		power = 0;
 		BallLeft = 5;
-
-		//test
 		coins = 0;
 }
 
@@ -466,7 +464,7 @@ void ScenePinball::Update(double dt)
 
 	//std::cout << "Pos: " << m_player->pos.x << ", " << m_player->pos.y << ", " << m_player->pos.z << std::endl;
 
-	// spotlight for zaku cleaner view
+	// spotlight for cleaner view
 	light[0].position = glm::vec3(cameraArray[1].position.x, cameraArray[1].position.y, cameraArray[1].position.z);
 	light[0].spotDirection = glm::normalize(cameraArray[1].position - cameraArray[1].target);
 	
@@ -475,6 +473,7 @@ void ScenePinball::Update(double dt)
 	if (m_player->active)
 	{
 		//speed limit
+		{
 		m_player->pos.y = 2.42f;
 		if (m_player->vel.x > 25)
 		{
@@ -492,16 +491,29 @@ void ScenePinball::Update(double dt)
 		{
 			m_player->vel.z = -25;
 		}
+		}
+
+		//Boundary Check
+		if (m_player->pos.x < -15 || m_player->pos.x > 15)
+		{
+			m_player->active = false;
+			ballLaunch = false;
+			std::cout << "Out of Bound" << std::endl;
+		}
+		else if (m_player->pos.z < -15 || m_player->pos.z > 15)
+		{
+			m_player->active = false;
+			ballLaunch = false;
+			std::cout << "Out of Bound" << std::endl;
+		}
+			
 
 		CollisionCheck();
 		m_player->fixedUpdate(dt);
 		ScoreAndCoin();
 	}
 	if (BallLeft == 0 && !m_player->active) {
-		if (KeyboardController::GetInstance()->IsKeyPressed('Z')) {
-			Player::GetInstance()->coins += coins;
-			SceneManager::GetInstance()->LoadScene(SceneManager::SCENE_NUM::SCENE_MAIN);
-		}
+		
 	}
 
 	//std::cout << "X: " << light[0].position.x << " Y: " << light[0].position.y << " Z: " << light[0].position.z << std::endl;
@@ -567,7 +579,7 @@ void ScenePinball::Render()
 	modelStack.PopMatrix();
 
 	//GUI
-	if (BallLeft > 0 && m_player->active || BallLeft > 0 && !m_player->active)
+	if (BallLeft >= 0 && m_player->active || BallLeft > 0 && !m_player->active)
 	{
 		RenderMeshOnScreen(meshList[GEO_UI], 100, 50, 20, 10);
 		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(power), Color(50 / 255.f, 205 / 255.f, 50 / 255.f), 50, 600, 0);
@@ -579,8 +591,8 @@ void ScenePinball::Render()
 		RenderTextOnScreen(meshList[GEO_TEXT], "GAME OVER", Color(50 / 255.f, 205 / 255.f, 50 / 255.f), 50, 220, 350);
 		RenderMeshOnScreen(meshList[GEO_UI], 300, 190, 20, 10);
 		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(coins), Color(50 / 255.f, 205 / 255.f, 50 / 255.f), 100, 300, 140);
-		//RenderTextOnScreen(meshList[GEO_TEXT], "Score: ", Color(50 / 255.f, 205 / 255.f, 50 / 255.f), 50, 200, 160);
 		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(score), Color(50 / 255.f, 205 / 255.f, 50 / 255.f), 50, 300, 270);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Press Z to Return", Color(50 / 255.f, 205 / 255.f, 50 / 255.f), 30, 190, 80);
 	}
 }
 
@@ -1250,7 +1262,6 @@ void ScenePinball::HandleKeyPress()
 			bRKeyStateSpace = false;
 			ballLaunch = true;
 			m_player->vel = glm::vec3(0.f, 0.f, power);
-			m_player->force = glm::vec3(0, 0, -5.f);
 			std::cout << m_player->vel.x << std::endl;
 			BallLeft--;
 			//PinballMachine[9]->pos = glm::vec3(-0.6f, 2.15f, 7.35f);
@@ -1296,7 +1307,15 @@ void ScenePinball::HandleKeyPress()
 			bRKeyState = false;
 		}*/
 	}
+	else if (BallLeft == 0 && !m_player->active)
+	{
+		if (KeyboardController::GetInstance()->IsKeyPressed('Z')) {
+			Player::GetInstance()->coins += coins;
+			SceneManager::GetInstance()->LoadScene(SceneManager::SCENE_NUM::SCENE_MAIN);
+		}
+	}
 
+	// Reset
 	if (!bRKeyStateR && Application::IsKeyPressed(GLFW_KEY_R))
 	{
 		bRKeyStateR = true;
