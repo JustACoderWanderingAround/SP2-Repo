@@ -149,7 +149,7 @@ void SceneCanTopple::Init()
 
 	}
 		// Initialise camera properties
-		camera.Init(glm::vec3(0, 10, 11), glm::vec3(0, 0, 0), glm::vec3(0.f, 1, 0.f));
+		camera.Init(glm::vec3(0, 10, 11), glm::vec3(0, 0, 0), glm::vec3(0.f, 1, 0.f), false, false);
 
 		// Init VBO here
 		for (int i = 0; i < NUM_GEOMETRY; ++i)
