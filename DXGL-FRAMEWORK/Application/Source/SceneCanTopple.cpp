@@ -429,7 +429,7 @@ void SceneCanTopple::Update(double dt)
 	else {
 
 		if (KeyboardController::GetInstance()->IsKeyPressed('Z')) {
-      		Player::GetInstance()->coins += score;
+      		Player::GetInstance()->coins += static_cast<int>(0.5f * score);
 			    SceneManager::GetInstance()->LoadScene(SceneManager::SCENE_NUM::SCENE_MAIN);
     }
 	}

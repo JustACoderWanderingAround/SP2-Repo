@@ -29,8 +29,6 @@ public:
 
 	static int GetWindowWidth();
 	static int GetWindowHeight();
-	static bool getGameStart();
-	static void setGameStart(bool Value);
 
 private:
 	SCENE_NUM sceneNum;

@@ -86,8 +86,6 @@ void Application::GetCursorPos(double* xpos, double* ypos)
 	glfwGetCursorPos(m_window, xpos, ypos);
 }
 
-bool gameStart;
-
 bool Application::getGameStart()
 {
 	return gameStart;
@@ -213,16 +211,6 @@ int Application::GetWindowWidth()
 int Application::GetWindowHeight()
 {
 	return m_height;
-}
-
-bool Application::getGameStart()
-{
-	return gameStart;
-}
-
-void Application::setGameStart(bool Value)
-{
-	gameStart = Value;
 }
 
 void Application::Exit()
