@@ -264,6 +264,9 @@ void SceneMain::Init()
 		meshList[GEO_MENU] = MeshBuilder::GenerateQuad("Menu", Color(1, 1, 1), 5);
 		meshList[GEO_MENU]->textureID = LoadTGA("Image//MainMenu.tga");
 
+		meshList[GEO_HM_RULES] = MeshBuilder::GenerateQuad("rules", Color(1, 1, 1), 1);
+		meshList[GEO_HM_RULES]->textureID = LoadTGA("Image//hmrules.tga");
+
 
 	}
 
@@ -376,8 +379,8 @@ void SceneMain::Init()
 	shopItems = 0;
 	ivt = false;
 	notEnoughCoins = false;
-	startCutscene = true;
 	endScreen = false;
+	sign = false;
 
 	mainFPSCam.Init(glm::vec3(0, -7, -40), glm::vec3(0, -12, 0), glm::vec3(0.f, 1, 0.f));
 
@@ -838,6 +841,17 @@ void SceneMain::Update(double dt)
 	if (Application::getGameStart() == false && KeyboardController::GetInstance()->IsKeyPressed('F'))
 	{
 		Application::setGameStart(true);
+	}
+
+	if (Application::getCutScene())
+	{
+		mainFPSCam.Update(dt);
+		m_player->fixedUpdate(static_cast<float>(dt));
+	}
+
+	if (Application::getCutScene() == false && KeyboardController::GetInstance()->IsKeyPressed('C'))
+	{
+		Application::setCutScene(true);
 	}
 
 }
@@ -1587,6 +1601,15 @@ void SceneMain::Render()
 	}
 	modelStack.PopMatrix();
 
+	modelStack.PushMatrix();
+	{
+		modelStack.Translate(-5.73, -5.8, -5);
+		modelStack.Rotate(90, 0, 1, 0);
+		modelStack.Scale(2.5, 2.5, 2.5);
+		RenderMesh(meshList[GEO_HM_RULES], enableLight);
+	}
+	modelStack.PopMatrix();
+
 
 	//render text
 	{
@@ -1643,6 +1666,9 @@ void SceneMain::Render()
 		}
 
 	}
+
+	// render rules
+	
 
 	// render shop UI
 	if (nearShop == true && shopUI == true)
@@ -1762,13 +1788,13 @@ void SceneMain::Render()
 		RenderTextOnScreen(meshList[GEO_TEXT], "Press [I] to exit.", Color(1, 1, 1), 25, 10, 100);
 	}
 
-	RenderMeshOnScreen(meshList[GEO_BLACK_BG], 150, 560 , 300, 50);
+	RenderMeshOnScreen(meshList[GEO_BLACK_BG], 150, 560, 300, 50);
 	RenderTextOnScreen(meshList[GEO_TEXT], " Coins: ", Color(1, 1, 1), 25, 0, 550);
 	RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(coins), Color(1, 1, 1), 25, 200, 550);
 
-	if (startCutscene == true)
+	if (sign == true)
 	{
-		RenderCutscene();
+		RenderMeshOnScreen(meshList[GEO_HM_RULES], 400, 300, 600, 600);
 	}
 
 	if (endScreen == true)
@@ -1777,11 +1803,17 @@ void SceneMain::Render()
 		RenderTextOnScreen(meshList[GEO_TEXT], "You have turn back to a human!", Color(1, 1, 1), 25, 0, 300);
 	}
 	
+	if (Application::getCutScene() == false)
+	{
+		RenderCutscene();
+	}
 
 	if (Application::getGameStart() == false)
 	{
 		RenderMeshOnScreen(meshList[GEO_MENU], 400, 300, 160, 120);
 	}
+
+	
 }
 
 
@@ -2563,13 +2595,13 @@ void SceneMain::HandleKeyPress()
 			inventory->addItem("Apple");
 		}
 		
-	}
-
-	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_C))
-	{
-		if (startCutscene == true)
+		if (nearHitMenSign == true)
 		{
-			startCutscene = false;
+			sign = true;
+		}
+		else
+		{
+			sign = false;
 		}
 	}
 
@@ -2578,25 +2610,25 @@ void SceneMain::HandleKeyPress()
 	{
 		if (nearShop == true && shopUI == true )
 		{
-			if (Player::GetInstance()->getCoins() > costOfZaku && shopItems == 0)
+			if (Player::GetInstance()->getCoins() >= costOfZaku && shopItems == 0)
 			{
 				//notEnoughCoins = false;
 				inventory->addItem("Zaku Toy");
 				Player::GetInstance()->coins -= costOfZaku;
 			}
-			else if (Player::GetInstance()->getCoins() > costOfBall && shopItems == 1)
+			else if (Player::GetInstance()->getCoins() >= costOfBall && shopItems == 1)
 			{
 				notEnoughCoins = false;
 				inventory->addItem("Ball");
 				Player::GetInstance()->coins -= costOfBall;
 			}
-			else if (Player::GetInstance()->getCoins() > costOfRubik && shopItems == 2)
+			else if (Player::GetInstance()->getCoins() >= costOfRubik && shopItems == 2)
 			{
 				//notEnoughCoins = false;
 				inventory->addItem("Rubik's Cube");
 				Player::GetInstance()->coins -= costOfRubik;
 			}
-			else if (Player::GetInstance()->getCoins() > costOfPotion && shopItems == 3)
+			else if (Player::GetInstance()->getCoins() >= costOfPotion && shopItems == 3)
 			{
 				//notEnoughCoins = false;
 				inventory->addItem("Potion of Change");

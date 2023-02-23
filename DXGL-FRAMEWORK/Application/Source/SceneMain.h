@@ -67,6 +67,7 @@ public:
 		GEO_COTTON_CANDY,
 		GEO_BLACK_BG,
 		GEO_MENU,
+		GEO_HM_RULES,
 
 		GEO_SPHERE_BLACK,
 		GEO_ZAKU_HEAD,
@@ -223,8 +224,8 @@ private:
 	int costOfZaku, costOfBall, costOfRubik, costOfPotion;
 	int coins;
 	bool notEnoughCoins;
-	bool startCutscene;
 	bool endScreen;
+	bool sign;
 
 };
 
