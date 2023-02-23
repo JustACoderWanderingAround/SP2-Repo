@@ -1,25 +1,53 @@
 #include "player.h"
 
-void player::GetInstance()
+Player* Player::instance = nullptr;
+
+Player::Player(void)
+{
+	coins = 0;
+	playerPos = glm::vec3(0, -7, -40);
+}
+
+Player::~Player(void)
+{
+
+}
+
+Player* Player::GetInstance(void)
 {
 	if (instance == nullptr)
 	{
-		instance = new player;
+		instance = new Player();
+	}
+	return instance;
+}
+
+void Player::DestroyInstance(void)
+{
+	if (instance)
+	{
+		delete instance;
+		instance = nullptr;
 	}
 }
 
-int player::getCoins()
+int Player::getCoins()
 {
 	return coins;
 }
 
-void player::setCoins(int newCoins)
+void Player::setCoins(int newCoins)
 {
 	coins = newCoins;
 }
 
-player::player()
+glm::vec3 Player::getPos()
 {
-	coins = 0;
-	instance = nullptr;
+	return glm::vec3(playerPos);
 }
+
+void Player::setPos(glm::vec3 currentPos)
+{
+	playerPos = currentPos;
+}
+

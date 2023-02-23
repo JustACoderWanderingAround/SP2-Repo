@@ -135,6 +135,8 @@ public:
 	void RenderSkybox();
 	virtual void Exit();
 
+	int score;
+
 private:
 	void HandleKeyPress();
 	void RenderCanStack();
@@ -177,7 +179,6 @@ private:
 	int cameraNum;
 	int currInteractable;
 	int roomY;
-	int score;
 	bool showUI;
 	bool doorOpen;
 	bool lowered;

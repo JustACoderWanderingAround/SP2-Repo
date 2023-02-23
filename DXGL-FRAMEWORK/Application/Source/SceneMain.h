@@ -9,6 +9,11 @@
 #include "CameraFPS.h"
 #include <vector>
 #include "GameObject.h"
+#include "Inventory.h"
+#include "Player.h"
+#include "SceneHitMen.h"
+#include "SceneCanTopple.h"
+#include "ScenePinball.h"
 #define MAX_FENCE 33
 #define MAX_OBJ 5
 class SceneMain : public Scene
@@ -18,6 +23,7 @@ public:
 	{
 		GEO_AXES,
 		GEO_SPHERE,
+		GEO_QUAD,
 		GEO_LEFT,
 		GEO_RIGHT,
 		GEO_FRONT,
@@ -49,7 +55,34 @@ public:
 		GEO_FERRIS_WHEEL,
 		GEO_WALL,
 		GEO_CAROUSEL,
+		GEO_WOODEN_SIGN,
+		GEO_LAMP_POST,
+		GEO_RUBIKS_CUBE,
+		GEO_POTION,
+		GEO_ZAKU,
+		GEO_INVENTORY,
+		GEO_BALL,
+		GEO_RUBIK_PNG,
+		GEO_POTION_PNG,
+		GEO_COTTON_CANDY,
+		GEO_BLACK_BG,
 		GEO_MENU,
+
+		GEO_SPHERE_BLACK,
+		GEO_ZAKU_HEAD,
+		GEO_ZAKU_CUBE,
+		GEO_ZAKU_CUBE_ALT,
+		GEO_ZAKU_SPHERE,
+		GEO_GREY_CUBE,
+		GEO_ZAKU_CYLINDER,
+		GEO_ZAKU_CYLINDER_ALT,
+		GEO_GREY_CYLINDER,
+		GEO_WOOD_CUBE,
+		GEO_AXE_CUBE,
+		GEO_FIRE_CUBE,
+
+		GEO_MENU,
+
 
 		GEO_TEXT_BG,
 		GEO_TEXT,
@@ -155,6 +188,8 @@ private:
 	void RenderText(Mesh* mesh, std::string text, Color color);
 	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y);
 	void RenderLight(int lightIndex);
+	void RenderZaku();
+	void RenderCutscene();
 	unsigned m_vertexArrayID;
 	Mesh* meshList[NUM_GEOMETRY];
 
@@ -167,22 +202,31 @@ private:
 	GameObject* stallShop;
 	GameObject* fences[MAX_FENCE];
 	GameObject* objs[MAX_OBJ];
+	Inventory* inventory;
 
 	CameraFPS mainFPSCam;
-	std::vector<CameraFPS> cameraArray;
 	int projType = 1; // fix to 0 for orthographic, 1 for projection
 	MatrixStack modelStack, viewStack, projectionStack;
 	static const int NUM_LIGHTS = 1;
 	Light light[NUM_LIGHTS];
 	bool enableLight;
-	
+
 	glm::vec3 oldPlayerPos;
 
 	bool nearFerrisWheel;
 	bool nearMarket;
 	bool nearCottonStore;
 	bool nearGrocery;
-
+	bool nearHitMenSign;
+	bool shopUI;
+	int shopItems;
+	bool ivt;
+	
+	int costOfZaku, costOfBall, costOfRubik, costOfPotion;
+	int coins;
+	bool notEnoughCoins;
+	bool startCutscene;
+	bool endScreen;
 
 };
 

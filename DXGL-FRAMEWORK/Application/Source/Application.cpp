@@ -20,6 +20,7 @@
 #include "SceneMain.h"
 #include "SceneHitMen.h"
 #include "SceneManager.h"
+#include "Player.h"
 
 GLFWwindow* m_window;
 const unsigned char FPS = 60; // FPS of this game
@@ -83,6 +84,18 @@ bool Application::IsMousePressed(unsigned short key) //0 - Left, 1 - Right, 2 - 
 void Application::GetCursorPos(double* xpos, double* ypos)
 {
 	glfwGetCursorPos(m_window, xpos, ypos);
+}
+
+bool gameStart;
+
+bool Application::getGameStart()
+{
+	return gameStart;
+}
+
+void Application::setGameStart(bool Value)
+{
+	gameStart = Value;
 }
 
 void Application::Init()
@@ -178,6 +191,7 @@ void Application::Run()
 		KeyboardController::GetInstance()->PostUpdate();
 
 		MouseController::GetInstance()->PostUpdate();
+		Player::GetInstance();
 
 
 		double mouse_x, mouse_y;

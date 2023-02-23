@@ -17,6 +17,7 @@
 #include "KeyboardController.h"
 #include "LoadTGA.h"
 #include "SceneManager.h"
+#include "Player.h"
 
 ScenePinball::ScenePinball()
 {
@@ -498,6 +499,7 @@ void ScenePinball::Update(double dt)
 	}
 	if (BallLeft == 0 && !m_player->active) {
 		if (KeyboardController::GetInstance()->IsKeyPressed('Z')) {
+			Player::GetInstance()->coins += coins;
 			SceneManager::GetInstance()->LoadScene(SceneManager::SCENE_NUM::SCENE_MAIN);
 		}
 	}

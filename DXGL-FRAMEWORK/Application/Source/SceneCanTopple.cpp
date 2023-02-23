@@ -17,6 +17,7 @@
 #include "KeyboardController.h"
 #include "LoadTGA.h"
 #include "SceneManager.h"
+#include "Player.h"
 SceneCanTopple::SceneCanTopple()
 {
 	srand(rand());
@@ -426,8 +427,11 @@ void SceneCanTopple::Update(double dt)
 			}
 		}
 	else {
-		if (KeyboardController::GetInstance()->IsKeyPressed('Z'))
-			SceneManager::GetInstance()->LoadScene(SceneManager::SCENE_NUM::SCENE_MAIN);
+
+		if (KeyboardController::GetInstance()->IsKeyPressed('Z')) {
+      		Player::GetInstance()->coins += score;
+			    SceneManager::GetInstance()->LoadScene(SceneManager::SCENE_NUM::SCENE_MAIN);
+    }
 	}
 
 		std::cout << camera.target.x << "," << camera.target.y << "," << camera.target.z << std::endl;

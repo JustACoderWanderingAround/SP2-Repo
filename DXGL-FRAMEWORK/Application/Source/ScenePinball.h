@@ -141,6 +141,7 @@ public:
 	virtual void Render();
 	void RenderSkybox();
 	virtual void Exit();
+	int coins;
 
 private:
 	void HandleKeyPress();
@@ -175,7 +176,7 @@ private:
 	int cameraNum;
 	bool bRKeyStateZ, bRKeyStateX, bRKeyStateSpace, bRKeyStateR, bRKeyState,  ballLaunch;
 	float rotation1, rotation2, power;
-	int BallLeft,coins, score;
+	int BallLeft, score;
 	float yaw;
 	glm::vec3 gravity;
 };
