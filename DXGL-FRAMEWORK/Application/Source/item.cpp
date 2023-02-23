@@ -1,10 +1,9 @@
 #include "Item.h"
 
-Item::Item(std::string NAME, std::string DESCRIPTION)
+Item::Item(std::string NAME)
 {
 	name = NAME;
 	amtOfItems = 1;
-	description = DESCRIPTION;
 	nextItem = nullptr;
 	prevItem = nullptr;
 
@@ -26,10 +25,6 @@ int Item::getAmt()
 	return amtOfItems;
 }
 
-std::string Item::getDescription()
-{
-	return std::string(description);
-}
 
 Item* Item::getNextItem()
 {

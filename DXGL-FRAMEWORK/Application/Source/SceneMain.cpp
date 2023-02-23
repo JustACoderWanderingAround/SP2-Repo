@@ -159,7 +159,7 @@ void SceneMain::Init()
 		meshList[GEO_TEXT]->textureID = LoadTGA("Image//ComicSans.tga");
 		meshList[GEO_TEXT_BG] = MeshBuilder::GenerateQuad("left", Color(1, 1, 1), 5);
 		meshList[GEO_TEXT_BG]->textureID = LoadTGA("Image//scroll.tga");
-		meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("shop UI", Color(85 / 255, 85 / 255, 85 / 255), 1);
+		meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("shop UI", Color( 0.5, 0.5, 0.5), 1);
 		meshList[GEO_INVENTORY] = MeshBuilder::GenerateQuad("left", Color(1, 1, 1), 1);
 		meshList[GEO_INVENTORY]->textureID = LoadTGA("Image//inventory.tga");
 		meshList[GEO_BLACK_BG] = MeshBuilder::GenerateQuad("shop UI", Color(0, 0, 0), 1);
@@ -260,6 +260,9 @@ void SceneMain::Init()
 
 		meshList[GEO_COTTON_CANDY] = MeshBuilder::GenerateQuad("cotton candy pic", Color(1, 1, 1), 1);
 		meshList[GEO_COTTON_CANDY]->textureID = LoadTGA("Image//cottoncandy.tga");
+
+		meshList[GEO_MENU] = MeshBuilder::GenerateQuad("Menu", Color(1, 1, 1), 5);
+		meshList[GEO_MENU]->textureID = LoadTGA("Image//MainMenu.tga");
 
 
 	}
@@ -373,6 +376,8 @@ void SceneMain::Init()
 	shopItems = 0;
 	ivt = false;
 	notEnoughCoins = false;
+	startCutscene = true;
+	endScreen = false;
 
 	mainFPSCam.Init(glm::vec3(0, -7, -40), glm::vec3(0, -12, 0), glm::vec3(0.f, 1, 0.f));
 
@@ -496,7 +501,6 @@ void SceneMain::Init()
 	costOfRubik = 15;
 	costOfPotion = 30;
 
-	Player::GetInstance()->coins = 100;
 }
 
 
@@ -816,6 +820,17 @@ void SceneMain::Update(double dt)
 	}
 	if (nearPinball && KeyboardController::GetInstance()->IsKeyPressed('F')) {
 		SceneManager::GetInstance()->LoadScene(SceneManager::SCENE_NUM::SCENE_PINBALL);
+	}
+
+	if (Application::getGameStart())
+	{
+		mainFPSCam.Update(dt);
+		m_player->fixedUpdate(static_cast<float>(dt));
+	}
+
+	if (Application::getGameStart() == false && KeyboardController::GetInstance()->IsKeyPressed('F'))
+	{
+		Application::setGameStart(true);
 	}
 
 }
@@ -1635,11 +1650,15 @@ void SceneMain::Render()
 			RenderMeshOnScreen(meshList[GEO_ZAKU], 400, 300, 150, 200);
 			RenderTextOnScreen(meshList[GEO_TEXT], "Purchase 'Zaku Toy'? - [B] ", Color(0, 0, 0), 25, 100, 150);
 			RenderTextOnScreen(meshList[GEO_TEXT], "Press Right to see next item", Color(0, 0, 0), 25, 50, 500);
+			RenderTextOnScreen(meshList[GEO_TEXT], "Cost: ", Color(0, 0, 0), 25, 125, 100);
+			RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(costOfZaku), Color(0, 0, 0), 25, 300, 100);
 		}
 		else if (shopItems == 1)
 		{
 			RenderMeshOnScreen(meshList[GEO_BALL], 400, 300, 150, 150);
 			RenderTextOnScreen(meshList[GEO_TEXT], "Purchase 'Ball'? - [B]", Color(0, 0, 0), 25, 125, 150);
+			RenderTextOnScreen(meshList[GEO_TEXT], "Cost: ", Color(0, 0, 0), 25, 125, 100);
+			RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(costOfBall), Color(0, 0, 0), 25, 300, 100);
 			RenderTextOnScreen(meshList[GEO_TEXT], "Press Left to see previous item", Color(0, 0, 0), 25, 20, 500);
 			RenderTextOnScreen(meshList[GEO_TEXT], "Press Right to see next item", Color(0, 0, 0), 25, 50, 450);
 		}
@@ -1649,6 +1668,8 @@ void SceneMain::Render()
 			RenderTextOnScreen(meshList[GEO_TEXT], "Purchase 'Rubik's Cube'? - [B]", Color(0, 0, 0), 25, 50, 150);
 			RenderTextOnScreen(meshList[GEO_TEXT], "Press Left to see previous item", Color(0, 0, 0), 25, 20, 500);
 			RenderTextOnScreen(meshList[GEO_TEXT], "Press Right to see next item", Color(0, 0, 0), 25, 50, 450);
+			RenderTextOnScreen(meshList[GEO_TEXT], "Cost: ", Color(0, 0, 0), 25, 125, 100);
+			RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(costOfRubik), Color(0, 0, 0), 25, 300, 100);
 		}
 		else if (shopItems == 3)
 		{
@@ -1658,6 +1679,8 @@ void SceneMain::Render()
 			RenderTextOnScreen(meshList[GEO_TEXT], "- [B] ", Color(0, 0, 0), 25, 350, 100);
 			RenderTextOnScreen(meshList[GEO_TEXT], "Press Left to see previous item", Color(0, 0, 0), 25, 20, 500);
 			RenderTextOnScreen(meshList[GEO_TEXT], "Press Right to see next item", Color(0, 0, 0), 25, 50, 450);
+			RenderTextOnScreen(meshList[GEO_TEXT], "Cost: ", Color(0, 0, 0), 25, 125, 100);
+			RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(costOfPotion), Color(0, 0, 0), 25, 300, 100);
 		}
 		else
 		{
@@ -1735,10 +1758,26 @@ void SceneMain::Render()
 		RenderTextOnScreen(meshList[GEO_TEXT], "Press [I] to exit.", Color(1, 1, 1), 25, 10, 100);
 	}
 
-	RenderMeshOnScreen(meshList[GEO_BLACK_BG], 0, 550 , 100, 100);
+	RenderMeshOnScreen(meshList[GEO_BLACK_BG], 150, 560 , 300, 50);
 	RenderTextOnScreen(meshList[GEO_TEXT], " Coins: ", Color(1, 1, 1), 25, 0, 550);
 	RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(coins), Color(1, 1, 1), 25, 200, 550);
 
+	if (startCutscene == true)
+	{
+		RenderCutscene();
+	}
+
+	if (endScreen == true)
+	{
+		RenderMeshOnScreen(meshList[GEO_BLACK_BG], 400, 300, 1000, 800);
+		RenderTextOnScreen(meshList[GEO_TEXT], "You have turn back to a human!", Color(1, 1, 1), 25, 0, 300);
+	}
+	
+
+	if (Application::getGameStart() == false)
+	{
+		RenderMeshOnScreen(meshList[GEO_MENU], 400, 300, 160, 120);
+	}
 }
 
 
@@ -2424,6 +2463,21 @@ void SceneMain::RenderZaku()
 	} modelStack.PopMatrix();
 }
 
+void SceneMain::RenderCutscene()
+{
+	RenderMeshOnScreen(meshList[GEO_BLACK_BG], 400, 300, 1000, 800);
+	RenderTextOnScreen(meshList[GEO_TEXT], "'NOOOOOOOOOOOOOOOOOOOO', ", Color(1, 1, 1), 25, 100, 500);
+	RenderTextOnScreen(meshList[GEO_TEXT], "You screamed as a evil witch", Color(1, 1, 1), 25, 60, 450);
+	RenderTextOnScreen(meshList[GEO_TEXT], "turns you into a ball. ", Color(1, 1, 1), 25, 100, 400);
+
+	RenderTextOnScreen(meshList[GEO_TEXT], "'You shall pay for what", Color(1, 1, 1), 25, 100, 300);
+	RenderTextOnScreen(meshList[GEO_TEXT], " you did!', the witch said.", Color(1, 1, 1), 25, 70, 250);
+	RenderTextOnScreen(meshList[GEO_TEXT], "'Find a way to turn youself back!'", Color(1, 1, 1), 25, 0, 200);
+
+	RenderTextOnScreen(meshList[GEO_TEXT], "Press [C] to skip.", Color(1, 1, 1), 25, 200, 100);
+
+}
+
 void SceneMain::RenderLight(int lightIndex)
 {
 	if (light[lightIndex].type == Light::LIGHT_DIRECTIONAL)
@@ -2504,7 +2558,17 @@ void SceneMain::HandleKeyPress()
 		{
 			inventory->addItem("Apple");
 		}
+		
 	}
+
+	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_C))
+	{
+		if (startCutscene == true)
+		{
+			startCutscene = false;
+		}
+	}
+
 
 	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_B))
 	{
@@ -2533,6 +2597,7 @@ void SceneMain::HandleKeyPress()
 				//notEnoughCoins = false;
 				inventory->addItem("Potion of Change");
 				Player::GetInstance()->coins -= costOfPotion;
+				endScreen = true;
 			}
 			else
 			{

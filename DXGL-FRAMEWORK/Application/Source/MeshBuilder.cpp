@@ -74,6 +74,7 @@ Mesh* MeshBuilder::GenerateQuad(const std::string &meshName, Color color, float 
 
 	int texCoord;
 	texCoord = repeated ? 1 * length : 1;
+	v.color.Set(color.r, color.g, color.b);
 
 	// Add the vertices here
 	v.pos.Set(-0.5f * length, 0.5f * length, 0.f); v.normal = glm::vec3(0, 0.f, 1.f); v.texCoord = glm::vec2(0, texCoord);	vertex_buffer_data.push_back(v); //v0

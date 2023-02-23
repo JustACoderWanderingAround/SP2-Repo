@@ -10,7 +10,6 @@ public:
 	Item* temp;
 	Item* findTail();
 	std::string items[6];
-	std::string descriptions[6];
 
 	Item*findName(std::string NAME);
 	void addItem(std::string NAME);

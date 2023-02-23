@@ -11,12 +11,7 @@ Inventory::Inventory()
 	items[4] = "Cotton Candy";
 	items[5] = "Apple";
  
-	descriptions[0] = "Robot From Moblie Suit Gundam.";
-	descriptions[1] = "A normal ball.";
-	descriptions[2] = "3D puzzle.";
-	descriptions[3] = "Potion that changes the person's appearance.";
-	descriptions[4] = "Candy that melts in the mouth.";
-	descriptions[5] = "An apple a day keeps the doctor away.";
+
 }
 
 Inventory::~Inventory()
@@ -74,9 +69,7 @@ void Inventory::addItem(std::string NAME)
 {
 	
 	bool nameFinder;
-	int desNo;
 	nameFinder = false;
-	desNo = 0;
 	// find name in LL
 	
 	if (findName(NAME) != nullptr)
@@ -91,7 +84,6 @@ void Inventory::addItem(std::string NAME)
 			if (NAME == items[i])
 			{
 				nameFinder = true;
-				desNo = i;
 				break;
 			}
 			else
@@ -103,7 +95,7 @@ void Inventory::addItem(std::string NAME)
 		if (nameFinder == true)
 		{
 			Item* temp2;
-			temp = new Item(NAME, descriptions[desNo]);
+			temp = new Item(NAME);
 			if (headptr == nullptr)
 			{
 				headptr = temp;

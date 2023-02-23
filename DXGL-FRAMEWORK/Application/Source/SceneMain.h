@@ -66,6 +66,7 @@ public:
 		GEO_POTION_PNG,
 		GEO_COTTON_CANDY,
 		GEO_BLACK_BG,
+		GEO_MENU,
 
 		GEO_SPHERE_BLACK,
 		GEO_ZAKU_HEAD,
@@ -185,6 +186,7 @@ private:
 	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y);
 	void RenderLight(int lightIndex);
 	void RenderZaku();
+	void RenderCutscene();
 	unsigned m_vertexArrayID;
 	Mesh* meshList[NUM_GEOMETRY];
 
@@ -220,6 +222,8 @@ private:
 	int costOfZaku, costOfBall, costOfRubik, costOfPotion;
 	int coins;
 	bool notEnoughCoins;
+	bool startCutscene;
+	bool endScreen;
 
 };
 

@@ -4,18 +4,16 @@
 class Item
 {
 public:
-	Item(std::string NAME, std::string DESCRIPTION);
+	Item(std::string NAME);
 	~Item();
 
 	std::string name;
 	int amtOfItems;
-	std::string description;
 	Item* nextItem;
 	Item* prevItem;
 
 	std::string getName();
 	int getAmt();
-	std::string getDescription();
 	Item* getNextItem();
 	Item* getPrevItem();
 
