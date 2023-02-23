@@ -858,7 +858,6 @@ void SceneMain::Render()
 	for (int i = 0; i < NUM_LIGHTS; i++) {
 		modelStack.PushMatrix(); {
 			modelStack.Translate(light[i].position.x, light[i].position.y, light[i].position.z);
-			RenderMesh(meshList[GEO_SPHERE], false);
 		} modelStack.PopMatrix();
 	}
 	/*modelStack.PushMatrix(); {
@@ -1182,13 +1181,7 @@ void SceneMain::Render()
 		modelStack.PopMatrix();
 	}
 
-	modelStack.PushMatrix();
-	{
-		modelStack.Translate(-33.5, -9, 25);
-		modelStack.Scale(0.5, 0.5, 0.5);
-		RenderMesh(meshList[GEO_CUBE], enableLight);
-	}
-	modelStack.PopMatrix();
+
 
 	for (int i = 0; i < 4; i++)
 	{
